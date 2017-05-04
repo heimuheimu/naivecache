@@ -45,9 +45,8 @@ public class SocketConfiguration {
 	static {
 		SocketConfiguration config = new SocketConfiguration();
 		config.setKeepAlive(true);
-		config.setTcpNoDelay(true);
-		config.setSendBufferSize(16 * 1024);
-		config.setReceiveBufferSize(16 * 1024);
+		config.setSendBufferSize(32 * 1024);
+		config.setReceiveBufferSize(32 * 1024);
 		config.setConnectionTimeout(30000);
 		DEFAULT = config;
 	}

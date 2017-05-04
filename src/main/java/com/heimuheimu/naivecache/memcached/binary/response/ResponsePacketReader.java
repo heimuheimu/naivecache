@@ -41,7 +41,7 @@ public class ResponsePacketReader {
     private final InputStream inputStream;
 
     public ResponsePacketReader(InputStream inputStream) {
-        this.inputStream = new BufferedInputStream(inputStream, 16 * 1024);
+        this.inputStream = inputStream;
     }
 
     public ResponsePacket read() throws IOException {

@@ -96,6 +96,10 @@ public class MemcachedChannel implements Closeable {
         return command.getResponsePacketList(timeout);
     }
 
+    public boolean isActive() {
+        return state == BeanStatusEnum.NORMAL;
+    }
+
     public synchronized void init() {
         if (state == BeanStatusEnum.UNINITIALIZED) {
             try {

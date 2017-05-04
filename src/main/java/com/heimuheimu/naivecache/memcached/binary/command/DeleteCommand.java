@@ -24,12 +24,11 @@
 
 package com.heimuheimu.naivecache.memcached.binary.command;
 
-import com.heimuheimu.naivecache.memcached.binary.request.GetRequest;
+import com.heimuheimu.naivecache.memcached.binary.request.DeleteRequest;
 import com.heimuheimu.naivecache.memcached.binary.response.ResponsePacket;
 import com.heimuheimu.naivecache.memcached.exception.MemcachedException;
 import com.heimuheimu.naivecache.memcached.exception.TimeoutException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -37,19 +36,19 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Memcached Get 命令，命令定义请参考文档：
- * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#get-get-quietly-get-key-get-key-quietly">
- * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#get-get-quietly-get-key-get-key-quietly
+ * Memcached Delete 命令，命令定义请参考文档：
+ * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#delete">
+ * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#delete
  * </a>
  *
  * @author heimuheimu
  * @ThreadSafe
  */
-public class GetCommand implements OptimizedCommand {
+public class DeleteCommand implements Command {
 
     private final byte[] key;
 
-    private final GetRequest getRequest;
+    private final DeleteRequest deleteRequest;
 
     private final CountDownLatch latch = new CountDownLatch(1);
 
@@ -57,18 +56,14 @@ public class GetCommand implements OptimizedCommand {
 
     private volatile ResponsePacket responsePacket;
 
-    private List<GetCommand> optimizedCommandList = new ArrayList<>();
-
-    private final Object optimizedLock = new Object();
-
-    public GetCommand(byte[] key) {
-        this.getRequest = new GetRequest(key);
+    public DeleteCommand(byte[] key) {
         this.key = key;
+        this.deleteRequest = new DeleteRequest(key);
     }
 
     @Override
     public byte[] toRequestPacket() {
-        return getRequest.toByteArray();
+        return deleteRequest.toByteArray();
     }
 
     @Override
@@ -77,20 +72,15 @@ public class GetCommand implements OptimizedCommand {
     }
 
     @Override
-    public void receiveResponsePacket(ResponsePacket responsePacket) {
-        if (responsePacket.getOpcode() == getRequest.getOpcode()) {
+    public void receiveResponsePacket(ResponsePacket responsePacket) throws MemcachedException {
+        if (responsePacket.getOpcode() == deleteRequest.getOpcode()) {
             this.responsePacket = responsePacket;
             this.hasResponsePacket = false;
             latch.countDown();
-            synchronized (optimizedLock) {
-                for (GetCommand optimizedCommand : optimizedCommandList) {
-                    optimizedCommand.receiveResponsePacket(responsePacket);
-                }
-            }
         } else {
             //should not happen
-            throw new MemcachedException("Get command failed. Unexpected Opcode: " + responsePacket.getOpcode()
-                + ". Key: " + Arrays.toString(key));
+            throw new MemcachedException("Delete command failed. Unexpected Opcode: " + responsePacket.getOpcode()
+                    + ". Key: " + Arrays.toString(key));
         }
     }
 
@@ -100,27 +90,13 @@ public class GetCommand implements OptimizedCommand {
         try {
             latchFlag = latch.await(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            latchFlag = false; //never happened
+            latchFlag = false; //should not happen
         }
         if (latchFlag) {
             return Collections.singletonList(responsePacket);
         } else {
-            throw new TimeoutException("Wait get command response timeout :" + timeout
+            throw new TimeoutException("Wait delete command response timeout :" + timeout
                     + "ms. " + "Key: " + Arrays.toString(key));
         }
-    }
-
-    @Override
-    public boolean optimize(OptimizedCommand target) {
-        if (target != null && target instanceof GetCommand) {
-            GetCommand targetGetCommand = (GetCommand) target;
-            if (Arrays.equals(key, targetGetCommand.key)) {
-                synchronized (optimizedLock) {
-                    optimizedCommandList.add(targetGetCommand);
-                }
-                return true;
-            }
-        }
-        return false;
     }
 }

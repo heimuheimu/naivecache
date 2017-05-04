@@ -57,6 +57,7 @@ public class SimpleTranscoder implements Transcoder {
      *
      * @param compressionThreshold 最小可压缩的字节数
      */
+    @SuppressWarnings("unused")
     public void setCompressionThreshold(int compressionThreshold) {
         this.compressionThreshold = compressionThreshold;
     }
@@ -80,6 +81,7 @@ public class SimpleTranscoder implements Transcoder {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object decode(byte[] src, int flagsOffset, int valueOffset, int valueLength) throws Exception {
         ByteArrayInputStream flagsBis = new ByteArrayInputStream(src, flagsOffset, 4);

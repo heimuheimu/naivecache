@@ -46,11 +46,13 @@ public interface Transcoder {
     /**
      * 将字节数组还原成 Java 对象并返回，如果当前转换器不支持该 flags 对应的转换，将会返回 {@code null}
      *
-     * @param flags 长度为4的字节数组，通常用于表示 value 字节数组的格式（解码器版本、是否压缩等信息）
-     * @param value value 字节数组
+     * @param src 需要解码的字节数组
+     * @param flagsOffset flags 在字节数组中的起始索引
+     * @param valueOffset Value 在字节数组中的起始索引
+     * @param valueLength Value 字节数组的长度
      * @return Java 对象
      * @throws Exception 解码过程中发生错误
      */
-    public Object decode(byte[] src, int flagsOffset, int valueOffset, int valueLength) throws Exception;
+    public <T> T decode(byte[] src, int flagsOffset, int valueOffset, int valueLength) throws Exception;
 
 }

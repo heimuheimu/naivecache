@@ -131,4 +131,8 @@ public class ResponsePacket {
         return "Unknown error. Status: " + header[6] + ", " + header[7];
     }
 
+    public boolean isKeyNotFound() {
+        return header[6] == 0 && header[7] == 1;
+    }
+
 }
