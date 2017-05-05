@@ -43,7 +43,15 @@ import java.util.Set;
 public interface NaiveMemcachedClient {
 
 
+    /**
+     * Memcached Key 最大字节数：250B
+     */
     final int MAX_KEY_LENGTH = 255;
+
+    /**
+     * Memcached Value 最大字节数：1MB
+     */
+    final int MAX_VALUE_LENGTH = 1024 * 1024;
 
     /**
      * 根据 Key 获取在 Memcached 中存储的值，如果找不到或者发生异常，则会返回 {@code null}

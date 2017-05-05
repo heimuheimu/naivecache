@@ -49,7 +49,9 @@ import java.util.concurrent.LinkedBlockingQueue;
  * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped">
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped
  * </a>
+ *
  * <p>当前实现是线程安全的</p>
+ *
  * @author heimuheimu
  * @ThreadSafe
  */
@@ -219,6 +221,13 @@ public class MemcachedChannel implements Closeable {
             mergedPacketSize = 0;
         }
 
+        private void releaseWaitingCommand() {
+            Command waitingCommand;
+            while ((waitingCommand = waitingQueue.poll()) != null) {
+                waitingCommand.close();
+            }
+        }
+
         @Override
         public void run() {
             try {
@@ -250,20 +259,30 @@ public class MemcachedChannel implements Closeable {
                     //如果该连接某个命令一直等待不到返回，可能会一直阻塞，外部需正确处理连续TimeoutException，比如直接关闭
                     while (waitingQueue.size() > 0) {
                         command = waitingQueue.peek();
-                        command.receiveResponsePacket(reader.read());
-                        if (!command.hasResponsePacket()) {
-                            waitingQueue.poll();
+                        ResponsePacket responsePacket = reader.read();
+                        if (responsePacket != null) {
+                            command.receiveResponsePacket(responsePacket);
+                            if (!command.hasResponsePacket()) {
+                                waitingQueue.poll();
+                            }
+                        } else {
+                            LOG.info("End of the input stream has been reached. {}", socket);
+                            close();
+                            releaseWaitingCommand();
+                            break;
                         }
                     }
                 }
             } catch (InterruptedException e) {
-                //因当前通道关闭才会抛出此异常，不做任何处理
+                releaseWaitingCommand();
             } catch (IOException e) {
                 LOG.error("[IoTask] MemcachedChannel need to be closed due to: {}. {}", e.getMessage(), socket);
                 close();
+                releaseWaitingCommand();
             } catch (Exception e) {
                 LOG.error("[IoTask] Unexpected error. " + socket, e);
                 close();
+                releaseWaitingCommand();
             }
         }
 

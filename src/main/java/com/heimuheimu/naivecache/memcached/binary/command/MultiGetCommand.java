@@ -137,4 +137,10 @@ public class MultiGetCommand implements Command {
                     + "ms. " + "Last key: " + Arrays.toString(lastKey));
         }
     }
+
+    @Override
+    public void close() {
+        latch.countDown();
+    }
+
 }

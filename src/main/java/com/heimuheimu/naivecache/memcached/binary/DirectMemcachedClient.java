@@ -79,7 +79,8 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
                 LOG.error("[get] Key could not be empty. Key: `{}`. Host: `{}`.", key, host);
                 return null;
             }
-            if (key.length() > MAX_KEY_LENGTH) {
+            byte[] keyBytes = key.getBytes(CHARSET_UTF8);
+            if (keyBytes.length > MAX_KEY_LENGTH) {
                 LOG.error("[get] Key is too large. Key length could not greater than {}. Key: `{}`. Host: `{}`.",
                         MAX_KEY_LENGTH, key, host);
                 return null;
@@ -88,22 +89,26 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
                 LOG.error("[get] Inactive channel. Key: `{}`. Host: `{}`.", key, host);
                 return null;
             }
-            byte[] keyBytes = key.getBytes(CHARSET_UTF8);
             GetCommand getCommand = new GetCommand(keyBytes);
             List<ResponsePacket> responsePacketList = memcachedChannel.send(getCommand, timeout);
-            ResponsePacket responsePacket = responsePacketList.get(0);
-            if (responsePacket.isSuccess()) {
-                T value = transcoder.decode(responsePacket.getBody(), 0,
-                        responsePacket.getExtrasLength() + responsePacket.getKeyLength(),
-                        responsePacket.getValueLength());
-                LOG.debug("[get] Success. Key: `{}`. Value: `{}`. Host: `{}`.", key, value, host);
-                return value;
-            } else {
-                if (responsePacket.isKeyNotFound()) {
-                    LOG.info("[get] Key not found. Key: `{}`. Host: `{}`", key, host);
+            if (!responsePacketList.isEmpty()) {
+                ResponsePacket responsePacket = responsePacketList.get(0);
+                if (responsePacket.isSuccess()) {
+                    T value = transcoder.decode(responsePacket.getBody(), 0,
+                            responsePacket.getExtrasLength() + responsePacket.getKeyLength(),
+                            responsePacket.getValueLength());
+                    LOG.debug("[get] Success. Key: `{}`. Value: `{}`. Host: `{}`.", key, value, host);
+                    return value;
                 } else {
-                    LOG.error("[get] Memcached error: `{}`. Key: `{}`. Host: `{}`.", responsePacket.getErrorMessage(), key, host);
+                    if (responsePacket.isKeyNotFound()) {
+                        LOG.info("[get] Key not found. Key: `{}`. Host: `{}`", key, host);
+                    } else {
+                        LOG.error("[get] Memcached error: `{}`. Key: `{}`. Host: `{}`.", responsePacket.getErrorMessage(), key, host);
+                    }
+                    return null;
                 }
+            } else {
+                LOG.error("[get] Empty response. Key: `{}`. Host: `{}`", key, host);
                 return null;
             }
         } catch(TimeoutException e) {
@@ -133,12 +138,13 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
                     LOG.error("[multi-get] Key could not be empty. Key: `{}`. Key set: `{}`. Host: `{}`.", key, keySet, host);
                     continue;
                 }
-                if (key.length() > MAX_KEY_LENGTH) {
+                byte[] keyBytes = key.getBytes(CHARSET_UTF8);
+                if (keyBytes.length > MAX_KEY_LENGTH) {
                     LOG.error("[multi-get] Key is too large. Key length could not greater than {}. Key: `{}`. Key set: `{}`. Host: `{}`.",
                             MAX_KEY_LENGTH, key, keySet, host);
                     continue;
                 }
-                keyList.add(key.getBytes(CHARSET_UTF8));
+                keyList.add(keyBytes);
             }
             if (!keyList.isEmpty()) {
                 MultiGetCommand multiGetCommand = new MultiGetCommand(keyList);
@@ -187,7 +193,8 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
                 LOG.error("[set] Key could not be empty. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.", key, value, expiry, host);
                 return false;
             }
-            if (key.length() > MAX_KEY_LENGTH) {
+            byte[] keyBytes = key.getBytes(CHARSET_UTF8);
+            if (keyBytes.length > MAX_KEY_LENGTH) {
                 LOG.error("[set] Key is too large. Key length could not greater than {}. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
                         MAX_KEY_LENGTH, key, value, expiry, host);
                 return false;
@@ -211,18 +218,23 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
                 LOG.error("[set] Inactive channel. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.", key, value, expiry, host);
                 return false;
             }
-            byte[] keyBytes = key.getBytes(CHARSET_UTF8);
             byte[][] encodedBytes = transcoder.encode(value);
             SetCommand setCommand = new SetCommand(keyBytes, encodedBytes[1], expiry, encodedBytes[0]);
             List<ResponsePacket> responsePacketList = memcachedChannel.send(setCommand, timeout);
-            ResponsePacket responsePacket = responsePacketList.get(0);
-            if (responsePacket.isSuccess()) {
-                LOG.debug("[set] Success. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
-                        key, value, expiry, host);
-                return true;
+            if (!responsePacketList.isEmpty()) {
+                ResponsePacket responsePacket = responsePacketList.get(0);
+                if (responsePacket.isSuccess()) {
+                    LOG.debug("[set] Success. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
+                            key, value, expiry, host);
+                    return true;
+                } else {
+                    LOG.error("[set] Memcached error: `{}`. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
+                            responsePacket.getErrorMessage(), key, value, expiry, host);
+                    return false;
+                }
             } else {
-                LOG.error("[set] Memcached error: `{}`. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
-                        responsePacket.getErrorMessage(), key, value, expiry, host);
+                LOG.error("[set] Empty response. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`",
+                        key, value, expiry, host);
                 return false;
             }
         } catch (TimeoutException e) {
@@ -243,24 +255,29 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
                 LOG.error("[delete] Key could not be empty. Key: `{}`. Host: `{}`.", key, host);
                 return false;
             }
-            if (key.length() > MAX_KEY_LENGTH) {
+            byte[] keyBytes = key.getBytes(CHARSET_UTF8);
+            if (keyBytes.length > MAX_KEY_LENGTH) {
                 LOG.error("[delete] Key is too large. Key length could not greater than {}. Key: `{}`. Host: `{}`.",
                         MAX_KEY_LENGTH, key, host);
                 return false;
             }
-            byte[] keyBytes = key.getBytes(CHARSET_UTF8);
             DeleteCommand deleteCommand = new DeleteCommand(keyBytes);
             List<ResponsePacket> responsePacketList = memcachedChannel.send(deleteCommand, timeout);
-            ResponsePacket responsePacket = responsePacketList.get(0);
-            if (responsePacket.isSuccess()) {
-                LOG.debug("[delete] Success. Key: `{}`. Host: `{}`.", key, host);
-                return true;
-            } else {
-                if (responsePacket.isKeyNotFound()) {
-                    LOG.info("[delete] Key not found. Key: `{}`. Host: `{}`", key, host);
+            if (!responsePacketList.isEmpty()) {
+                ResponsePacket responsePacket = responsePacketList.get(0);
+                if (responsePacket.isSuccess()) {
+                    LOG.debug("[delete] Success. Key: `{}`. Host: `{}`.", key, host);
+                    return true;
                 } else {
-                    LOG.error("[delete] Memcached error: `{}`. Key: `{}`. Host: `{}`.", responsePacket.getErrorMessage(), key, host);
+                    if (responsePacket.isKeyNotFound()) {
+                        LOG.info("[delete] Key not found. Key: `{}`. Host: `{}`", key, host);
+                    } else {
+                        LOG.error("[delete] Memcached error: `{}`. Key: `{}`. Host: `{}`.", responsePacket.getErrorMessage(), key, host);
+                    }
+                    return false;
                 }
+            } else {
+                LOG.error("[delete] Empty response. Key: `{}`. Host: `{}`", key, host);
                 return false;
             }
         } catch (TimeoutException e) {

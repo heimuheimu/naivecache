@@ -73,6 +73,7 @@ public interface Command {
     /**
      * 获得该命令对应的响应数据包列表
      * <p>该方法为阻塞式，调用后将会等待响应数据包全部到达</p>
+     * <p><b>注意：</b>该方法不会返回 {@code null}，但有可能返回空列表</p>
      *
      * @param timeout 超时时间，单位：毫秒
      * @return 该命令对应的响应数据包列表
@@ -80,5 +81,10 @@ public interface Command {
      *
      */
     List<ResponsePacket> getResponsePacketList(long timeout) throws TimeoutException;
+
+    /**
+     * 关闭该命令，如果该命令处于等待响应数据包状态，应立刻释放
+     */
+    void close();
 
 }

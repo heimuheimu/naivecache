@@ -29,6 +29,7 @@ import com.heimuheimu.naivecache.memcached.binary.response.ResponsePacket;
 import com.heimuheimu.naivecache.memcached.exception.MemcachedException;
 import com.heimuheimu.naivecache.memcached.exception.TimeoutException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -93,11 +94,20 @@ public class SetCommand implements Command {
             latchFlag = false; //should not happen
         }
         if (latchFlag) {
-            return Collections.singletonList(responsePacket);
+            if (responsePacket != null) {
+                return Collections.singletonList(responsePacket);
+            } else {
+                return new ArrayList<>();
+            }
         } else {
             throw new TimeoutException("Wait set command response timeout :" + timeout
                     + "ms. " + "Key: " + Arrays.toString(key));
         }
+    }
+
+    @Override
+    public void close() {
+        latch.countDown();
     }
 
 }

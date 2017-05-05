@@ -103,7 +103,11 @@ public class GetCommand implements OptimizedCommand {
             latchFlag = false; //never happened
         }
         if (latchFlag) {
-            return Collections.singletonList(responsePacket);
+            if (responsePacket != null) {
+                return Collections.singletonList(responsePacket);
+            } else {
+                return new ArrayList<>();
+            }
         } else {
             throw new TimeoutException("Wait get command response timeout :" + timeout
                     + "ms. " + "Key: " + Arrays.toString(key));
@@ -123,4 +127,10 @@ public class GetCommand implements OptimizedCommand {
         }
         return false;
     }
+
+    @Override
+    public void close() {
+        latch.countDown();
+    }
+
 }
