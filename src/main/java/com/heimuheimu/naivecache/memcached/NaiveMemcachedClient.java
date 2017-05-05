@@ -30,13 +30,8 @@ import java.util.Set;
 /**
  * Memcached 客户端，提供 Memcached get、multi get、set、delete等常用操作
  *
- * <p>
- * <b>注意：</b>所有的客户端实现必须是线程安全的
- * </p>
- *
- * <p>
- * <b>注意：</b>所有的操作均不会抛出异常
- * </p>
+ * <p><b>注意：</b>所有的客户端实现必须是线程安全的</p>
+ * <p><b>注意：</b>所有的操作均不会抛出异常</p>
  *
  * @author heimuheimu
  */
@@ -46,12 +41,13 @@ public interface NaiveMemcachedClient {
     /**
      * Memcached Key 最大字节数：250B
      */
-    final int MAX_KEY_LENGTH = 255;
+    int MAX_KEY_LENGTH = 250;
+
 
     /**
      * Memcached Value 最大字节数：1MB
      */
-    final int MAX_VALUE_LENGTH = 1024 * 1024;
+    int MAX_VALUE_LENGTH = 1024 * 1024;
 
     /**
      * 根据 Key 获取在 Memcached 中存储的值，如果找不到或者发生异常，则会返回 {@code null}
@@ -60,7 +56,7 @@ public interface NaiveMemcachedClient {
      * <b>注意：</b>Key 的长度不应超过 {@link #MAX_KEY_LENGTH}
      * </p>
      *
-     * @param key Memcached key
+     * @param key Memcached key，字节长度不应超过 {@link #MAX_KEY_LENGTH}
      * @return key 对应的值，，如果找不到或者发生异常，则会返回 {@code null}
      */
     <T> T get(String key);
@@ -83,12 +79,11 @@ public interface NaiveMemcachedClient {
      * 将 Key 和 Value 存储至 Memcached 中，不指定过期时间，
      * 设置成功，返回 {@code true}，设置失败或发生异常，则返回 {@code false}
      *
-     * <p>
-     * <b>注意：</b>Key 的长度不应超过 {@link #MAX_KEY_LENGTH}
-     * </p>
+     * <p><b>注意：</b>Key 的字节长度不应超过 {@link #MAX_KEY_LENGTH}</p>
+     * <p><b>注意：</b>Value 的字节长度不应超过 {@link #MAX_VALUE_LENGTH}</p>
      *
-     * @param key Memcached key
-     * @param value Memcached value
+     * @param key Memcached key，字节长度不应超过 {@link #MAX_KEY_LENGTH}
+     * @param value Memcached value，字节长度不应超过 {@link #MAX_VALUE_LENGTH}
      * @return 设置成功，返回 {@code true}，设置失败或发生异常，则返回 {@code false}
      */
     boolean set(String key, Object value);
@@ -97,13 +92,12 @@ public interface NaiveMemcachedClient {
      * 将 Key 和 Value 存储至 Memcached 中，并指定过期时间，单位：秒。
      * 设置成功，返回 {@code true}，设置失败或发生异常，则返回 {@code false}
      *
-     * <p>
-     * <b>注意：</b>Key 的长度不应超过 {@link #MAX_KEY_LENGTH}
-     * </p>
+     * <p><b>注意：</b>Key 的字节长度不应超过 {@link #MAX_KEY_LENGTH}</p>
+     * <p><b>注意：</b>Value 的字节长度不应超过 {@link #MAX_VALUE_LENGTH}</p>
      *
-     * @param key Memcached key
-     * @param value Memcached value
-     * @param expiry 过期时间，单位：秒
+     * @param key Memcached key，字节长度不应超过 {@link #MAX_KEY_LENGTH}
+     * @param value Memcached value，字节长度不应超过 {@link #MAX_VALUE_LENGTH}
+     * @param expiry 过期时间，单位：秒，不允许小于0
      * @return 设置成功，返回 {@code true}，设置失败或发生异常，则返回 {@code false}
      */
     boolean set(String key, Object value, int expiry);
@@ -113,10 +107,10 @@ public interface NaiveMemcachedClient {
      * 删除成功，返回 {@code true}，删除失败或发生异常，则返回 {@code false}
      *
      * <p>
-     * <b>注意：</b>Key 的长度不应超过 {@link #MAX_KEY_LENGTH}
+     * <b>注意：</b>Key 的字节长度不应超过 {@link #MAX_KEY_LENGTH}
      * </p>
      *
-     * @param key Memcached key
+     * @param key Memcached key，字节长度不应超过 {@link #MAX_KEY_LENGTH}
      * @return 删除成功，返回 {@code true}，删除失败或发生异常，则返回 {@code false}
      */
     boolean delete(String key);

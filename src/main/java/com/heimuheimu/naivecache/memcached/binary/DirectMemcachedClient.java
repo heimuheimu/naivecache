@@ -219,6 +219,11 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
                 return false;
             }
             byte[][] encodedBytes = transcoder.encode(value);
+            if (encodedBytes[1].length > MAX_VALUE_LENGTH) {
+                LOG.error("[set] Value is too large. Value length could not greater than {}. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
+                        MAX_VALUE_LENGTH, key, value, expiry, host);
+                return false;
+            }
             SetCommand setCommand = new SetCommand(keyBytes, encodedBytes[1], expiry, encodedBytes[0]);
             List<ResponsePacket> responsePacketList = memcachedChannel.send(setCommand, timeout);
             if (!responsePacketList.isEmpty()) {
