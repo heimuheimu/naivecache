@@ -28,43 +28,42 @@ import java.net.Socket;
 import java.net.SocketException;
 
 /**
- * {@link Socket}实例构造器
+ * {@link Socket} 实例构造器
  *
  * @author heimuheimu
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class SocketBuilder {
 	
 	/**
-	 * 根据目标服务器地址（由主机名和端口组成，":"符号分割，例如：localhost:9610）生成{@link Socket}实例并返回。
-	 * Socket配置信息使用{@link SocketConfiguration#DEFAULT}配置信息。
-	 * <p>如果目标服务器地址不符合规则，将会抛出{@link IllegalArgumentException}异常
-	 * <p>如果创建过程中发生错误，将会抛出{@link RuntimeException}异常
+	 * 根据目标服务器地址（由主机名和端口组成，":"符号分割，例如：localhost:11211）生成 {@link Socket} 实例并返回。
+	 * Socket 配置信息使用 {@link SocketConfiguration#DEFAULT} 配置信息。
+	 * <p>如果目标服务器地址不符合规则，将会抛出 {@link IllegalArgumentException} 异常
+	 * <p>如果创建过程中发生错误，将会抛出 {@link RuntimeException} 异常
 	 * 
-	 * @param host 目标服务器地址
-	 * @return Socket实例
+	 * @param host 目标服务器地址（由主机名和端口组成，":"符号分割，例如：localhost:11211）
+	 * @return Socket 实例
 	 * @throws IllegalArgumentException 如果目标服务器地址不符合规则，将会抛出此异常
 	 * @throws RuntimeException 如果创建过程中发生错误，将会抛出此异常
 	 */
-	public static Socket create(String host) 
-			throws RuntimeException {
+	public static Socket create(String host) throws RuntimeException {
 		return create(host, null);
 	}
 	
 	/**
-	 * 根据目标服务器地址（由主机名和端口组成，":"符号分割，例如：localhost:9610）、Socket配置信息生成{@link Socket}实例并返回。
-	 * <p>如果目标服务器地址不符合规则，将会抛出{@link IllegalArgumentException}异常
-	 * <p>如果创建过程中发生错误，将会抛出{@link RuntimeException}异常
+	 * 根据目标服务器地址（由主机名和端口组成，":"符号分割，例如：localhost:11211）、Socket 配置信息生成 {@link Socket} 实例并返回。
+	 * <p>如果目标服务器地址不符合规则，将会抛出 {@link IllegalArgumentException} 异常
+	 * <p>如果创建过程中发生错误，将会抛出 {@link RuntimeException} 异常
 	 * 
-	 * @param host 目标服务器地址（由主机名和端口组成，":"符号分割，例如：localhost:9610）
-	 * @param config Socket配置信息，如果传null，将会使用{@link SocketConfiguration#DEFAULT}配置信息
-	 * @return Socket实例
+	 * @param host 目标服务器地址（由主机名和端口组成，":"符号分割，例如：localhost:11211）
+	 * @param config Socket 配置信息，如果传 {@code null}，将会使用 {@link SocketConfiguration#DEFAULT} 配置信息
+	 * @return Socket 实例
 	 * @throws IllegalArgumentException 如果目标服务器地址不符合规则，将会抛出此异常
 	 * @throws RuntimeException 如果创建过程中发生错误，将会抛出此异常
 	 */
-	public static Socket create(String host, SocketConfiguration config) 
-			throws RuntimeException {
-		String hostname = "";
-		int port = -1;
+	public static Socket create(String host, SocketConfiguration config) throws RuntimeException {
+		String hostname;
+		int port;
 		try {
 			String[] hostParts = host.split(":");
 			hostname = hostParts[0];
@@ -76,12 +75,12 @@ public class SocketBuilder {
 	}
 	
 	/**
-	 * 根据目标服务器主机名、端口号生成{@link Socket}实例并返回。Socket配置信息使用{@link SocketConfiguration#DEFAULT}配置信息。
-	 * <p>如果创建过程中发生错误，将会抛出{@link RuntimeException}异常
+	 * 根据目标服务器主机名、端口号生成 {@link Socket} 实例并返回。Socket配置信息使用 {@link SocketConfiguration#DEFAULT} 配置信息。
+	 * <p>如果创建过程中发生错误，将会抛出 {@link RuntimeException} 异常
 	 * 
 	 * @param hostname 目标服务器主机名
 	 * @param port 端口号
-	 * @return Socket实例
+	 * @return Socket 实例
 	 * @throws RuntimeException 如果创建过程中发生错误，将会抛出此异常
 	 * @see #create(String, int, SocketConfiguration)
 	 */
@@ -90,16 +89,16 @@ public class SocketBuilder {
 	}
 	
 	/**
-	 * 根据目标服务器主机名、端口号、Socket配置信息生成{@link Socket}实例并返回。
-	 * <p>如果创建过程中发生错误，将会抛出{@link RuntimeException}异常
+	 * 根据目标服务器主机名、端口号、Socket 配置信息生成 {@link Socket} 实例并返回。
+	 * <p>如果创建过程中发生错误，将会抛出 {@link RuntimeException} 异常
 	 * 
 	 * @param hostname 目标服务器主机名
 	 * @param port 端口号
-	 * @param config Socket配置信息，如果传null，将会使用{@link SocketConfiguration#DEFAULT}配置信息
-	 * @return Socket实例
+	 * @param config Socket 配置信息，如果传 {@code null}，将会使用 {@link SocketConfiguration#DEFAULT} 配置信息
+	 * @return Socket 实例
 	 * @throws RuntimeException 如果创建过程中发生错误，将会抛出此异常
 	 */
-	public static Socket create(String hostname, int port, SocketConfiguration config) 
+	public static Socket create(String hostname, int port, SocketConfiguration config)
 		throws RuntimeException {
 		try {
 			if (config == null) {
@@ -120,15 +119,14 @@ public class SocketBuilder {
 	}
 	
 	/**
-	 * 根据Socket配置信息设置{@link Socket}实例，设置完后将其返回
-	 * <p>如果设置过程中发生错误，将会抛出{@link RuntimeException}异常
+	 * 根据 Socket 配置信息设置 {@link Socket} 实例
+	 * <p>如果设置过程中发生错误，将会抛出 {@link RuntimeException} 异常
 	 * 
-	 * @param socket Socket连接
-	 * @param config Socket配置信息，如果传null，将会使用{@link SocketConfiguration#DEFAULT}配置信息
-	 * @return Socket实例
-	 * @throws RuntimeException 如果创建过程中发生错误，将会抛出此异常
+	 * @param socket Socket 连接
+	 * @param config Socket 配置信息，如果传 {@code null}，将会使用 {@link SocketConfiguration#DEFAULT} 配置信息
+	 * @throws RuntimeException 如果设置过程中发生错误，将会抛出此异常
 	 */
-	public static Socket setConfig(Socket socket, SocketConfiguration config) 
+	public static void setConfig(Socket socket, SocketConfiguration config)
 		throws RuntimeException {
 		try {
 			if (config == null) {
@@ -152,7 +150,6 @@ public class SocketBuilder {
 			if (config.getSoLinger() != null && config.getSoLinger() > 0) {
 				socket.setSoLinger(true, config.getSoLinger());
 			}
-			return socket;
 		} catch (Exception e) {
 			throw new RuntimeException("Set socket config failed. Socket: " 
 					+ socket + ". Config: " + config);
@@ -160,11 +157,10 @@ public class SocketBuilder {
 	}
 	
 	/**
-	 * 获得该{@link Socket}实例的配置信息，但不包含{@link SocketConfiguration#getConnectionTimeout()}配置项
-	 * <p>如果获取过程中发生错误，将会抛出{@link RuntimeException}异常
+	 * 获得该 {@link Socket} 实例的配置信息，但不包含 {@link SocketConfiguration#getConnectionTimeout()} 配置项
 	 * 
-	 * @param socket Socket连接
-	 * @return Socket配置信息
+	 * @param socket Socket 连接
+	 * @return Socket 配置信息
 	 * @throws SocketException 如果获取过程中发生错误，将会抛出此异常
 	 */
 	public static SocketConfiguration getConfig(Socket socket) throws SocketException {

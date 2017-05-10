@@ -31,16 +31,14 @@ import com.heimuheimu.naivecache.memcached.binary.command.GetCommand;
 import com.heimuheimu.naivecache.memcached.binary.command.MultiGetCommand;
 import com.heimuheimu.naivecache.memcached.binary.command.SetCommand;
 import com.heimuheimu.naivecache.memcached.binary.response.ResponsePacket;
-import com.heimuheimu.naivecache.memcached.binary.transcoder.SimpleTranscoder;
-import com.heimuheimu.naivecache.memcached.binary.transcoder.Transcoder;
+import com.heimuheimu.naivecache.transcoder.SimpleTranscoder;
+import com.heimuheimu.naivecache.transcoder.Transcoder;
 import com.heimuheimu.naivecache.memcached.exception.TimeoutException;
-import com.heimuheimu.naivecache.net.SocketBuilder;
 import com.heimuheimu.naivecache.net.SocketConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.net.Socket;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -62,14 +60,23 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
 
     private final MemcachedChannel memcachedChannel;
 
-    private final Transcoder transcoder = new SimpleTranscoder();
+    private final Transcoder transcoder;
 
-    public DirectMemcachedClient(String host, SocketConfiguration configuration, int timeout) {
-        Socket socket = SocketBuilder.create(host, configuration);
-        this.memcachedChannel = new MemcachedChannel(socket);
+    /**
+     * 创建一个 Memcached 直连客户端
+     *
+     * @param host Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:11211
+     * @param configuration Socket配置信息，如果传 {@code null}，将会使用 {@link SocketConfiguration#DEFAULT} 配置信息
+     * @param timeout Memcached 操作超时时间，单位：毫秒，不能小于等于0
+     * @param compressionThreshold 最小压缩字节数，当 Value 字节数小于或等于该值，不进行压缩，不能小于等于0
+     */
+    public DirectMemcachedClient(String host, SocketConfiguration configuration,
+                                 int timeout, int compressionThreshold) {
+        this.memcachedChannel = new MemcachedChannel(host, configuration);
         this.memcachedChannel.init();
         this.host = host;
         this.timeout = timeout;
+        this.transcoder = new SimpleTranscoder(compressionThreshold);
     }
 
     @Override
@@ -294,6 +301,21 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
                     + "`. Host: `" + host + "`.", e);
             return false;
         }
+    }
+
+    @Override
+    public boolean isActive() {
+        return memcachedChannel.isActive();
+    }
+
+    @Override
+    public void close() {
+        memcachedChannel.close();
+    }
+
+    @Override
+    public String getHost() {
+        return host;
     }
 
 }

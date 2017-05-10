@@ -27,18 +27,24 @@ import java.net.Socket;
 import java.net.SocketOptions;
 
 /**
- * {@link Socket}配置信息
+ * {@link Socket} 配置信息
  * <p>注意：该实现是线程安全的</p>
  *
  * @author heimuheimu
  * @ThreadSafe
  * @see SocketBuilder
  */
+@SuppressWarnings({"WeakerAccess", "SameParameterValue"})
 public class SocketConfiguration {
 	
 	/**
-	 * 默认{@link Socket}配置信息：{@link SocketOptions#SO_KEEPALIVE}值为true，
-	 * {@link #connectionTimeout}值为30秒，其余值均为系统默认配置。
+	 * 默认{@link Socket}配置信息：
+	 * <ul>
+	 * <li>{@link SocketOptions#SO_KEEPALIVE} 值为 {@code true}</li>
+	 * <li>{@link SocketOptions#SO_SNDBUF} 值为 32KB</li>
+	 * <li>{@link SocketOptions#SO_RCVBUF} 值为 32KB</li>
+	 * <li>Socket 连接超时时间值为30秒</li>
+	 * </ul>
 	 */
 	public static final SocketConfiguration DEFAULT;
 	
@@ -82,27 +88,27 @@ public class SocketConfiguration {
 	private volatile Integer soLinger = null;
 	
 	/**
-	 * 建立Socket连接超时时间，单位：毫秒。 如果该值小于等于0，则不设置连接超时时间。
+	 * 建立 Socket 连接超时时间，单位：毫秒。 如果该值小于等于 0，则不设置连接超时时间。
 	 * @see Socket#connect(java.net.SocketAddress, int)
 	 */
 	private volatile int connectionTimeout = 0;
 
 	/**
-	 * 获得{@link SocketOptions#SO_KEEPALIVE}配置值，
-	 * 如果为{@code null}，则使用系统默认配置。
+	 * 获得 {@link SocketOptions#SO_KEEPALIVE} 配置值，
+	 * 如果为 {@code null}，则使用系统默认配置。
 	 * 
-	 * @return keepAlive配置值
+	 * @return keepAlive 配置值，可能返回 {@code null}
 	 */
 	public Boolean getKeepAlive() {
 		return keepAlive;
 	}
 
 	/**
-	 * 设置{@link SocketOptions#SO_KEEPALIVE}配置值， 如果为{@code null}，则使用系统默认配置。
-	 * <p>如果对{@link #DEFAULT}实例操作此方法，将会抛出{@link UnsupportedOperationException}异常。</p>
+	 * 设置 {@link SocketOptions#SO_KEEPALIVE} 配置值， 如果为 {@code null}，则使用系统默认配置。
+	 * <p>如果对 {@link #DEFAULT} 实例操作此方法，将会抛出 {@link UnsupportedOperationException} 异常。</p>
 	 * 
-	 * @param keepAlive keepAlive配置值
-	 * @throws UnsupportedOperationException 如果对{@link #DEFAULT}实例操作此方法，将会抛出此异常
+	 * @param keepAlive keepAlive 配置值，允许为 {@code null}
+	 * @throws UnsupportedOperationException 如果对 {@link #DEFAULT} 实例操作此方法，将会抛出此异常
 	 */
 	public void setKeepAlive(Boolean keepAlive) throws UnsupportedOperationException {
 		if (this == DEFAULT) {
@@ -112,21 +118,21 @@ public class SocketConfiguration {
 	}
 
 	/**
-	 * 获得{@link SocketOptions#TCP_NODELAY}配置值，
-	 * 如果为{@code null}，则使用系统默认配置
+	 * 获得 {@link SocketOptions#TCP_NODELAY} 配置值，
+	 * 如果为 {@code null}，则使用系统默认配置
 	 * 
-	 * @return tcpNoDelay配置值
+	 * @return tcpNoDelay 配置值，可能返回 {@code null}
 	 */
 	public Boolean getTcpNoDelay() {
 		return tcpNoDelay;
 	}
 
 	/**
-	 * 设置{@link SocketOptions#TCP_NODELAY}配置值，如果为{@code null}，则使用系统默认配置。
-	 * <p>如果对{@link #DEFAULT}实例操作此方法，将会抛出{@link UnsupportedOperationException}异常。</p>
+	 * 设置 {@link SocketOptions#TCP_NODELAY} 配置值，如果为 {@code null}，则使用系统默认配置。
+	 * <p>如果对 {@link #DEFAULT} 实例操作此方法，将会抛出 {@link UnsupportedOperationException} 异常。</p>
 	 * 
-	 * @param tcpNoDelay tcpNoDelay配置值
-	 * @throws UnsupportedOperationException 如果对{@link #DEFAULT}实例操作此方法，将会抛出此异常
+	 * @param tcpNoDelay tcpNoDelay 配置值，允许为 {@code null}
+	 * @throws UnsupportedOperationException 如果对 {@link #DEFAULT} 实例操作此方法，将会抛出此异常
 	 */
 	public void setTcpNoDelay(Boolean tcpNoDelay) throws UnsupportedOperationException {
 		if (this == DEFAULT) {
@@ -136,21 +142,21 @@ public class SocketConfiguration {
 	}
 
 	/**
-	 * 获得{@link SocketOptions#SO_SNDBUF}配置值，
-	 * 如果为{@code null}，则使用系统默认配置。
+	 * 获得 {@link SocketOptions#SO_SNDBUF} 配置值，
+	 * 如果为 {@code null}，则使用系统默认配置。
 	 * 
-	 * @return sendBufferSize配置值
+	 * @return sendBufferSize 配置值，可能返回 {@code null}
 	 */
 	public Integer getSendBufferSize() {
 		return sendBufferSize;
 	}
 
 	/**
-	 * 设置{@link SocketOptions#SO_SNDBUF}配置值， 如果为{@code null}，则使用系统默认配置。
-	 * <p>如果对{@link #DEFAULT}实例操作此方法，将会抛出{@link UnsupportedOperationException}异常。</p>
+	 * 设置 {@link SocketOptions#SO_SNDBUF} 配置值， 如果为 {@code null}，则使用系统默认配置。
+	 * <p>如果对 {@link #DEFAULT} 实例操作此方法，将会抛出 {@link UnsupportedOperationException} 异常。</p>
 	 * 
-	 * @param sendBufferSize sendBufferSize配置值
-	 * @throws UnsupportedOperationException 如果对{@link #DEFAULT}实例操作此方法，将会抛出此异常
+	 * @param sendBufferSize sendBufferSize 配置值，允许为 {@code null}
+	 * @throws UnsupportedOperationException 如果对 {@link #DEFAULT} 实例操作此方法，将会抛出此异常
 	 */
 	public void setSendBufferSize(Integer sendBufferSize) throws UnsupportedOperationException {
 		if (this == DEFAULT) {
@@ -160,21 +166,21 @@ public class SocketConfiguration {
 	}
 
 	/**
-	 * 获得{@link SocketOptions#SO_RCVBUF}配置值，
-	 * 如果为{@code null}，则使用系统默认配置。
+	 * 获得 {@link SocketOptions#SO_RCVBUF} 配置值，
+	 * 如果为 {@code null} ，则使用系统默认配置。
 	 * 
-	 * @return receiveBufferSize配置值
+	 * @return receiveBufferSize 配置值，可能返回 {@code null}
 	 */
 	public Integer getReceiveBufferSize() {
 		return receiveBufferSize;
 	}
 
 	/**
-	 * 设置{@link SocketOptions#SO_RCVBUF}配置值，如果为{@code null}，则使用系统默认配置。
-	 * <p>如果对{@link #DEFAULT}实例操作此方法，将会抛出{@link UnsupportedOperationException}异常。</p>
+	 * 设置 {@link SocketOptions#SO_RCVBUF} 配置值，如果为 {@code null}，则使用系统默认配置。
+	 * <p>如果对 {@link #DEFAULT} 实例操作此方法，将会抛出 {@link UnsupportedOperationException} 异常。</p>
 	 * 
-	 * @param receiveBufferSize receiveBufferSize配置值
-	 * @throws UnsupportedOperationException 如果对{@link #DEFAULT}实例操作此方法，将会抛出此异常
+	 * @param receiveBufferSize receiveBufferSize 配置值，允许为 {@code null}
+	 * @throws UnsupportedOperationException 如果对 {@link #DEFAULT} 实例操作此方法，将会抛出此异常
 	 */
 	public void setReceiveBufferSize(Integer receiveBufferSize) throws UnsupportedOperationException {
 		if (this == DEFAULT) {
@@ -184,20 +190,21 @@ public class SocketConfiguration {
 	}
 
 	/**
-	 * 获得{@link SocketOptions#SO_TIMEOUT}配置值，如果为{@code null}，则使用系统默认配置
+	 * 获得 {@link SocketOptions#SO_TIMEOUT} 配置值，
+	 * 如果为 {@code null}，则使用系统默认配置
 	 * 
-	 * @return soTimeout配置值
+	 * @return soTimeout配置值，可能返回 {@code null}
 	 */
 	public Integer getSoTimeout() {
 		return soTimeout;
 	}
 
 	/**
-	 * 设置{@link SocketOptions#SO_TIMEOUT}配置值，如果为{@code null}，则使用系统默认配置。
-	 * <p>如果对{@link #DEFAULT}实例操作此方法，将会抛出{@link UnsupportedOperationException}异常。</p>
+	 * 设置 {@link SocketOptions#SO_TIMEOUT} 配置值，如果为 {@code null}，则使用系统默认配置。
+	 * <p>如果对 {@link #DEFAULT} 实例操作此方法，将会抛出 {@link UnsupportedOperationException} 异常。</p>
 	 * 
-	 * @param soTimeout soTimeout配置值
-	 * @throws UnsupportedOperationException 如果对{@link #DEFAULT}实例操作此方法，将会抛出此异常
+	 * @param soTimeout soTimeout 配置值，允许为 {@code null}
+	 * @throws UnsupportedOperationException 如果对 {@link #DEFAULT} 实例操作此方法，将会抛出此异常
 	 */
 	public void setSoTimeout(Integer soTimeout) throws UnsupportedOperationException {
 		if (this == DEFAULT) {
@@ -207,21 +214,21 @@ public class SocketConfiguration {
 	}
 
 	/**
-	 * 获得{@link SocketOptions#SO_LINGER}配置值，
-	 * 如果为{@code null}，则使用系统默认配置
+	 * 获得 {@link SocketOptions#SO_LINGER} 配置值，
+	 * 如果为 {@code null}，则使用系统默认配置
 	 * 
-	 * @return soLinger配置值
+	 * @return soLinger 配置值，可能返回 {@code null}
 	 */
 	public Integer getSoLinger() {
 		return soLinger;
 	}
 
 	/**
-	 * 设置{@link SocketOptions#SO_LINGER}配置值，如果为{@code null}，则使用系统默认配置。
-	 * <p>如果对{@link #DEFAULT}实例操作此方法，将会抛出{@link UnsupportedOperationException}异常。</p>
+	 * 设置 {@link SocketOptions#SO_LINGER} 配置值，如果为 {@code null}，则使用系统默认配置。
+	 * <p>如果对 {@link #DEFAULT} 实例操作此方法，将会抛出 {@link UnsupportedOperationException} 异常。</p>
 	 * 
-	 * @param soLinger soLinger配置值
-	 * @throws UnsupportedOperationException 如果对{@link #DEFAULT}实例操作此方法，将会抛出此异常
+	 * @param soLinger soLinger 配置值，允许为 {@code null}
+	 * @throws UnsupportedOperationException 如果对 {@link #DEFAULT} 实例操作此方法，将会抛出此异常
 	 */
 	public void setSoLinger(Integer soLinger) {
 		if (this == DEFAULT) {
@@ -231,9 +238,9 @@ public class SocketConfiguration {
 	}
 
 	/**
-	 * 获得建立Socket连接超时时间，单位：毫秒。 如果该值小于等于0，则不设置连接超时时间。
+	 * 获得建立 Socket 连接超时时间，单位：毫秒。 如果该值小于等于 0，则不设置连接超时时间。
 	 * 
-	 * @return Socket连接超时时间，单位：毫秒
+	 * @return Socket 连接超时时间，单位：毫秒
 	 * @see Socket#connect(java.net.SocketAddress, int)
 	 */
 	public int getConnectionTimeout() {
@@ -241,11 +248,11 @@ public class SocketConfiguration {
 	}
 
 	/**
-	 * 设置建立Socket连接超时时间，单位：毫秒。 如果该值小于等于0，则不设置连接超时时间。
-	 * <p>如果对{@link #DEFAULT}实例操作此方法，将会抛出{@link UnsupportedOperationException}异常。</p>
+	 * 设置建立 Socket 连接超时时间，单位：毫秒。 如果该值小于等于0，则不设置连接超时时间。
+	 * <p>如果对 {@link #DEFAULT} 实例操作此方法，将会抛出 {@link UnsupportedOperationException} 异常。</p>
 	 * 
-	 * @param connectionTimeout Socket连接超时时间，单位：毫秒
-	 * @throws UnsupportedOperationException 如果对{@link #DEFAULT}实例操作此方法，将会抛出此异常
+	 * @param connectionTimeout Socket 连接超时时间，单位：毫秒
+	 * @throws UnsupportedOperationException 如果对 {@link #DEFAULT} 实例操作此方法，将会抛出此异常
 	 * @see Socket#connect(java.net.SocketAddress, int)
 	 */
 	public void setConnectionTimeout(int connectionTimeout) {
@@ -267,4 +274,5 @@ public class SocketConfiguration {
 				", connectionTimeout=" + connectionTimeout +
 				'}';
 	}
+
 }

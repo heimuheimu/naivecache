@@ -24,6 +24,7 @@
 
 package com.heimuheimu.naivecache.memcached;
 
+import java.io.Closeable;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,7 +36,7 @@ import java.util.Set;
  *
  * @author heimuheimu
  */
-public interface NaiveMemcachedClient {
+public interface NaiveMemcachedClient extends Closeable {
 
 
     /**
@@ -114,5 +115,19 @@ public interface NaiveMemcachedClient {
      * @return 删除成功，返回 {@code true}，删除失败或发生异常，则返回 {@code false}
      */
     boolean delete(String key);
+
+    /**
+     * 判断当前客户端是否处于可用状态
+     *
+     * @return 当前客户端是否处于可用状态
+     */
+    boolean isActive();
+
+    /**
+     * 获得当前客户端所连的 Memcached 地址
+     *
+     * @return 当前客户端所连的 Memcached 地址
+     */
+    String getHost();
 
 }

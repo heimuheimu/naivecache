@@ -21,20 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package com.heimuheimu.naivecache.transcoder.compression;
 
-package com.heimuheimu.naivecache.memcached;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.ByteBuffer;
+import com.ning.compress.lzf.LZFDecoder;
+import com.ning.compress.lzf.LZFEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
+ * LZF 压缩、解压工具，更多信息可参考：
+ * <p>
+ *     <a href="https://github.com/ning/compress">https://github.com/ning/compress</a>
+ * </p>
+ *
+ *
  * @author heimuheimu
  */
-public class SocketTest {
-    public static void main(String[] args) throws Exception {
-        InputStreamReader reader;
-        BufferedReader reader1;
-        ByteBuffer buffer;
-    }
+public class LZFUtil {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(LZFUtil.class);
+	
+	public static byte[] compress(byte[] src) {
+		try {
+			byte[] output = LZFEncoder.encode(src);
+			return output;
+		} catch (Exception e) {
+			LOG.error("LZF compress error.", e);
+			return new byte[0];
+		}
+	}
+	
+	public static byte[] decompress(byte[] compressedBytes) {
+		try {
+			byte[] output = LZFDecoder.decode(compressedBytes);
+			return output;
+		} catch (Exception e) {
+			LOG.error("LZF decompress error.", e);
+			return new byte[0];
+		}
+	}
+
 }

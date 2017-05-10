@@ -57,7 +57,14 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class MemcachedChannel implements Closeable {
 
+    private static final Logger MEMCACHED_CONNECTION_LOG = LoggerFactory.getLogger("NAIVECACHE_MEMCACHED_CONNECTION_LOG");
+
     private static final Logger LOG = LoggerFactory.getLogger(MemcachedChannel.class);
+
+    /**
+     * Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:11211
+     */
+    private final String host;
 
     /**
      * 与 Memcached 服务器建立的Socket连接
@@ -80,20 +87,30 @@ public class MemcachedChannel implements Closeable {
      */
     private IoTask ioTask = null;
 
-    public MemcachedChannel(Socket socket) {
-        this.socket = socket;
+    /**
+     * 创建基于 Memcached 二进制协议与 Memcached 服务进行数据交互的管道
+     *
+     * @param host Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:11211
+     * @param configuration {@link Socket} 配置信息，如果传 {@code null}，将会使用 {@link SocketConfiguration#DEFAULT} 配置信息
+     * @throws IllegalArgumentException 如果目标服务器地址不符合规则，将会抛出此异常
+     * @throws RuntimeException 如果创建 {@link Socket} 过程中发生错误，将会抛出此异常
+     */
+    public MemcachedChannel(String host, SocketConfiguration configuration) throws RuntimeException {
+        this.host = host;
+        this.socket = SocketBuilder.create(host, configuration);;
+
     }
 
     public List<ResponsePacket> send(Command command, long timeout)
             throws NullPointerException, IllegalStateException, TimeoutException {
         if (command == null) {
-            throw new NullPointerException("Memcached command could not be null. " + socket);
+            throw new NullPointerException("Memcached command could not be null. Host: `" + host + "`. " + socket);
         }
         if (state == BeanStatusEnum.NORMAL) {
             commandQueue.add(command);
         } else {
-            throw new IllegalStateException("MemcachedChannel is not initialized or has been closed. State: "
-                    + state + ". " + socket);
+            throw new IllegalStateException("MemcachedChannel is not initialized or has been closed. State: `"
+                    + state + "`. Host: `" + host + "`. " + socket);
         }
         return command.getResponsePacketList(timeout);
     }
@@ -109,22 +126,21 @@ public class MemcachedChannel implements Closeable {
                     state = BeanStatusEnum.NORMAL;
                     long startTime = System.currentTimeMillis();
                     SocketConfiguration config = SocketBuilder.getConfig(socket);
-                    String socketAddress = socket.getInetAddress().getCanonicalHostName() + ":" + socket.getPort()
-                            + "/" + socket.getLocalPort();
+                    String socketAddress = host + "/" + socket.getLocalPort();
                     //启动写入线程
                     ioTask = new IoTask(config.getSendBufferSize());
                     ioTask.setName("[Memcached IO Thread] " + socketAddress);
                     ioTask.setDaemon(true);
                     ioTask.start();
-                    //设置状态
-                    LOG.info("MemcachedChannel has been initialized. Cost: {}ms. {}. {}",
-                            (System.currentTimeMillis() - startTime), socket, config);
+                    MEMCACHED_CONNECTION_LOG.info("MemcachedChannel has been initialized. Cost: {}ms. Host: `{}`. Local port: `{}`. Config: `{}`.",
+                            (System.currentTimeMillis() - startTime), host, socket.getLocalPort(), config);
                 } else {
-                    LOG.error("Initialize MemcachedChannel failed. Socket is not connected or has been closed. {}", socket);
+                    MEMCACHED_CONNECTION_LOG.error("Initialize MemcachedChannel failed. Socket is not connected or has been closed. Host: `{}`.", host);
                     close();
                 }
             } catch(Exception e) {
-                LOG.error("Initialize MemcachedChannel failed. Unexpected error. " + socket, e);
+                MEMCACHED_CONNECTION_LOG.error("Initialize MemcachedChannel failed. Unexpected error: `{}`. Host: `{}`.", e.getMessage(), host);
+                LOG.error("Initialize MemcachedChannel failed. Unexpected error. Host: `" + host + "`. " + socket, e);
                 close();
             }
         }
@@ -141,10 +157,11 @@ public class MemcachedChannel implements Closeable {
                 //停止IO线程
                 ioTask.stopSignal = true;
                 ioTask.interrupt();
-                LOG.info("MemcachedChannel has been closed. Cost: {}ms. {}",
-                        (System.currentTimeMillis() - startTime), socket);
+                MEMCACHED_CONNECTION_LOG.info("MemcachedChannel has been closed. Cost: {}ms. Host: `{}`.",
+                        (System.currentTimeMillis() - startTime), host);
             } catch (Exception e) {
-                LOG.error("Close MemcachedChannel failed. Unexpected error. " + socket, e);
+                MEMCACHED_CONNECTION_LOG.error("Close MemcachedChannel failed. Unexpected error: `{}`. Host: `{}`.", e.getMessage(), host);
+                LOG.error("Close MemcachedChannel failed. Unexpected error. Host: `" + host + "`. " + socket, e);
             }
         }
     }
@@ -266,7 +283,7 @@ public class MemcachedChannel implements Closeable {
                                 waitingQueue.poll();
                             }
                         } else {
-                            LOG.info("End of the input stream has been reached. {}", socket);
+                            MEMCACHED_CONNECTION_LOG.info("End of the input stream has been reached. Host: `{}`", host);
                             close();
                             releaseWaitingCommand();
                             break;
@@ -276,11 +293,15 @@ public class MemcachedChannel implements Closeable {
             } catch (InterruptedException e) {
                 releaseWaitingCommand();
             } catch (IOException e) {
-                LOG.error("[IoTask] MemcachedChannel need to be closed due to: {}. {}", e.getMessage(), socket);
+                MEMCACHED_CONNECTION_LOG.error("[IoTask] MemcachedChannel need to be closed due to: `{}`. Host: `{}`.",
+                        e.getMessage(), host);
+                LOG.error("[IoTask] MemcachedChannel need to be closed: `IoException`. Host: `" + host + "`. " + socket, e);
                 close();
                 releaseWaitingCommand();
             } catch (Exception e) {
-                LOG.error("[IoTask] Unexpected error. " + socket, e);
+                MEMCACHED_CONNECTION_LOG.error("[IoTask] MemcachedChannel need to be closed due to: `{}`. Host: `{}`.",
+                        e.getMessage(), host);
+                LOG.error("[IoTask] MemcachedChannel need to be closed: `Unexpected error`. Host: `" + host + "`. " + socket, e);
                 close();
                 releaseWaitingCommand();
             }

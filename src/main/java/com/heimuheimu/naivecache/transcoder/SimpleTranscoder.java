@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.memcached.binary.transcoder;
+package com.heimuheimu.naivecache.transcoder;
 
-import com.heimuheimu.naivecache.memcached.binary.transcoder.compression.LZFUtil;
+import com.heimuheimu.naivecache.transcoder.compression.LZFUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,17 +48,11 @@ public class SimpleTranscoder implements Transcoder {
     private static final byte LZF_COMPRESSION_BYTE = 1;
 
     /**
-     * 当 Value 字节数小于或等于该值，不进行压缩，默认为64KB
+     * 当 Value 字节数小于或等于该值，不进行压缩
      */
-    private volatile int compressionThreshold = 64 * 1024;
+    private final int compressionThreshold;
 
-    /**
-     * 设置最小可压缩的字节数，当 Value 字节数小于或等于该值，不进行压缩，默认为64KB
-     *
-     * @param compressionThreshold 最小可压缩的字节数
-     */
-    @SuppressWarnings("unused")
-    public void setCompressionThreshold(int compressionThreshold) {
+    public SimpleTranscoder(int compressionThreshold) {
         this.compressionThreshold = compressionThreshold;
     }
 

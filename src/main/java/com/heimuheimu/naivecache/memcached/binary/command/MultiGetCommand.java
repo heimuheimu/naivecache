@@ -75,6 +75,7 @@ public class MultiGetCommand implements Command {
                 getRequest = new GetKRequest(key);
                 lastKey = key;
             }
+            getRequestList.add(getRequest);
             packetSize += getRequest.toByteArray().length;
         }
         this.lastKey = lastKey;

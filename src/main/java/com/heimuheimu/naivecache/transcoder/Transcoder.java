@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.memcached.binary.transcoder;
+package com.heimuheimu.naivecache.transcoder;
 
 /**
  * Java 对象与 Memcached 二进制协议存储的字节数组转换器
