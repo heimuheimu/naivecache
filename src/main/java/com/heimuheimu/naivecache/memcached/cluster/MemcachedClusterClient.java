@@ -93,7 +93,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                 MEMCACHED_CONNECTION_LOG.warn("Add `{}` to cluster failed. Hosts: `{}`.", host, hosts);
             }
         }
-        MEMCACHED_CONNECTION_LOG.info("MemcachedClusterClient has been initialized. Hosts: `{}`.", hosts);
+        MEMCACHED_CONNECTION_LOG.info("MemcachedClusterClient has been initialized. Hosts: `{}`.", Arrays.toString(hosts));
     }
 
     @Override
@@ -201,7 +201,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                     LOG.error("Close client failed: " + aliveClient, e);
                 }
             }
-            MEMCACHED_CONNECTION_LOG.info("MemcachedClusterClient has been closed. Hosts: `{}`.", hosts);
+            MEMCACHED_CONNECTION_LOG.info("MemcachedClusterClient has been closed. Hosts: `{}`.", Arrays.toString(hosts));
         }
     }
 
@@ -278,7 +278,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                         @Override
                         public void run() {
                             long startTime = System.currentTimeMillis();
-                            MEMCACHED_CONNECTION_LOG.info("Rescue task has been started. Hosts: `{}`",
+                            MEMCACHED_CONNECTION_LOG.info("Rescue task has been started. Cost: {}ms. Hosts: `{}`",
                                     System.currentTimeMillis() - startTime, hosts);
                             try {
                                 while (state == BeanStatusEnum.NORMAL &&
