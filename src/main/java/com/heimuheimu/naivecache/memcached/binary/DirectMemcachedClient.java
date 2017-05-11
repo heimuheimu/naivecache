@@ -31,10 +31,10 @@ import com.heimuheimu.naivecache.memcached.binary.command.GetCommand;
 import com.heimuheimu.naivecache.memcached.binary.command.MultiGetCommand;
 import com.heimuheimu.naivecache.memcached.binary.command.SetCommand;
 import com.heimuheimu.naivecache.memcached.binary.response.ResponsePacket;
-import com.heimuheimu.naivecache.transcoder.SimpleTranscoder;
-import com.heimuheimu.naivecache.transcoder.Transcoder;
 import com.heimuheimu.naivecache.memcached.exception.TimeoutException;
 import com.heimuheimu.naivecache.net.SocketConfiguration;
+import com.heimuheimu.naivecache.transcoder.SimpleTranscoder;
+import com.heimuheimu.naivecache.transcoder.Transcoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,6 +121,9 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
         } catch(TimeoutException e) {
             LOG.error("[get] Wait response timeout: {}ms. Key: `{}`. Host: `{}`.", timeout, key, host);
             return null;
+        } catch (IllegalStateException e) {
+            LOG.error("[get] MemcachedChannel has benn closed. Key: `{}`. Host: `{}`.", key, host);
+            return null;
         } catch (Exception e) {
             LOG.error("[get] Unexpected error: `" + e.getMessage() + "`. Key: `" + key + "`. Host: `" + host + "`.", e);
             return null;
@@ -181,6 +184,9 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
             return result;
         } catch (TimeoutException e) {
             LOG.error("[multi-get] Wait response timeout: {}ms. Key set: `{}`. Host: `{}`.", timeout, keySet, host);
+            return result;
+        } catch (IllegalStateException e) {
+            LOG.error("[multi-get] MemcachedChannel has benn closed. Key set: `{}`. Host: `{}`.", keySet, host);
             return result;
         } catch (Exception e) {
             LOG.error("[multi-get] Unexpected error: `" + e.getMessage() + "`. Key set: `" + keySet + "`. Host: `" + host + "`.", e);
@@ -253,6 +259,10 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
             LOG.error("[set] Wait response timeout: {}ms. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
                     timeout, key, value, expiry, host);
             return false;
+        } catch (IllegalStateException e) {
+            LOG.error("[set] MemcachedChannel has benn closed. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
+                    key, value, expiry, host);
+            return false;
         } catch (Exception e) {
             LOG.error("[set] Unexpected error: `" + e.getMessage() + "`. Key: `" + key + "`. Value: `" + value
                     + "`. Expiry: `" + expiry + "`. Host: `" + host + "`.", e);
@@ -296,6 +306,9 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
             LOG.error("[delete] Wait response timeout: {}ms. Key: `{}`. Host: `{}`.",
                     timeout, key, host);
             return false;
+        } catch (IllegalStateException e) {
+            LOG.error("[delete] MemcachedChannel has benn closed. Key: `{}`. Host: `{}`.", key, host);
+            return false;
         } catch (Exception e) {
             LOG.error("[delete] Unexpected error: `" + e.getMessage() + "`. Key: `" + key
                     + "`. Host: `" + host + "`.", e);
@@ -316,6 +329,14 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
     @Override
     public String getHost() {
         return host;
+    }
+
+    @Override
+    public String toString() {
+        return "DirectMemcachedClient{" +
+                "host='" + host + '\'' +
+                ", timeout=" + timeout +
+                '}';
     }
 
 }

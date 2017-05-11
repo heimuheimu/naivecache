@@ -24,6 +24,7 @@
 
 package com.heimuheimu.naivecache.memcached.cluster;
 
+import com.heimuheimu.naivecache.constant.BeanStatusEnum;
 import com.heimuheimu.naivecache.memcached.NaiveMemcachedClient;
 import com.heimuheimu.naivecache.memcached.NaiveMemcachedClientFactory;
 import com.heimuheimu.naivecache.memcached.cluster.hash.ConsistentHashLocator;
@@ -31,7 +32,6 @@ import com.heimuheimu.naivecache.net.SocketConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
@@ -67,6 +67,13 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
 
     private final Object rescueTaskLock = new Object();
 
+    /**
+     * 当前实例所处状态
+     * @see BeanStatusEnum
+     */
+    private volatile BeanStatusEnum state = BeanStatusEnum.NORMAL;
+
+
     public MemcachedClusterClient(String[] hosts, SocketConfiguration configuration,
                                   int timeout, int compressionThreshold) {
         if (hosts == null || hosts.length == 0) {
@@ -86,6 +93,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                 MEMCACHED_CONNECTION_LOG.warn("Add `{}` to cluster failed. Hosts: `{}`.", host, hosts);
             }
         }
+        MEMCACHED_CONNECTION_LOG.info("MemcachedClusterClient has been initialized. Hosts: `{}`.", hosts);
     }
 
     @Override
@@ -183,8 +191,32 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
     }
 
     @Override
-    public void close() throws IOException {
+    public synchronized void close() {
+        if (state != BeanStatusEnum.CLOSED) {
+            state = BeanStatusEnum.CLOSED;
+            for (NaiveMemcachedClient aliveClient : aliveClientList) {
+                try {
+                    aliveClient.close();
+                } catch (Exception e) {
+                    LOG.error("Close client failed: " + aliveClient, e);
+                }
+            }
+            MEMCACHED_CONNECTION_LOG.info("MemcachedClusterClient has been closed. Hosts: `{}`.", hosts);
+        }
+    }
 
+    @Override
+    public String toString() {
+        return "MemcachedClusterClient{" +
+                "hosts=" + Arrays.toString(hosts) +
+                ", clientList=" + clientList +
+                ", aliveClientList=" + aliveClientList +
+                ", configuration=" + configuration +
+                ", timeout=" + timeout +
+                ", compressionThreshold=" + compressionThreshold +
+                ", isRescueTaskRunning=" + isRescueTaskRunning +
+                ", state=" + state +
+                '}';
     }
 
     private boolean createClient(String host) {
@@ -200,6 +232,10 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
     }
 
     private NaiveMemcachedClient getClient(String key) {
+        if (state != BeanStatusEnum.NORMAL) {
+            LOG.warn("Could not find client for key `{}`. MemcachedClusterClient has been closed. Hosts: `{}`.", key, hosts);
+            return null;
+        }
         try {
             int clientIndex = locator.getIndex(key, hosts.length);
             NaiveMemcachedClient client = clientList.get(clientIndex);
@@ -234,52 +270,55 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
     }
 
     private void startRescueTask() {
-        synchronized (rescueTaskLock) {
-            if (!isRescueTaskRunning) {
-                Thread rescueThread = new Thread() {
+        if (state == BeanStatusEnum.NORMAL) {
+            synchronized (rescueTaskLock) {
+                if (!isRescueTaskRunning) {
+                    Thread rescueThread = new Thread() {
 
-                    @Override
-                    public void run() {
-                        long startTime = System.currentTimeMillis();
-                        MEMCACHED_CONNECTION_LOG.info("Rescue task has been started. Hosts: `{}`",
-                                System.currentTimeMillis() - startTime, hosts);
-                        try {
-                            while (aliveClientList.size() < hosts.length) {
-                                for (int i = 0; i < hosts.length; i++) {
-                                    if (clientList.get(i) == null) {
-                                        boolean isSuccess = createClient(hosts[i]);
-                                        if (isSuccess) {
-                                            MEMCACHED_CONNECTION_LOG.info("Rescue `{}` to cluster success.", hosts[i]);
-                                        } else {
-                                            MEMCACHED_CONNECTION_LOG.warn("Rescue `{}` to cluster failed.", hosts[i]);
+                        @Override
+                        public void run() {
+                            long startTime = System.currentTimeMillis();
+                            MEMCACHED_CONNECTION_LOG.info("Rescue task has been started. Hosts: `{}`",
+                                    System.currentTimeMillis() - startTime, hosts);
+                            try {
+                                while (state == BeanStatusEnum.NORMAL &&
+                                        aliveClientList.size() < hosts.length) {
+                                    for (int i = 0; i < hosts.length; i++) {
+                                        if (clientList.get(i) == null) {
+                                            boolean isSuccess = createClient(hosts[i]);
+                                            if (isSuccess) {
+                                                MEMCACHED_CONNECTION_LOG.info("Rescue `{}` to cluster success.", hosts[i]);
+                                            } else {
+                                                MEMCACHED_CONNECTION_LOG.warn("Rescue `{}` to cluster failed.", hosts[i]);
+                                            }
                                         }
                                     }
+                                    Thread.sleep(500); //delay 500ms
                                 }
-                                Thread.sleep(500); //delay 500ms
+                                rescueOver();
+                                MEMCACHED_CONNECTION_LOG.info("Rescue task has been finished. Cost: {}ms. Hosts: `{}`",
+                                        System.currentTimeMillis() - startTime, hosts);
+                            } catch (Exception e) {
+                                rescueOver();
+                                MEMCACHED_CONNECTION_LOG.info("Rescue task executed failed: `{}`. Cost: {}ms. Hosts: `{}`",
+                                        e.getMessage(), System.currentTimeMillis() - startTime, hosts);
+                                LOG.error("Rescue task executed failed. Hosts: `" + Arrays.toString(hosts)
+                                        + "`", e);
                             }
-                            rescueOver();
-                            MEMCACHED_CONNECTION_LOG.info("Rescue task has been finished. Cost: {}ms. Hosts: `{}`",
-                                    System.currentTimeMillis() - startTime, hosts);
-                        } catch (Exception e) {
-                            rescueOver();
-                            MEMCACHED_CONNECTION_LOG.info("Rescue task executed failed: `{}`. Cost: {}ms. Hosts: `{}`",
-                                    e.getMessage(), System.currentTimeMillis() - startTime, hosts);
-                            LOG.error("Rescue task executed failed. Hosts: `" + Arrays.toString(hosts)
-                                + "`", e);
                         }
-                    }
 
-                    private void rescueOver() {
-                        synchronized (rescueTaskLock) {
-                            isRescueTaskRunning = false;
+                        private void rescueOver() {
+                            synchronized (rescueTaskLock) {
+                                isRescueTaskRunning = false;
+                            }
                         }
-                    }
 
-                };
-                rescueThread.setName("MemcachedClusterClient rescue task");
-                rescueThread.setDaemon(true);
-                rescueThread.start();
-                isRescueTaskRunning = true;
+                    };
+                    rescueThread.setName("MemcachedClusterClient rescue task");
+                    rescueThread.setDaemon(true);
+                    rescueThread.start();
+                    isRescueTaskRunning = true;
+                }
             }
         }
     }

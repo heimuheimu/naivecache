@@ -114,7 +114,7 @@ public class SocketBuilder {
 			return socket;
 		} catch (Exception e) {
 			throw new RuntimeException("Create socket failed. Hostname: " 
-					+ hostname + ". Port: " + port + ". " + config);
+					+ hostname + ". Port: " + port + ". " + config, e);
 		}
 	}
 	
@@ -152,7 +152,7 @@ public class SocketBuilder {
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("Set socket config failed. Socket: " 
-					+ socket + ". Config: " + config);
+					+ socket + ". Config: " + config, e);
 		}
 	}
 	
