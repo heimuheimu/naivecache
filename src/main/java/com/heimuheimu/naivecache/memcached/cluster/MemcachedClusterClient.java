@@ -152,11 +152,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
     public boolean set(String key, Object value, int expiry) {
         try {
             NaiveMemcachedClient client = getClient(key);
-            if (client != null) {
-                return client.set(key, value, expiry);
-            } else {
-                return false;
-            }
+            return client != null && client.set(key, value, expiry);
         } catch (Exception e) {
             LOG.error("[set] Unexpected error: `" + e.getMessage() + "`. Key: `" + key + "`. Value: `" + value
                     + "`. Expiry: `" + expiry + "`. Hosts: `" + Arrays.toString(hosts) + "`.", e);
@@ -168,11 +164,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
     public boolean delete(String key) {
         try {
             NaiveMemcachedClient client = getClient(key);
-            if (client != null) {
-                return client.delete(key);
-            } else {
-                return false;
-            }
+            return client != null && client.delete(key);
         } catch (Exception e) {
             LOG.error("[delete] Unexpected error: `" + e.getMessage() + "`. Key: `" + key
                     + "`. Hosts: `" + Arrays.toString(hosts) + "`.", e);

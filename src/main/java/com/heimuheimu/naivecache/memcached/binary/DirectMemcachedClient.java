@@ -32,6 +32,9 @@ import com.heimuheimu.naivecache.memcached.binary.command.MultiGetCommand;
 import com.heimuheimu.naivecache.memcached.binary.command.SetCommand;
 import com.heimuheimu.naivecache.memcached.binary.response.ResponsePacket;
 import com.heimuheimu.naivecache.memcached.exception.TimeoutException;
+import com.heimuheimu.naivecache.memcached.monitor.MemcachedMonitor;
+import com.heimuheimu.naivecache.memcached.monitor.OperationResult;
+import com.heimuheimu.naivecache.memcached.monitor.OperationType;
 import com.heimuheimu.naivecache.net.SocketConfiguration;
 import com.heimuheimu.naivecache.transcoder.SimpleTranscoder;
 import com.heimuheimu.naivecache.transcoder.Transcoder;
@@ -81,19 +84,23 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
 
     @Override
     public <T> T get(String key) {
+        long startTime = System.nanoTime();
         try {
             if (key == null || key.isEmpty()) {
                 LOG.error("[get] Key could not be empty. Key: `{}`. Host: `{}`.", key, host);
+                MemcachedMonitor.add(host, OperationType.GET, OperationResult.ERROR, startTime);
                 return null;
             }
             byte[] keyBytes = key.getBytes(CHARSET_UTF8);
             if (keyBytes.length > MAX_KEY_LENGTH) {
                 LOG.error("[get] Key is too large. Key length could not greater than {}. Key: `{}`. Host: `{}`.",
                         MAX_KEY_LENGTH, key, host);
+                MemcachedMonitor.add(host, OperationType.GET, OperationResult.ERROR, startTime);
                 return null;
             }
             if (!memcachedChannel.isActive()) {
                 LOG.error("[get] Inactive channel. Key: `{}`. Host: `{}`.", key, host);
+                MemcachedMonitor.add(host, OperationType.GET, OperationResult.ERROR, startTime);
                 return null;
             }
             GetCommand getCommand = new GetCommand(keyBytes);
@@ -105,41 +112,51 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
                             responsePacket.getExtrasLength() + responsePacket.getKeyLength(),
                             responsePacket.getValueLength());
                     LOG.debug("[get] Success. Key: `{}`. Value: `{}`. Host: `{}`.", key, value, host);
+                    MemcachedMonitor.add(host, OperationType.GET, OperationResult.SUCCESS, startTime);
                     return value;
                 } else {
                     if (responsePacket.isKeyNotFound()) {
                         LOG.info("[get] Key not found. Key: `{}`. Host: `{}`", key, host);
+                        MemcachedMonitor.add(host, OperationType.GET, OperationResult.MISS, startTime);
                     } else {
                         LOG.error("[get] Memcached error: `{}`. Key: `{}`. Host: `{}`.", responsePacket.getErrorMessage(), key, host);
+                        MemcachedMonitor.add(host, OperationType.GET, OperationResult.ERROR, startTime);
                     }
                     return null;
                 }
             } else {
                 LOG.error("[get] Empty response. Key: `{}`. Host: `{}`", key, host);
+                MemcachedMonitor.add(host, OperationType.GET, OperationResult.ERROR, startTime);
                 return null;
             }
         } catch(TimeoutException e) {
             LOG.error("[get] Wait response timeout: {}ms. Key: `{}`. Host: `{}`.", timeout, key, host);
+            MemcachedMonitor.add(host, OperationType.GET, OperationResult.TIMEOUT, startTime);
             return null;
         } catch (IllegalStateException e) {
             LOG.error("[get] MemcachedChannel has benn closed. Key: `{}`. Host: `{}`.", key, host);
+            MemcachedMonitor.add(host, OperationType.GET, OperationResult.ERROR, startTime);
             return null;
         } catch (Exception e) {
             LOG.error("[get] Unexpected error: `" + e.getMessage() + "`. Key: `" + key + "`. Host: `" + host + "`.", e);
+            MemcachedMonitor.add(host, OperationType.GET, OperationResult.ERROR, startTime);
             return null;
         }
     }
 
     @Override
     public <T> Map<String, T> multiGet(Set<String> keySet) {
+        long startTime = System.nanoTime();
         Map<String, T> result = new HashMap<>();
         try {
             if (keySet == null || keySet.isEmpty()) {
                 LOG.error("[multi-get] Key set could not be empty. Key set: `{}`. Host: `{}`.", keySet, host);
+                MemcachedMonitor.add(host, OperationType.MULTI_GET, OperationResult.ERROR, startTime);
                 return result;
             }
             if (!memcachedChannel.isActive()) {
                 LOG.error("[multi-get] Inactive channel. Key set: `{}`. Host: `{}`.", keySet, host);
+                MemcachedMonitor.add(host, OperationType.MULTI_GET, OperationResult.ERROR, startTime);
                 return result;
             }
             List<byte[]> keyList = new ArrayList<>();
@@ -155,6 +172,9 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
                     continue;
                 }
                 keyList.add(keyBytes);
+            }
+            if (keyList.size() < keySet.size()) {
+                MemcachedMonitor.add(host, OperationType.MULTI_GET, OperationResult.ERROR, startTime);
             }
             if (!keyList.isEmpty()) {
                 MultiGetCommand multiGetCommand = new MultiGetCommand(keyList);
@@ -179,17 +199,23 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
                 if (result.size() < keySet.size()) {
                     LOG.info("[multi-get] Miss `{}` keys. Hit keys: `{}`. Key set: `{}`. Host: `{}`.",
                             keySet.size() - result.size(), result.keySet(), keySet, host);
+                    MemcachedMonitor.add(host, OperationType.MULTI_GET, OperationResult.MISS, startTime);
+                } else {
+                    MemcachedMonitor.add(host, OperationType.MULTI_GET, OperationResult.SUCCESS, startTime);
                 }
             }
             return result;
         } catch (TimeoutException e) {
             LOG.error("[multi-get] Wait response timeout: {}ms. Key set: `{}`. Host: `{}`.", timeout, keySet, host);
+            MemcachedMonitor.add(host, OperationType.MULTI_GET, OperationResult.TIMEOUT, startTime);
             return result;
         } catch (IllegalStateException e) {
             LOG.error("[multi-get] MemcachedChannel has benn closed. Key set: `{}`. Host: `{}`.", keySet, host);
+            MemcachedMonitor.add(host, OperationType.MULTI_GET, OperationResult.ERROR, startTime);
             return result;
         } catch (Exception e) {
             LOG.error("[multi-get] Unexpected error: `" + e.getMessage() + "`. Key set: `" + keySet + "`. Host: `" + host + "`.", e);
+            MemcachedMonitor.add(host, OperationType.MULTI_GET, OperationResult.ERROR, startTime);
             return result;
         }
     }
@@ -201,40 +227,48 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
 
     @Override
     public boolean set(String key, Object value, int expiry) {
+        long startTime = System.nanoTime();
         try {
             if (key == null || key.isEmpty()) {
                 LOG.error("[set] Key could not be empty. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.", key, value, expiry, host);
+                MemcachedMonitor.add(host, OperationType.SET, OperationResult.ERROR, startTime);
                 return false;
             }
             byte[] keyBytes = key.getBytes(CHARSET_UTF8);
             if (keyBytes.length > MAX_KEY_LENGTH) {
                 LOG.error("[set] Key is too large. Key length could not greater than {}. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
                         MAX_KEY_LENGTH, key, value, expiry, host);
+                MemcachedMonitor.add(host, OperationType.SET, OperationResult.ERROR, startTime);
                 return false;
             }
             if (value == null) {
                 LOG.error("[set] Value could not be null. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
                         key, "null", expiry, host);
+                MemcachedMonitor.add(host, OperationType.SET, OperationResult.ERROR, startTime);
                 return false;
             }
             if (!(value instanceof Serializable)) {
                 LOG.error("[set] Value is not serializable. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
                         key, value, expiry, host);
+                MemcachedMonitor.add(host, OperationType.SET, OperationResult.ERROR, startTime);
                 return false;
             }
             if (expiry < 0) {
                 LOG.error("[set] Expiry could not less than 0. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
                         key, value, expiry, host);
+                MemcachedMonitor.add(host, OperationType.SET, OperationResult.ERROR, startTime);
                 return false;
             }
             if (!memcachedChannel.isActive()) {
                 LOG.error("[set] Inactive channel. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.", key, value, expiry, host);
+                MemcachedMonitor.add(host, OperationType.SET, OperationResult.ERROR, startTime);
                 return false;
             }
             byte[][] encodedBytes = transcoder.encode(value);
             if (encodedBytes[1].length > MAX_VALUE_LENGTH) {
                 LOG.error("[set] Value is too large. Value length could not greater than {}. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
                         MAX_VALUE_LENGTH, key, value, expiry, host);
+                MemcachedMonitor.add(host, OperationType.SET, OperationResult.ERROR, startTime);
                 return false;
             }
             SetCommand setCommand = new SetCommand(keyBytes, encodedBytes[1], expiry, encodedBytes[0]);
@@ -244,43 +278,52 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
                 if (responsePacket.isSuccess()) {
                     LOG.debug("[set] Success. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
                             key, value, expiry, host);
+                    MemcachedMonitor.add(host, OperationType.SET, OperationResult.SUCCESS, startTime);
                     return true;
                 } else {
                     LOG.error("[set] Memcached error: `{}`. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
                             responsePacket.getErrorMessage(), key, value, expiry, host);
+                    MemcachedMonitor.add(host, OperationType.SET, OperationResult.ERROR, startTime);
                     return false;
                 }
             } else {
                 LOG.error("[set] Empty response. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`",
                         key, value, expiry, host);
+                MemcachedMonitor.add(host, OperationType.SET, OperationResult.ERROR, startTime);
                 return false;
             }
         } catch (TimeoutException e) {
             LOG.error("[set] Wait response timeout: {}ms. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
                     timeout, key, value, expiry, host);
+            MemcachedMonitor.add(host, OperationType.SET, OperationResult.TIMEOUT, startTime);
             return false;
         } catch (IllegalStateException e) {
             LOG.error("[set] MemcachedChannel has benn closed. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
                     key, value, expiry, host);
+            MemcachedMonitor.add(host, OperationType.SET, OperationResult.ERROR, startTime);
             return false;
         } catch (Exception e) {
             LOG.error("[set] Unexpected error: `" + e.getMessage() + "`. Key: `" + key + "`. Value: `" + value
                     + "`. Expiry: `" + expiry + "`. Host: `" + host + "`.", e);
+            MemcachedMonitor.add(host, OperationType.SET, OperationResult.ERROR, startTime);
             return false;
         }
     }
 
     @Override
     public boolean delete(String key) {
+        long startTime = System.nanoTime();
         try {
             if (key == null || key.isEmpty()) {
                 LOG.error("[delete] Key could not be empty. Key: `{}`. Host: `{}`.", key, host);
+                MemcachedMonitor.add(host, OperationType.DELETE, OperationResult.ERROR, startTime);
                 return false;
             }
             byte[] keyBytes = key.getBytes(CHARSET_UTF8);
             if (keyBytes.length > MAX_KEY_LENGTH) {
                 LOG.error("[delete] Key is too large. Key length could not greater than {}. Key: `{}`. Host: `{}`.",
                         MAX_KEY_LENGTH, key, host);
+                MemcachedMonitor.add(host, OperationType.DELETE, OperationResult.ERROR, startTime);
                 return false;
             }
             DeleteCommand deleteCommand = new DeleteCommand(keyBytes);
@@ -289,29 +332,36 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
                 ResponsePacket responsePacket = responsePacketList.get(0);
                 if (responsePacket.isSuccess()) {
                     LOG.debug("[delete] Success. Key: `{}`. Host: `{}`.", key, host);
+                    MemcachedMonitor.add(host, OperationType.DELETE, OperationResult.SUCCESS, startTime);
                     return true;
                 } else {
                     if (responsePacket.isKeyNotFound()) {
                         LOG.info("[delete] Key not found. Key: `{}`. Host: `{}`", key, host);
+                        MemcachedMonitor.add(host, OperationType.DELETE, OperationResult.MISS, startTime);
                     } else {
                         LOG.error("[delete] Memcached error: `{}`. Key: `{}`. Host: `{}`.", responsePacket.getErrorMessage(), key, host);
+                        MemcachedMonitor.add(host, OperationType.DELETE, OperationResult.ERROR, startTime);
                     }
                     return false;
                 }
             } else {
                 LOG.error("[delete] Empty response. Key: `{}`. Host: `{}`", key, host);
+                MemcachedMonitor.add(host, OperationType.DELETE, OperationResult.ERROR, startTime);
                 return false;
             }
         } catch (TimeoutException e) {
             LOG.error("[delete] Wait response timeout: {}ms. Key: `{}`. Host: `{}`.",
                     timeout, key, host);
+            MemcachedMonitor.add(host, OperationType.DELETE, OperationResult.TIMEOUT, startTime);
             return false;
         } catch (IllegalStateException e) {
             LOG.error("[delete] MemcachedChannel has benn closed. Key: `{}`. Host: `{}`.", key, host);
+            MemcachedMonitor.add(host, OperationType.DELETE, OperationResult.ERROR, startTime);
             return false;
         } catch (Exception e) {
             LOG.error("[delete] Unexpected error: `" + e.getMessage() + "`. Key: `" + key
                     + "`. Host: `" + host + "`.", e);
+            MemcachedMonitor.add(host, OperationType.DELETE, OperationResult.ERROR, startTime);
             return false;
         }
     }
