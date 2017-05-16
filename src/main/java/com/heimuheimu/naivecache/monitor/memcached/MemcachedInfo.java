@@ -22,7 +22,10 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.memcached.monitor;
+package com.heimuheimu.naivecache.monitor.memcached;
+
+import com.heimuheimu.naivecache.monitor.ExecutionTimeInfo;
+import com.heimuheimu.naivecache.monitor.TpsInfo;
 
 /**
  * Memcached 统计信息

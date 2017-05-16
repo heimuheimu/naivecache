@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.memcached.monitor;
+package com.heimuheimu.naivecache.monitor.memcached;
 
 /**
  * Memcached 命令返回结果，用于统计使用

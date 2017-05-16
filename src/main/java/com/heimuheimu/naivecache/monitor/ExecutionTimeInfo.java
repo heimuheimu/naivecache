@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.memcached.monitor;
+package com.heimuheimu.naivecache.monitor;
 
 import java.util.concurrent.atomic.AtomicLong;
 

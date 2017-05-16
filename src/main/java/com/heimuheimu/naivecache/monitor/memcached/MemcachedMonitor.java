@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.memcached.monitor;
+package com.heimuheimu.naivecache.monitor.memcached;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
