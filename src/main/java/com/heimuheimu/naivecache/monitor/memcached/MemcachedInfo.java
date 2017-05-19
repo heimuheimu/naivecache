@@ -24,6 +24,8 @@
 
 package com.heimuheimu.naivecache.monitor.memcached;
 
+import com.heimuheimu.naivecache.memcached.OperationResult;
+import com.heimuheimu.naivecache.memcached.OperationType;
 import com.heimuheimu.naivecache.monitor.ExecutionTimeInfo;
 import com.heimuheimu.naivecache.monitor.TpsInfo;
 
@@ -34,6 +36,7 @@ import com.heimuheimu.naivecache.monitor.TpsInfo;
  * @author heimuheimu
  * @ThreadSafe
  */
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class MemcachedInfo {
 
     /**
@@ -112,6 +115,78 @@ public class MemcachedInfo {
             default:
                 break;
         }
+    }
+
+    /**
+     * 获得 Memcached 地址
+     *
+     * @return Memcached 地址
+     */
+    public String getHost() {
+        return host;
+    }
+
+    /**
+     * 获得 Memcached TPS 统计信息
+     *
+     * @return Memcached TPS 统计信息
+     */
+    public TpsInfo getTpsInfo() {
+        return tpsInfo;
+    }
+
+    /**
+     * 获得 Memcached 命令执行时间统计信息
+     *
+     * @return Memcached 命令执行时间统计信息
+     */
+    public ExecutionTimeInfo getExecutionTimeInfo() {
+        return executionTimeInfo;
+    }
+
+    /**
+     * 获得 Memcached 所有命令执行次数统计信息
+     *
+     * @return Memcached 所有命令执行次数统计信息
+     */
+    public OperationInfo getTotalOpInfo() {
+        return totalOpInfo;
+    }
+
+    /**
+     * 获得 Memcached get 命令次数统计信息
+     *
+     * @return Memcached get 命令次数统计信息
+     */
+    public OperationInfo getGetOpInfo() {
+        return getOpInfo;
+    }
+
+    /**
+     * 获得 Memcached multi-get 命令次数统计信息
+     *
+     * @return Memcached multi-get 命令次数统计信息
+     */
+    public OperationInfo getMultiGetOpInfo() {
+        return multiGetOpInfo;
+    }
+
+    /**
+     * 获得 Memcached set 命令次数统计信息
+     *
+     * @return Memcached set 命令次数统计信息
+     */
+    public OperationInfo getSetOpInfo() {
+        return setOpInfo;
+    }
+
+    /**
+     * 获得 Memcached delete 命令次数统计信息
+     *
+     * @return Memcached delete 命令次数统计信息
+     */
+    public OperationInfo getDeleteOpInfo() {
+        return deleteOpInfo;
     }
 
     @Override

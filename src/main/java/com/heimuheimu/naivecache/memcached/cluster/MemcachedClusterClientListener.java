@@ -22,34 +22,35 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.monitor.memcached;
+package com.heimuheimu.naivecache.memcached.cluster;
 
 /**
- * Memcached 命令返回结果，用于统计使用
+ * Memcached 集群客户端事件监听器
  *
  * @author heimuheimu
- * @see MemcachedMonitor
  */
-public enum OperationResult {
+@SuppressWarnings({"EmptyMethod", "WeakerAccess", "unused"})
+public interface MemcachedClusterClientListener {
 
     /**
-     * 操作成功
+     * 当 Memcached 服务在 Memcached 集群客户端初始化过程被创建成功时，将会触发此事件
+     *
+     * @param host 创建成功的 Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:11211
      */
-    SUCCESS,
+    void onCreated(String host);
 
     /**
-     * Memcached Key 不存在
+     * 当 Memcached 服务恢复时，将会触发此事件
+     *
+     * @param host 已恢复的 Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:11211
      */
-    MISS,
+    void onRecovered(String host);
 
     /**
-     * 操作超时
+     * 当 Memcached 服务关闭时，将会触发此事件
+     *
+     * @param host 已关闭的 Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:11211
      */
-    TIMEOUT,
-
-    /**
-     * 操作发生异常
-     */
-    ERROR
+    void onClosed(String host);
 
 }

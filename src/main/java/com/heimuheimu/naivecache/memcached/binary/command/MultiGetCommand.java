@@ -28,7 +28,6 @@ import com.heimuheimu.naivecache.memcached.binary.request.GetKQRequest;
 import com.heimuheimu.naivecache.memcached.binary.request.GetKRequest;
 import com.heimuheimu.naivecache.memcached.binary.request.RequestPacket;
 import com.heimuheimu.naivecache.memcached.binary.response.ResponsePacket;
-import com.heimuheimu.naivecache.memcached.exception.MemcachedException;
 import com.heimuheimu.naivecache.memcached.exception.TimeoutException;
 
 import java.util.*;
@@ -54,7 +53,7 @@ public class MultiGetCommand implements Command {
 
     private volatile boolean hasResponsePacket = true;
 
-    private List<ResponsePacket> responsePacketList = new ArrayList<>();
+    private final List<ResponsePacket> responsePacketList = new ArrayList<>();
 
     private final Object responseLock = new Object();
 
@@ -68,7 +67,7 @@ public class MultiGetCommand implements Command {
         byte[] lastKey = null;
         while (keyIterator.hasNext()) {
             byte[] key = keyIterator.next();
-            RequestPacket getRequest = null;
+            RequestPacket getRequest;
             if (keyIterator.hasNext()) {
                 getRequest = new GetKQRequest(key);
             } else {

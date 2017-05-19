@@ -41,7 +41,7 @@ public interface Transcoder {
      * @return 长度为2的二维数组，索引0的为 flags 字节数组，长度为4，索引1的为 value 字节数组，长度不固定
      * @throws Exception 编码过程中发生错误
      */
-    public byte[][] encode(Object value) throws Exception;
+    byte[][] encode(Object value) throws Exception;
 
     /**
      * 将字节数组还原成 Java 对象并返回，如果当前转换器不支持该 flags 对应的转换，将会返回 {@code null}
@@ -53,6 +53,6 @@ public interface Transcoder {
      * @return Java 对象
      * @throws Exception 解码过程中发生错误
      */
-    public <T> T decode(byte[] src, int flagsOffset, int valueOffset, int valueLength) throws Exception;
+    <T> T decode(byte[] src, @SuppressWarnings("SameParameterValue") int flagsOffset, int valueOffset, int valueLength) throws Exception;
 
 }

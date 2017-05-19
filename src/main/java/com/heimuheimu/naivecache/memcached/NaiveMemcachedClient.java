@@ -87,6 +87,7 @@ public interface NaiveMemcachedClient extends Closeable {
      * @param value Memcached value，字节长度不应超过 {@link #MAX_VALUE_LENGTH}
      * @return 设置成功，返回 {@code true}，设置失败或发生异常，则返回 {@code false}
      */
+    @SuppressWarnings("unused")
     boolean set(String key, Object value);
 
     /**
@@ -125,6 +126,7 @@ public interface NaiveMemcachedClient extends Closeable {
 
     /**
      * 获得当前客户端所连的 Memcached 地址
+     * <p>注意：客户端可能支持多 Memcached 地址，输出格式由实现类自行定义</p>
      *
      * @return 当前客户端所连的 Memcached 地址
      */

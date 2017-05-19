@@ -21,42 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.heimuheimu.naivecache.transcoder.compression;
 
-import com.ning.compress.lzf.LZFDecoder;
-import com.ning.compress.lzf.LZFEncoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package com.heimuheimu.naivecache.memcached;
 
 /**
- * LZF 压缩、解压工具，更多信息可参考：
- * <p>
- *     <a href="https://github.com/ning/compress">https://github.com/ning/compress</a>
- * </p>
- *
+ * Memcached 命令类型
  *
  * @author heimuheimu
  */
-public class LZFUtil {
-	
-	private static final Logger LOG = LoggerFactory.getLogger(LZFUtil.class);
-	
-	public static byte[] compress(byte[] src) {
-		try {
-			return LZFEncoder.encode(src);
-		} catch (Exception e) {
-			LOG.error("LZF compress error.", e);
-			return new byte[0];
-		}
-	}
-	
-	public static byte[] decompress(byte[] compressedBytes, int offset, int length) {
-		try {
-			return LZFDecoder.decode(compressedBytes, offset, length);
-		} catch (Exception e) {
-			LOG.error("LZF decompress error.", e);
-			return new byte[0];
-		}
-	}
+public enum OperationType {
+
+    /**
+     * Memcached get 命令
+     */
+    GET,
+
+    /**
+     * Memcached multi-get 命令
+     */
+    MULTI_GET,
+
+    /**
+     * Memcached set 命令
+     */
+    SET,
+
+    /**
+     * Memcached delete 命令
+     */
+    DELETE
 
 }

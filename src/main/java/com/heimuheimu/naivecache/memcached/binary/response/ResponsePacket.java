@@ -36,6 +36,7 @@ import com.heimuheimu.naivecache.memcached.util.ByteUtil;
  * @author heimuheimu
  * @ThreadSafe
  */
+@SuppressWarnings("unused")
 public class ResponsePacket {
 
     private final byte[] header;
@@ -48,7 +49,7 @@ public class ResponsePacket {
 
     private final int valueLength;
 
-    public ResponsePacket(byte[] header, byte[] body) {
+    ResponsePacket(byte[] header, byte[] body) {
         this.header = header;
         this.body = body;
         if (body != null && body.length > 0) {

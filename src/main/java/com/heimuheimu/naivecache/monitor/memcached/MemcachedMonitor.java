@@ -24,9 +24,12 @@
 
 package com.heimuheimu.naivecache.monitor.memcached;
 
+import com.heimuheimu.naivecache.memcached.OperationResult;
+import com.heimuheimu.naivecache.memcached.OperationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -37,9 +40,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author heimuheimu
  * @ThreadSafe
  */
+@SuppressWarnings("unused")
 public class MemcachedMonitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(MemcachedMonitor.class);
+
+    private static final MemcachedInfo GLOBAL_INFO = new MemcachedInfo("");
 
     private static final ConcurrentHashMap<String, MemcachedInfo> MEM_INFO_MAP = new ConcurrentHashMap<>();
 
@@ -60,6 +66,7 @@ public class MemcachedMonitor {
      */
     public static void add(String host, OperationType op, OperationResult result, long startTime) {
         try {
+            GLOBAL_INFO.add(op, result, startTime);
             MemcachedInfo memcachedInfo = get(host);
             memcachedInfo.add(op, result, startTime);
         } catch (Exception e) {
@@ -70,7 +77,9 @@ public class MemcachedMonitor {
     }
 
     public static Map<String, MemcachedInfo> get() {
-        return MEM_INFO_MAP;
+        HashMap<String, MemcachedInfo> memcachedInfoHashMap = new HashMap<>(MEM_INFO_MAP);
+        memcachedInfoHashMap.put("", GLOBAL_INFO);
+        return memcachedInfoHashMap;
     }
 
     private static MemcachedInfo get(String host) {
@@ -78,6 +87,7 @@ public class MemcachedMonitor {
         if (memcachedInfo == null) {
             synchronized (lock) {
                 memcachedInfo = MEM_INFO_MAP.get(host);
+                //noinspection Java8MapApi
                 if (memcachedInfo == null) {
                     memcachedInfo = new MemcachedInfo(host);
                     MEM_INFO_MAP.put(host, memcachedInfo);

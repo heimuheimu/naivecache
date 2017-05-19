@@ -41,12 +41,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author heimuheimu
  * @ThreadSafe
  */
-public class MultiGetExecutor implements Closeable {
+class MultiGetExecutor implements Closeable {
 
     private final ExecutorService executorService = Executors.newCachedThreadPool(new NamedThreadFactory());
 
     @SuppressWarnings("unchecked")
-    public <T> Future<Map<String, T>> submit(NaiveMemcachedClient client, Set<String> keySet) {
+    <T> Future<Map<String, T>> submit(NaiveMemcachedClient client, Set<String> keySet) {
         return executorService.submit(new MultiGetTask(client, keySet));
     }
 

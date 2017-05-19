@@ -57,7 +57,7 @@ public class GetCommand implements OptimizedCommand {
 
     private volatile ResponsePacket responsePacket;
 
-    private List<GetCommand> optimizedCommandList = new ArrayList<>();
+    private final List<GetCommand> optimizedCommandList = new ArrayList<>();
 
     private final Object optimizedLock = new Object();
 

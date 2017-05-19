@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author heimuheimu
  * @ThreadSafe
  */
+@SuppressWarnings("unused")
 public class TpsInfo {
 
     /**

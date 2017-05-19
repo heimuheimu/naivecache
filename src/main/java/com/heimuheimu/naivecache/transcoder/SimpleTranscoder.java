@@ -24,6 +24,7 @@
 
 package com.heimuheimu.naivecache.transcoder;
 
+import com.heimuheimu.naivecache.monitor.compress.CompressionMonitor;
 import com.heimuheimu.naivecache.transcoder.compression.LZFUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,7 @@ public class SimpleTranscoder implements Transcoder {
 
     @Override
     public byte[][] encode(Object value) throws Exception {
+
         byte[][] result = new byte[2][0];
         byte[] flags = new byte[4];
         flags[0] = TRANSCODER_VERSION_BYTE;
@@ -66,8 +68,12 @@ public class SimpleTranscoder implements Transcoder {
         oos.writeObject(value);
         byte[] valueBytes = bos.toByteArray();
         oos.close();
+        int preCompressedLength = valueBytes.length;
+        CompressionMonitor.addSize(preCompressedLength);
         if (valueBytes.length > compressionThreshold) {
+            long startTime = System.nanoTime();
             valueBytes = LZFUtil.compress(valueBytes);
+            CompressionMonitor.addCompress(preCompressedLength, valueBytes.length, startTime);
             flags[1] = LZF_COMPRESSION_BYTE;
         }
         result[0] = flags;
@@ -78,10 +84,18 @@ public class SimpleTranscoder implements Transcoder {
     @SuppressWarnings("unchecked")
     @Override
     public Object decode(byte[] src, int flagsOffset, int valueOffset, int valueLength) throws Exception {
-        ByteArrayInputStream flagsBis = new ByteArrayInputStream(src, flagsOffset, 4);
-        int flagVersion = flagsBis.read();
+        int flagVersion = src[flagsOffset];
+        int compressionByte = src[flagsOffset + 1];
         if (flagVersion == TRANSCODER_VERSION_BYTE) {
-            ByteArrayInputStream valueBis = new ByteArrayInputStream(src, valueOffset, valueLength);
+            ByteArrayInputStream valueBis;
+            if (compressionByte != LZF_COMPRESSION_BYTE) {
+                valueBis = new ByteArrayInputStream(src, valueOffset, valueLength);
+            } else {
+                long startTime = System.nanoTime();
+                byte[] value = LZFUtil.decompress(src, valueOffset, valueLength);
+                CompressionMonitor.addDecompress(valueLength, value.length, startTime);
+                valueBis = new ByteArrayInputStream(value);
+            }
             ObjectInputStream ois = new ObjectInputStream(valueBis);
             return ois.readObject();
         } else {

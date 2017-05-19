@@ -43,12 +43,14 @@ public class NaiveMemcachedClientFactory {
      *
      * @param host Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:9610
      * @param configuration Socket配置信息，如果传 {@code null}，将会使用{@link SocketConfiguration#DEFAULT}配置信息
-     * @param timeout Memcached 操作超时时间，单位：毫秒，不能小于等于0
-     * @param compressionThreshold 最小压缩字节数，当 Value 字节数小于或等于该值，不进行压缩，不能小于等于0
+     * @param timeout Memcached 操作超时时间，单位：毫秒，如果传入的值小于等于 0，将会使用默认值 1000ms
+     * @param compressionThreshold 最小压缩字节数，当 Value 字节数小于或等于该值，不进行压缩，如果传入的值小于等于 0，将会使用默认值 64KB
+     * @param clientListener Memcached 客户端事件监听器，允许为 {@code null}
      * @return Memcached 客户端，有可能返回 {@code null}
      */
     public static NaiveMemcachedClient create(String host, SocketConfiguration configuration,
-                                              int timeout, int compressionThreshold) {
+                                              int timeout, int compressionThreshold,
+                                              NaiveMemcachedClientListener clientListener) {
         try {
             if (timeout <= 0) {
                 LOG.warn("Invalid timeout: `{}`. Use default value: 1000ms. Host: `{}`. SocketConfiguration: `{}`. Compression threshold: `{}`.",
@@ -60,8 +62,7 @@ public class NaiveMemcachedClientFactory {
                         compressionThreshold, host, configuration, timeout);
                 compressionThreshold = 64 * 1024;
             }
-            NaiveMemcachedClient client = new DirectMemcachedClient(host, configuration, timeout, compressionThreshold);
-            return client;
+            return new DirectMemcachedClient(host, configuration, timeout, compressionThreshold, clientListener);
         } catch (Exception e) {
             LOG.error("Create NaiveMemcachedClient failed. Host: `" + host + "`. SocketConfiguration: `" + configuration + "`. Timeout: `"
                 + timeout + "`. Compression threshold: `" + compressionThreshold + "`.", e);

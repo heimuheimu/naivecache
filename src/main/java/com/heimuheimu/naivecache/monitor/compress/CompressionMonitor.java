@@ -36,24 +36,42 @@ import org.slf4j.LoggerFactory;
  * @author heimuheimu
  * @ThreadSafe
  */
+@SuppressWarnings("unused")
 public class CompressionMonitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(CompressionMonitor.class);
 
-    private final CompressionInfo compressionInfo = new CompressionInfo();
-
-    private final SizeInfo sizeInfo = new SizeInfo();
-
-    private final ExecutionTimeInfo compressExecutionTimeInfo = new ExecutionTimeInfo();
-
-    private final ExecutionTimeInfo decompressExecutionTimeInfo = new ExecutionTimeInfo();
+    /**
+     * 压缩（解压）字节数统计信息
+     */
+    private static final CompressionInfo compressionInfo = new CompressionInfo();
 
     /**
-     * 增加一个被压缩字节数组长度统计
-     *
-     * @param size
+     * 被压缩内容字节长度统计信息
      */
-    public void addSize(long size) {
+    private static final SizeInfo sizeInfo = new SizeInfo();
+
+    /**
+     * 压缩执行时间统计信息
+     */
+    private static final ExecutionTimeInfo compressExecutionTimeInfo = new ExecutionTimeInfo();
+
+    /**
+     * 解压执行时间统计信息
+     */
+    private static final ExecutionTimeInfo decompressExecutionTimeInfo = new ExecutionTimeInfo();
+
+    private CompressionMonitor() {
+        //private constructor
+    }
+
+    /**
+     * 增加一个被压缩内容字节长度统计信息
+     * <p>注意：该方法不会抛出任何异常</p>
+     *
+     * @param size 被压缩内容字节长度
+     */
+    public static void addSize(long size) {
         try {
             sizeInfo.add(size);
         } catch (Exception e) {
@@ -64,12 +82,13 @@ public class CompressionMonitor {
 
     /**
      * 增加一个压缩操作统计
+     * <p>注意：该方法不会抛出任何异常</p>
      *
-     * @param preCompressed 压缩前内容字节大小
-     * @param compressed 压缩后内容字节大小
+     * @param preCompressed 压缩前内容字节长度
+     * @param compressed 压缩后内容字节长度
      * @param startTime 压缩操作开始时间
      */
-    public void addCompress(long preCompressed, long compressed, long startTime) {
+    public static void addCompress(long preCompressed, long compressed, long startTime) {
         try {
             compressionInfo.addCompress(preCompressed, compressed);
             compressExecutionTimeInfo.add(startTime);
@@ -82,12 +101,13 @@ public class CompressionMonitor {
 
     /**
      * 增加一个解压操作统计
+     * <p>注意：该方法不会抛出任何异常</p>
      *
-     * @param preDecompressed 解压前内容字节大小
-     * @param decompressed 解压后内容字节大小
+     * @param preDecompressed 解压前内容字节长度
+     * @param decompressed 解压后内容字节长度
      * @param startTime 解压操作开始时间
      */
-    public void addDecompress(long preDecompressed, long decompressed, long startTime) {
+    public static void addDecompress(long preDecompressed, long decompressed, long startTime) {
         try {
             compressionInfo.addDecompress(preDecompressed, decompressed);
             decompressExecutionTimeInfo.add(startTime);
@@ -96,6 +116,42 @@ public class CompressionMonitor {
             LOG.error("Unexpected error. PreDecompressed: `" + preDecompressed + "`. Decompressed: `"
                     + decompressed + "`. Start time: `" + startTime + "`.", e);
         }
+    }
+
+    /**
+     * 获得压缩（解压）字节数统计信息
+     *
+     * @return 压缩（解压）字节数统计信息
+     */
+    public static CompressionInfo getCompressionInfo() {
+        return compressionInfo;
+    }
+
+    /**
+     * 获得被压缩内容字节长度统计信息
+     *
+     * @return 被压缩内容字节长度统计信息
+     */
+    public static SizeInfo getSizeInfo() {
+        return sizeInfo;
+    }
+
+    /**
+     * 获得压缩执行时间统计信息
+     *
+     * @return 压缩执行时间统计信息
+     */
+    public static ExecutionTimeInfo getCompressExecutionTimeInfo() {
+        return compressExecutionTimeInfo;
+    }
+
+    /**
+     * 获得解压执行时间统计信息
+     *
+     * @return 解压执行时间统计信息
+     */
+    public static ExecutionTimeInfo getDecompressExecutionTimeInfo() {
+        return decompressExecutionTimeInfo;
     }
 
 }

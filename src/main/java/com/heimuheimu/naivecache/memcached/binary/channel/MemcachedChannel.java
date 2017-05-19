@@ -30,6 +30,7 @@ import com.heimuheimu.naivecache.memcached.binary.command.OptimizedCommand;
 import com.heimuheimu.naivecache.memcached.binary.response.ResponsePacket;
 import com.heimuheimu.naivecache.memcached.binary.response.ResponsePacketReader;
 import com.heimuheimu.naivecache.memcached.exception.TimeoutException;
+import com.heimuheimu.naivecache.monitor.socket.SocketMonitor;
 import com.heimuheimu.naivecache.net.SocketBuilder;
 import com.heimuheimu.naivecache.net.SocketConfiguration;
 import org.slf4j.Logger;
@@ -73,7 +74,6 @@ public class MemcachedChannel implements Closeable {
 
     /**
      * 当前实例所处状态
-     * @see BeanStatusEnum
      */
     private volatile BeanStatusEnum state = BeanStatusEnum.UNINITIALIZED;
 
@@ -88,6 +88,16 @@ public class MemcachedChannel implements Closeable {
     private IoTask ioTask = null;
 
     /**
+     * 连续 {@link TimeoutException} 异常出现次数
+     */
+    private volatile long continuousTimeoutExceptionTimes = 0;
+
+    /**
+     * 最后一次出现 {@link TimeoutException} 异常的时间戳
+     */
+    private volatile long lastTimeoutExceptionTime = 0;
+
+    /**
      * 创建基于 Memcached 二进制协议与 Memcached 服务进行数据交互的管道
      *
      * @param host Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:11211
@@ -98,7 +108,6 @@ public class MemcachedChannel implements Closeable {
     public MemcachedChannel(String host, SocketConfiguration configuration) throws RuntimeException {
         this.host = host;
         this.socket = SocketBuilder.create(host, configuration);;
-
     }
 
     public List<ResponsePacket> send(Command command, long timeout)
@@ -112,7 +121,25 @@ public class MemcachedChannel implements Closeable {
             throw new IllegalStateException("MemcachedChannel is not initialized or has been closed. State: `"
                     + state + "`. Host: `" + host + "`. " + socket);
         }
-        return command.getResponsePacketList(timeout);
+        try {
+            return command.getResponsePacketList(timeout);
+        } catch (TimeoutException e) {
+            //如果两次超时异常发生在 1s 以内，则认为是连续失败
+            if (System.currentTimeMillis() - lastTimeoutExceptionTime < 1000) {
+                continuousTimeoutExceptionTimes ++;
+            } else {
+                continuousTimeoutExceptionTimes = 1;
+            }
+            lastTimeoutExceptionTime = System.currentTimeMillis();
+            //如果连续超时异常出现次数大于 50 次，认为当前连接出现异常，关闭当前连接
+            if (continuousTimeoutExceptionTimes > 50) {
+                MEMCACHED_CONNECTION_LOG.error("MemcachedChannel need to be closed due to: `Too many timeout exceptions[{}]`. Host: `{}`.",
+                        continuousTimeoutExceptionTimes, host);
+                close();
+            }
+            throw e;
+        }
+
     }
 
     public boolean isActive() {
@@ -166,6 +193,17 @@ public class MemcachedChannel implements Closeable {
         }
     }
 
+    @Override
+    public String toString() {
+        return "MemcachedChannel{" +
+                "host='" + host + '\'' +
+                ", socket=" + socket +
+                ", state=" + state +
+                ", continuousTimeoutExceptionTimes=" + continuousTimeoutExceptionTimes +
+                ", lastTimeoutExceptionTime=" + lastTimeoutExceptionTime +
+                '}';
+    }
+
     private class IoTask extends Thread {
 
         private final ResponsePacketReader reader;
@@ -176,7 +214,7 @@ public class MemcachedChannel implements Closeable {
 
         private int mergedPacketSize = 0;
 
-        private ArrayList<Command> mergedCommandList = new ArrayList<>();
+        private final ArrayList<Command> mergedCommandList = new ArrayList<>();
 
         /**
          * 等待响应数据包的 Memcached 命令队列
@@ -185,7 +223,7 @@ public class MemcachedChannel implements Closeable {
 
         public IoTask(Integer sendBufferSize) throws IOException {
             this.sendBufferSize = sendBufferSize != null ? sendBufferSize : 64 * 1024;
-            this.reader = new ResponsePacketReader(socket.getInputStream());
+            this.reader = new ResponsePacketReader(host, socket.getInputStream());
         }
 
         private void sendMergedPacket(OutputStream outputStream) throws IOException {
@@ -217,10 +255,13 @@ public class MemcachedChannel implements Closeable {
                     }
                 }
                 outputStream.write(mergedPacket, 0,  destPos);
+                SocketMonitor.addWrite(host, destPos);
                 resetMergedPacket();
             } else if (mergedCommandList.size() == 1) {
                 Command command = mergedCommandList.get(0);
-                outputStream.write(command.toRequestPacket());
+                byte[] requestPacket = command.toRequestPacket();
+                outputStream.write(requestPacket);
+                SocketMonitor.addWrite(host, requestPacket.length);
                 if (command.hasResponsePacket()) {
                     waitingQueue.add(command);
                 }
@@ -264,6 +305,7 @@ public class MemcachedChannel implements Closeable {
                             sendMergedPacket(outputStream);
                             if (commandQueue.size() == 0) {
                                 outputStream.write(requestPacket);
+                                SocketMonitor.addWrite(host, requestPacket.length);
                                 if (command.hasResponsePacket()) {
                                     waitingQueue.add(command);
                                 }
@@ -273,7 +315,7 @@ public class MemcachedChannel implements Closeable {
                             outputStream.flush();
                         }
                     }
-                    //如果该连接某个命令一直等待不到返回，可能会一直阻塞，外部需正确处理连续TimeoutException，比如直接关闭
+                    //如果该连接某个命令一直等待不到返回，可能会一直阻塞
                     while (waitingQueue.size() > 0) {
                         command = waitingQueue.peek();
                         ResponsePacket responsePacket = reader.read();

@@ -22,34 +22,33 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.monitor.memcached;
+package com.heimuheimu.naivecache.memcached;
 
 /**
- * Memcached 命令类型，用于统计使用
+ * Memcached 命令返回结果
  *
  * @author heimuheimu
- * @see MemcachedMonitor
  */
-public enum OperationType {
+public enum OperationResult {
 
     /**
-     * Memcached get 命令
+     * 操作成功
      */
-    GET,
+    SUCCESS,
 
     /**
-     * Memcached multi-get 命令
+     * Memcached Key 不存在
      */
-    MULTI_GET,
+    KEY_NOT_FOUND,
 
     /**
-     * Memcached set 命令
+     * 操作超时
      */
-    SET,
+    TIMEOUT,
 
     /**
-     * Memcached delete 命令
+     * 操作发生异常
      */
-    DELETE
+    ERROR
 
 }

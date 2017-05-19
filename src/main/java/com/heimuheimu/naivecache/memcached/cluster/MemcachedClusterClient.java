@@ -27,6 +27,7 @@ package com.heimuheimu.naivecache.memcached.cluster;
 import com.heimuheimu.naivecache.constant.BeanStatusEnum;
 import com.heimuheimu.naivecache.memcached.NaiveMemcachedClient;
 import com.heimuheimu.naivecache.memcached.NaiveMemcachedClientFactory;
+import com.heimuheimu.naivecache.memcached.NaiveMemcachedClientListener;
 import com.heimuheimu.naivecache.memcached.cluster.hash.ConsistentHashLocator;
 import com.heimuheimu.naivecache.net.SocketConfiguration;
 import org.slf4j.Logger;
@@ -37,45 +38,104 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
 
 /**
- * 可使用多台 Memcached 服务的客户端
+ * Memcached 集群客户端，连接多台 Memcached 服务，根据 Key 进行 Hash 选择
+ * <p>当前实现是线程安全的</p>
  *
  * @author heimuheimu
+ * @ThreadSafe
  */
+@SuppressWarnings("unused")
 public class MemcachedClusterClient implements NaiveMemcachedClient {
 
     private static final Logger MEMCACHED_CONNECTION_LOG = LoggerFactory.getLogger("NAIVECACHE_MEMCACHED_CONNECTION_LOG");
 
     private static final Logger LOG = LoggerFactory.getLogger(MemcachedClusterClient.class);
 
+    /**
+     * Memcached 客户端定位器，根据 Memcached Key 获取对应的 Memcached 客户端索引
+     */
     private final MemcachedClientLocator locator = new ConsistentHashLocator();
 
+    /**
+     * Memcached multi-get 命令执行器，用于同时执行多台 Memcached 服务的 multi-get 命令
+     */
     private final MultiGetExecutor multiGetExecutor = new MultiGetExecutor();
 
+    /**
+     * Memcached 地址数组，Memcached 地址由主机名和端口组成，":"符号分割，例如：localhost:11211
+     */
     private final String[] hosts;
 
+    /**
+     * Memcached 客户端列表，该列表顺序、大小与 {@link #hosts} 一致
+     * <p>
+     *     如果某个 Memcached 客户端不可用，该客户端在列表中中的值为 {@code null}
+     * </p>
+     */
     private final CopyOnWriteArrayList<NaiveMemcachedClient> clientList = new CopyOnWriteArrayList<>();
 
+    /**
+     * 当前可用的 Memcached 客户端列表
+     */
     private final CopyOnWriteArrayList<NaiveMemcachedClient> aliveClientList = new CopyOnWriteArrayList<>();
 
+    /**
+     * 创建 Memcached 客户端所使用的 Socket 配置信息
+     */
     private final SocketConfiguration configuration;
 
+    /**
+     * Memcached 操作超时时间，单位：毫秒，不能小于等于0
+     */
     private final int timeout;
 
+    /**
+     * 最小压缩字节数，当 Value 字节数小于或等于该值，不进行压缩，不能小于等于0
+     */
     private final int compressionThreshold;
 
+    /**
+     * Memcached 客户端事件监听器
+     */
+    private final NaiveMemcachedClientListener naiveMemcachedClientListener;
+
+    /**
+     * Memcached 集群客户端事件监听器
+     */
+    private final MemcachedClusterClientListener memcachedClusterClientListener;
+
+    /**
+     * Memcached 客户端恢复任务是否运行
+     */
     private boolean isRescueTaskRunning = false;
 
+    /**
+     * Memcached 客户端恢复任务实用的私有锁
+     */
     private final Object rescueTaskLock = new Object();
 
     /**
-     * 当前实例所处状态
-     * @see BeanStatusEnum
+     * 当前 Memcached 集群客户端实例所处状态
      */
     private volatile BeanStatusEnum state = BeanStatusEnum.NORMAL;
 
 
+    /**
+     * 构造一个 Memcached 集群客户端
+     *
+     * @param hosts Memcached 地址数组，Memcached 地址由主机名和端口组成，":"符号分割，例如：localhost:11211。不允许为 {@code null} 或 空数组
+     * @param configuration 创建 Memcached 客户端所使用的 Socket 配置信息
+     * @param timeout Memcached 操作超时时间，单位：毫秒，不能小于等于0
+     * @param compressionThreshold 最小压缩字节数，当 Value 字节数小于或等于该值，不进行压缩，不能小于等于0
+     * @param naiveMemcachedClientListener Memcached 客户端事件监听器
+     * @param memcachedClusterClientListener Memcached 集群客户端事件监听器
+     * @throws IllegalArgumentException 如果 Memcached 地址数组为 {@code null} 或 空数组
+     */
+    @SuppressWarnings("WeakerAccess")
     public MemcachedClusterClient(String[] hosts, SocketConfiguration configuration,
-                                  int timeout, int compressionThreshold) {
+                                  int timeout, int compressionThreshold,
+                                  NaiveMemcachedClientListener naiveMemcachedClientListener,
+                                  MemcachedClusterClientListener memcachedClusterClientListener) throws IllegalArgumentException {
         if (hosts == null || hosts.length == 0) {
             throw new IllegalArgumentException("Hosts could not be empty. Hosts: " + Arrays.toString(hosts)
                     + ". SocketConfiguration: " + configuration + ". Timeout: " + timeout
@@ -85,12 +145,28 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
         this.configuration = configuration;
         this.timeout = timeout;
         this.compressionThreshold = compressionThreshold;
+        this.naiveMemcachedClientListener = naiveMemcachedClientListener;
+        this.memcachedClusterClientListener = memcachedClusterClientListener;
         for (String host : hosts) {
             boolean isSuccess = createClient(host);
             if (isSuccess) {
                 MEMCACHED_CONNECTION_LOG.info("Add `{}` to cluster is success. Hosts: `{}`.", host, hosts);
+                if (memcachedClusterClientListener != null) {
+                    try {
+                        memcachedClusterClientListener.onCreated(host);
+                    } catch (Exception e) {
+                        LOG.error("Call MemcachedClusterClientListener#onCreated() failed. Host: `" + host + "`.", e);
+                    }
+                }
             } else {
-                MEMCACHED_CONNECTION_LOG.warn("Add `{}` to cluster failed. Hosts: `{}`.", host, hosts);
+                MEMCACHED_CONNECTION_LOG.error("Add `{}` to cluster failed. Hosts: `{}`.", host, hosts);
+                if (memcachedClusterClientListener != null) {
+                    try {
+                        memcachedClusterClientListener.onClosed(host);
+                    } catch (Exception e) {
+                        LOG.error("Call MemcachedClusterClientListener#onClosed() failed. Host: `" + host + "`.", e);
+                    }
+                }
             }
         }
         MEMCACHED_CONNECTION_LOG.info("MemcachedClusterClient has been initialized. Hosts: `{}`.", Arrays.toString(hosts));
@@ -120,6 +196,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                 NaiveMemcachedClient client = getClient(key);
                 if (client != null) {
                     Set<String> thisClientKeySet = clusterKeyMap.get(client);
+                    //noinspection Java8MapApi
                     if (thisClientKeySet == null) {
                         thisClientKeySet = new HashSet<>();
                         clusterKeyMap.put(client, thisClientKeySet);
@@ -174,7 +251,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
 
     @Override
     public boolean isActive() {
-        return true;
+        return !aliveClientList.isEmpty();
     }
 
     @Override
@@ -212,7 +289,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
     }
 
     private boolean createClient(String host) {
-        NaiveMemcachedClient client = NaiveMemcachedClientFactory.create(host, configuration, timeout, compressionThreshold);
+        NaiveMemcachedClient client = NaiveMemcachedClientFactory.create(host, configuration, timeout, compressionThreshold, naiveMemcachedClientListener);
         if (client != null && client.isActive()) {
             aliveClientList.add(client);
             clientList.add(client);
@@ -233,8 +310,17 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
             NaiveMemcachedClient client = clientList.get(clientIndex);
             if (client != null) { //如果该 Memcached 服务已不可用，执行移除操作
                 if (!client.isActive()) {
-                    aliveClientList.remove(client);
-                    clientList.set(clientIndex, null);
+                    boolean isRemoveSuccess= aliveClientList.remove(client);
+                    if (isRemoveSuccess) {
+                        clientList.set(clientIndex, null);
+                        if (memcachedClusterClientListener != null) {
+                            try {
+                                memcachedClusterClientListener.onClosed(client.getHost());
+                            } catch (Exception e) {
+                                LOG.error("Call MemcachedClusterClientListener#onCreated() failed. Host: `" + client.getHost() + "`.", e);
+                            }
+                        }
+                    }
                     client = null;
                 }
             }
@@ -280,6 +366,11 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                                             boolean isSuccess = createClient(hosts[i]);
                                             if (isSuccess) {
                                                 MEMCACHED_CONNECTION_LOG.info("Rescue `{}` to cluster success.", hosts[i]);
+                                                try {
+                                                    memcachedClusterClientListener.onRecovered(hosts[i]);
+                                                } catch (Exception e) {
+                                                    LOG.error("Call MemcachedClusterClientListener#onRecovered() failed. Host: `" + hosts[i] + "`.", e);
+                                                }
                                             } else {
                                                 MEMCACHED_CONNECTION_LOG.warn("Rescue `{}` to cluster failed.", hosts[i]);
                                             }

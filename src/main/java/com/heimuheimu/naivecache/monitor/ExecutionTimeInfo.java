@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @ThreadSafe
  * @see System#nanoTime()
  */
+@SuppressWarnings("unused")
 public class ExecutionTimeInfo {
 
     /**
@@ -44,12 +45,12 @@ public class ExecutionTimeInfo {
     /**
      * 总执行时间(nanoTime)
      */
-    private AtomicLong totalExecutionTime = new AtomicLong();
+    private final AtomicLong totalExecutionTime = new AtomicLong();
 
     /**
      * 统计次数
      */
-    private AtomicLong count = new AtomicLong();
+    private final AtomicLong count = new AtomicLong();
 
     /**
      * 增加一个执行时间(nanoTime)统计信息

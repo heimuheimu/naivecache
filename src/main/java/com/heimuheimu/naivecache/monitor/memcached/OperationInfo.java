@@ -24,6 +24,8 @@
 
 package com.heimuheimu.naivecache.monitor.memcached;
 
+import com.heimuheimu.naivecache.memcached.OperationResult;
+
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -33,6 +35,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author heimuheimu
  * @ThreadSafe
  */
+@SuppressWarnings("unused")
 public class OperationInfo {
 
     /**
@@ -44,7 +47,7 @@ public class OperationInfo {
      * 命令未找到 Memcached Key 次数
      * <p><b>注意：</b>使用 multi-get 命令时，只要有一个 Key 未命中，也将被统计为未找到 Memcached Key 次数</p>
      */
-    private final AtomicLong miss = new AtomicLong();
+    private final AtomicLong keyNotFound = new AtomicLong();
 
     /**
      * 命令超时次数
@@ -66,8 +69,8 @@ public class OperationInfo {
             case SUCCESS:
                 success.incrementAndGet();
                 break;
-            case MISS:
-                miss.incrementAndGet();
+            case KEY_NOT_FOUND:
+                keyNotFound.incrementAndGet();
                 break;
             case TIMEOUT:
                 timeout.incrementAndGet();
@@ -95,8 +98,8 @@ public class OperationInfo {
      *
      * @return 命令未找到 Memcached Key 次数
      */
-    public long getMiss() {
-        return miss.get();
+    public long getKeyNotFound() {
+        return keyNotFound.get();
     }
 
     /**
@@ -121,7 +124,7 @@ public class OperationInfo {
     public String toString() {
         return "OperationInfo{" +
                 "success=" + success +
-                ", miss=" + miss +
+                ", keyNotFound=" + keyNotFound +
                 ", timeout=" + timeout +
                 ", error=" + error +
                 '}';

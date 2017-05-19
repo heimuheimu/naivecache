@@ -27,10 +27,13 @@ package com.heimuheimu.naivecache.monitor.compress;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 压缩统计信息
+ * 压缩（解压）字节数统计信息
+ * <p>当前实现是线程安全的</p>
  *
  * @author heimuheimu
+ * @ThreadSafe
  */
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class CompressionInfo {
 
     /**
@@ -75,18 +78,38 @@ public class CompressionInfo {
         this.decompressed.addAndGet(decompressed);
     }
 
+    /**
+     * 获得未压缩前字节数
+     *
+     * @return 未压缩前字节数
+     */
     public AtomicLong getPreCompressed() {
         return preCompressed;
     }
 
+    /**
+     * 获得压缩后的字节数
+     *
+     * @return 压缩后的字节数
+     */
     public AtomicLong getCompressed() {
         return compressed;
     }
 
+    /**
+     * 获得解压缩前的字节数
+     *
+     * @return 解压缩前的字节数
+     */
     public AtomicLong getPreDecompressed() {
         return preDecompressed;
     }
 
+    /**
+     * 获得解压缩后的字节数
+     *
+     * @return 解压缩后的字节数
+     */
     public AtomicLong getDecompressed() {
         return decompressed;
     }

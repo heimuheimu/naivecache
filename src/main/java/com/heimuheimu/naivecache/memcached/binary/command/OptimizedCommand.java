@@ -42,6 +42,6 @@ public interface OptimizedCommand extends Command {
      * @param target 目标命令
      * @return 是否可以对目标命令进行优化
      */
-    public boolean optimize(OptimizedCommand target);
+    boolean optimize(OptimizedCommand target);
 
 }

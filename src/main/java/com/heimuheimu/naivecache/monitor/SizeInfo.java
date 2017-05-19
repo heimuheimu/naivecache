@@ -30,10 +30,12 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * 长度统计信息，通常用于统计字节长度
  * <p>大小将以 2 的次方为区间进行统计</p>
+ * <p>当前实现是线程安全的</p>
  *
  * @author heimuheimu
  * @ThreadSafe
  */
+@SuppressWarnings("unused")
 public class SizeInfo {
 
     private final AtomicLong size = new AtomicLong();
