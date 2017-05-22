@@ -139,8 +139,8 @@ public class FalconReporter implements Closeable {
             long executionCount = globalInfo.getExecutionTimeInfo().getCount();
             long totalExecutionTime = globalInfo.getExecutionTimeInfo().getTotalExecutionTime();
             FalconData avgExecutionTimeData = create();
-            tpsData.metric = "naivecache_average_exec_time";
-            tpsData.value = (totalExecutionTime - lastTotalExecutionTime) / (executionCount - lastExecutionCount);
+            avgExecutionTimeData.metric = "naivecache_average_exec_time";
+            avgExecutionTimeData.value = (totalExecutionTime - lastTotalExecutionTime) / (executionCount - lastExecutionCount);
             lastExecutionCount = executionCount;
             lastTotalExecutionTime = totalExecutionTime;
             buffer.append(avgExecutionTimeData.toJson());
