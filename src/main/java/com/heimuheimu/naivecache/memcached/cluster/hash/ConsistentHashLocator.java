@@ -52,20 +52,17 @@ public class ConsistentHashLocator implements MemcachedClientLocator {
             throw new IllegalArgumentException("Clients could not equal or less than 0. Key: "
                     + key + ". Clients: " + clients);
         }
-        int hash = consistentHash(key.hashCode(), clients * 200);
-        return hash / 200;
+        return consistentHash(key.hashCode(), clients);
     }
 
-    private double nextDouble(long hashCode) {
-        hashCode = 2862933555777941757L * hashCode + 1;
-        return ((double) ((int) (hashCode >>> 33) + 1)) / (0x1.0p31);
-    }
 
     private int consistentHash(long input, int buckets) {
+        LinearCongruentialGenerator generator = new LinearCongruentialGenerator(input);
         int candidate = 0;
         int next;
+
         while (true) {
-            next = (int) ((candidate + 1) / nextDouble(input));
+            next = (int) ((candidate + 1) / generator.nextDouble());
             if (next >= 0 && next < buckets) {
                 candidate = next;
             } else {
@@ -73,4 +70,18 @@ public class ConsistentHashLocator implements MemcachedClientLocator {
             }
         }
     }
+
+    private static final class LinearCongruentialGenerator {
+        private long state;
+
+        private LinearCongruentialGenerator(long seed) {
+            this.state = seed;
+        }
+
+        private double nextDouble() {
+            state = 2862933555777941757L * state + 1;
+            return ((double) ((int) (state >>> 33) + 1)) / (0x1.0p31);
+        }
+    }
+
 }
