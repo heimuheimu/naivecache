@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class TpsInfo {
 
     /**
-     * 当前对象创建时间
+     * 当前对象创建时间戳
      */
     private final long createdTime = System.currentTimeMillis();
 
@@ -96,15 +96,21 @@ public class TpsInfo {
     }
 
     /**
-     * 获得每秒事务处理数 TPS (Transaction per second)
-     * <p>
-     *     TPS = 总事务数 / (当前时间 - 创建时间)
-     * </p>
+     * 获得当前对象创建时间戳
      *
-     * @return 每秒事务处理数 TPS (Transaction per second)
+     * @return 当前对象创建时间戳
      */
-    public long getTps() {
-        return count.get() / ((System.currentTimeMillis() - createdTime) / 1000);
+    public long getCreatedTime() {
+        return createdTime;
+    }
+
+    /**
+     * 获得总事务数
+     *
+     * @return 总事务数
+     */
+    public long getCount() {
+        return count.get();
     }
 
     /**
