@@ -27,6 +27,8 @@ package com.heimuheimu.naivecache.monitor.socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -84,6 +86,12 @@ public class SocketMonitor {
             LOG.error("Unexpected error. Host: `" + host + "`, Size: `"
                     + size + "`.", e);
         }
+    }
+
+    public static Map<String, SocketInfo> get() {
+        HashMap<String, SocketInfo> socketInfoHashMap = new HashMap<>(SOCKET_INFO_MAP);
+        socketInfoHashMap.put("", GLOBAL_INFO);
+        return socketInfoHashMap;
     }
 
     private static SocketInfo get(String host) {

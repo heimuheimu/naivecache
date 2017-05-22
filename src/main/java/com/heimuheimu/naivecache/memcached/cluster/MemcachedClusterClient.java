@@ -124,18 +124,19 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
      * 构造一个 Memcached 集群客户端
      *
      * @param hosts Memcached 地址数组，Memcached 地址由主机名和端口组成，":"符号分割，例如：localhost:11211。不允许为 {@code null} 或 空数组
-     * @param configuration 创建 Memcached 客户端所使用的 Socket 配置信息
-     * @param timeout Memcached 操作超时时间，单位：毫秒，不能小于等于0
+     * @param configuration 创建 Memcached 客户端所使用的 Socket 配置信息，允许为 {@code null}
+     * @param timeout Memcached 操作超时时间，单位：毫秒，不能小于等于0，建议为 1000ms
      * @param compressionThreshold 最小压缩字节数，当 Value 字节数小于或等于该值，不进行压缩，不能小于等于0
      * @param naiveMemcachedClientListener Memcached 客户端事件监听器
      * @param memcachedClusterClientListener Memcached 集群客户端事件监听器
      * @throws IllegalArgumentException 如果 Memcached 地址数组为 {@code null} 或 空数组
+     * @throws IllegalStateException 如果在创建过程中所有 Memcached 服务都不可用
      */
     @SuppressWarnings("WeakerAccess")
     public MemcachedClusterClient(String[] hosts, SocketConfiguration configuration,
                                   int timeout, int compressionThreshold,
                                   NaiveMemcachedClientListener naiveMemcachedClientListener,
-                                  MemcachedClusterClientListener memcachedClusterClientListener) throws IllegalArgumentException {
+                                  MemcachedClusterClientListener memcachedClusterClientListener) throws IllegalArgumentException, IllegalStateException {
         if (hosts == null || hosts.length == 0) {
             throw new IllegalArgumentException("Hosts could not be empty. Hosts: " + Arrays.toString(hosts)
                     + ". SocketConfiguration: " + configuration + ". Timeout: " + timeout
@@ -148,7 +149,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
         this.naiveMemcachedClientListener = naiveMemcachedClientListener;
         this.memcachedClusterClientListener = memcachedClusterClientListener;
         for (String host : hosts) {
-            boolean isSuccess = createClient(host);
+            boolean isSuccess = createClient(-1, host);
             if (isSuccess) {
                 MEMCACHED_CONNECTION_LOG.info("Add `{}` to cluster is success. Hosts: `{}`.", host, hosts);
                 if (memcachedClusterClientListener != null) {
@@ -168,6 +169,9 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                     }
                 }
             }
+        }
+        if (aliveClientList.isEmpty()) {
+            throw new IllegalStateException("There is no available client. Host: `" + hosts + "`");
         }
         MEMCACHED_CONNECTION_LOG.info("MemcachedClusterClient has been initialized. Hosts: `{}`.", Arrays.toString(hosts));
     }
@@ -288,14 +292,22 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                 '}';
     }
 
-    private boolean createClient(String host) {
+    private boolean createClient(int clientIndex, String host) {
         NaiveMemcachedClient client = NaiveMemcachedClientFactory.create(host, configuration, timeout, compressionThreshold, naiveMemcachedClientListener);
         if (client != null && client.isActive()) {
             aliveClientList.add(client);
-            clientList.add(client);
+            if (clientIndex < 0) {
+                clientList.add(client);
+            } else {
+                clientList.set(clientIndex, client);
+            }
             return true;
         } else {
-            clientList.add(null);
+            if (clientIndex < 0) {
+                clientList.add(null);
+            } else {
+                clientList.set(clientIndex, null);
+            }
             return false;
         }
     }
@@ -363,7 +375,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                                         aliveClientList.size() < hosts.length) {
                                     for (int i = 0; i < hosts.length; i++) {
                                         if (clientList.get(i) == null) {
-                                            boolean isSuccess = createClient(hosts[i]);
+                                            boolean isSuccess = createClient(i, hosts[i]);
                                             if (isSuccess) {
                                                 MEMCACHED_CONNECTION_LOG.info("Rescue `{}` to cluster success.", hosts[i]);
                                                 try {

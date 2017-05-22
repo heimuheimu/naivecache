@@ -43,7 +43,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 class MultiGetExecutor implements Closeable {
 
-    private final ExecutorService executorService = Executors.newCachedThreadPool(new NamedThreadFactory());
+    private final ExecutorService executorService = new ThreadPoolExecutor(0, 200,
+            60L, TimeUnit.SECONDS,
+            new SynchronousQueue<Runnable>(),
+            new NamedThreadFactory());
 
     @SuppressWarnings("unchecked")
     <T> Future<Map<String, T>> submit(NaiveMemcachedClient client, Set<String> keySet) {
