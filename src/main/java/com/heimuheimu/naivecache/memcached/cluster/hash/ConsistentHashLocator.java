@@ -52,7 +52,8 @@ public class ConsistentHashLocator implements MemcachedClientLocator {
             throw new IllegalArgumentException("Clients could not equal or less than 0. Key: "
                     + key + ". Clients: " + clients);
         }
-        return consistentHash(key.hashCode(), clients);
+        int hash = consistentHash(key.hashCode(), clients * 200);
+        return hash / 200;
     }
 
     private double nextDouble(long hashCode) {
