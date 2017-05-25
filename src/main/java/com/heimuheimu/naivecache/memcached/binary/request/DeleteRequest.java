@@ -56,7 +56,7 @@ public class DeleteRequest extends RequestPacket {
     }
 
     @Override
-    public byte[] toByteArray() {
+    public byte[] getByteArray() {
         return packet;
     }
 

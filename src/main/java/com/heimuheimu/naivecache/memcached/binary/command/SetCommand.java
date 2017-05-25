@@ -63,8 +63,8 @@ public class SetCommand implements Command {
     }
 
     @Override
-    public byte[] toRequestPacket() {
-        return setRequest.toByteArray();
+    public byte[] getRequestByteArray() {
+        return setRequest.getByteArray();
     }
 
     @Override

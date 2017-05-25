@@ -75,20 +75,20 @@ public class MultiGetCommand implements Command {
                 lastKey = key;
             }
             getRequestList.add(getRequest);
-            packetSize += getRequest.toByteArray().length;
+            packetSize += getRequest.getByteArray().length;
         }
         this.lastKey = lastKey;
         this.requestPacket = new byte[packetSize];
         int destPos = 0;
         for (RequestPacket getRequest : getRequestList) {
-            byte[] getCommandPacket = getRequest.toByteArray();
+            byte[] getCommandPacket = getRequest.getByteArray();
             System.arraycopy(getCommandPacket, 0, requestPacket, destPos, getCommandPacket.length);
             destPos += getCommandPacket.length;
         }
     }
 
     @Override
-    public byte[] toRequestPacket() {
+    public byte[] getRequestByteArray() {
         return requestPacket;
     }
 

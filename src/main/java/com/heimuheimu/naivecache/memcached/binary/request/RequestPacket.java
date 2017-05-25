@@ -90,7 +90,7 @@ public abstract class RequestPacket {
      *
      * @return Memcached 请求数据包的字节数组
      */
-    public abstract byte[] toByteArray();
+    public abstract byte[] getByteArray();
 
     /**
      * 获得请求操作代码，代码定义：

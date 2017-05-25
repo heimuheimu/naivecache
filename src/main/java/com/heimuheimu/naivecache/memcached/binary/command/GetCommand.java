@@ -67,8 +67,8 @@ public class GetCommand implements OptimizedCommand {
     }
 
     @Override
-    public byte[] toRequestPacket() {
-        return getRequest.toByteArray();
+    public byte[] getRequestByteArray() {
+        return getRequest.getByteArray();
     }
 
     @Override

@@ -46,7 +46,7 @@ public interface Command {
      *
      * @return 该命令对应的请求数据包
      */
-    byte[] toRequestPacket();
+    byte[] getRequestByteArray();
 
     /**
      * {@link com.heimuheimu.naivecache.memcached.binary.channel.MemcachedChannel} 在发送完命令对应的请求数据包后，

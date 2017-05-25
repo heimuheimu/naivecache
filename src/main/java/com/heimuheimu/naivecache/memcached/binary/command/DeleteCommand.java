@@ -63,8 +63,8 @@ public class DeleteCommand implements Command {
     }
 
     @Override
-    public byte[] toRequestPacket() {
-        return deleteRequest.toByteArray();
+    public byte[] getRequestByteArray() {
+        return deleteRequest.getByteArray();
     }
 
     @Override

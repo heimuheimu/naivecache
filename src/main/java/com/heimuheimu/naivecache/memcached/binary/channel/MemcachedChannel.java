@@ -243,7 +243,7 @@ public class MemcachedChannel implements Closeable {
                         }
                     }
                     if (!optimized) {
-                        byte[] commandPacket = command.toRequestPacket();
+                        byte[] commandPacket = command.getRequestByteArray();
                         System.arraycopy(commandPacket, 0, mergedPacket, destPos, commandPacket.length);
                         destPos += commandPacket.length;
                         if (command.hasResponsePacket()) {
@@ -259,7 +259,7 @@ public class MemcachedChannel implements Closeable {
                 resetMergedPacket();
             } else if (mergedCommandList.size() == 1) {
                 Command command = mergedCommandList.get(0);
-                byte[] requestPacket = command.toRequestPacket();
+                byte[] requestPacket = command.getRequestByteArray();
                 outputStream.write(requestPacket);
                 SocketMonitor.addWrite(host, requestPacket.length);
                 if (command.hasResponsePacket()) {
@@ -271,7 +271,7 @@ public class MemcachedChannel implements Closeable {
 
         private void addToMergedPacket(Command command) {
             mergedCommandList.add(command);
-            mergedPacketSize += command.toRequestPacket().length;
+            mergedPacketSize += command.getRequestByteArray().length;
         }
 
         private void resetMergedPacket() {
@@ -294,7 +294,7 @@ public class MemcachedChannel implements Closeable {
                 while (!stopSignal) {
                     command = commandQueue.take();
                     if (command != null) {
-                        byte[] requestPacket = command.toRequestPacket();
+                        byte[] requestPacket = command.getRequestByteArray();
                         if ((mergedPacketSize + requestPacket.length) < sendBufferSize) {
                             addToMergedPacket(command);
                             if (commandQueue.size() == 0) {
