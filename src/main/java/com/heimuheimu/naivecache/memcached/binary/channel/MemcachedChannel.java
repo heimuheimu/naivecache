@@ -335,7 +335,7 @@ public class MemcachedChannel implements Closeable {
             } catch (InterruptedException e) {
                 releaseWaitingCommand();
             } catch (IOException e) {
-                MEMCACHED_CONNECTION_LOG.error("[IoTask] MemcachedChannel need to be closed due to: `{}`. Host: `{}`.",
+                MEMCACHED_CONNECTION_LOG.error("[IoTask] MemcachedChannel need to be closed due to: `IOException: {}`. Host: `{}`.",
                         e.getMessage(), host);
                 LOG.error("[IoTask] MemcachedChannel need to be closed: `IoException`. Host: `" + host + "`. " + socket, e);
                 close();

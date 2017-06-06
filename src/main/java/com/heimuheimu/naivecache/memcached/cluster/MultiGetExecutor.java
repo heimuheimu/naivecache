@@ -45,7 +45,7 @@ class MultiGetExecutor implements Closeable {
 
     private final ExecutorService executorService = new ThreadPoolExecutor(0, 200,
             60L, TimeUnit.SECONDS,
-            new SynchronousQueue<Runnable>(),
+            new SynchronousQueue<>(),
             new NamedThreadFactory());
 
     @SuppressWarnings("unchecked")

@@ -86,7 +86,7 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
      */
     public DirectMemcachedClient(String host, SocketConfiguration configuration,
                                  int timeout, int compressionThreshold,
-                                 NaiveMemcachedClientListener clientListener) throws RuntimeException  {
+                                 NaiveMemcachedClientListener clientListener) throws RuntimeException {
         if (timeout <= 0) {
             throw new IllegalArgumentException("Create DirectMemcachedClient failed. Timeout could not be equal or less than 0. Host: `" + host + "`. Configuration: `"
                 + configuration + "`. Timeout: `" + timeout + "`. compressionThreshold: `" + compressionThreshold + "`. clientListener: `"
@@ -581,7 +581,7 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
                 try {
                     clientListener.onSlowExecution(client, operationType, key, executedNanoTime);
                 } catch (Exception e) {
-                    logger.error("Call NaiveMemcachedClientListener#onError() failed. Client: `" + client + "`. Operation: `" + operationType
+                    logger.error("Call NaiveMemcachedClientListener#onSlowExecution() failed. Client: `" + client + "`. Operation: `" + operationType
                             + "`. key: `" + key + "`. ExecutedNanoTime: `" + executedNanoTime + "`.", e);
                 }
             }

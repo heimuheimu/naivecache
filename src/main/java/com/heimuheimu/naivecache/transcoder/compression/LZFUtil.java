@@ -25,8 +25,7 @@ package com.heimuheimu.naivecache.transcoder.compression;
 
 import com.ning.compress.lzf.LZFDecoder;
 import com.ning.compress.lzf.LZFEncoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.ning.compress.lzf.LZFException;
 
 /**
  * LZF 压缩、解压工具，更多信息可参考：
@@ -39,24 +38,12 @@ import org.slf4j.LoggerFactory;
  */
 public class LZFUtil {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(LZFUtil.class);
-	
 	public static byte[] compress(byte[] src) {
-		try {
-			return LZFEncoder.encode(src);
-		} catch (Exception e) {
-			LOG.error("LZF compress error.", e);
-			return new byte[0];
-		}
+		return LZFEncoder.encode(src);
 	}
 	
-	public static byte[] decompress(byte[] compressedBytes, int offset, int length) {
-		try {
-			return LZFDecoder.decode(compressedBytes, offset, length);
-		} catch (Exception e) {
-			LOG.error("LZF decompress error.", e);
-			return new byte[0];
-		}
+	public static byte[] decompress(byte[] compressedBytes, int offset, int length) throws LZFException {
+		return LZFDecoder.decode(compressedBytes, offset, length);
 	}
 
 }
