@@ -69,7 +69,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
     /**
      * Memcached 客户端列表，该列表顺序、大小与 {@link #hosts} 一致
      * <p>
-     *     如果某个 Memcached 客户端不可用，该客户端在列表中中的值为 {@code null}
+     *     如果某个 Memcached 客户端不可用，该客户端在列表中的值为 {@code null}
      * </p>
      */
     private final CopyOnWriteArrayList<NaiveMemcachedClient> clientList = new CopyOnWriteArrayList<>();
@@ -110,7 +110,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
     private boolean isRescueTaskRunning = false;
 
     /**
-     * Memcached 客户端恢复任务实用的私有锁
+     * Memcached 客户端恢复任务使用的私有锁
      */
     private final Object rescueTaskLock = new Object();
 
@@ -127,8 +127,8 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
      * @param configuration 创建 Memcached 客户端所使用的 Socket 配置信息，允许为 {@code null}
      * @param timeout Memcached 操作超时时间，单位：毫秒，不能小于等于0，建议为 1000ms
      * @param compressionThreshold 最小压缩字节数，当 Value 字节数小于或等于该值，不进行压缩，不能小于等于0
-     * @param naiveMemcachedClientListener Memcached 客户端事件监听器
-     * @param memcachedClusterClientListener Memcached 集群客户端事件监听器
+     * @param naiveMemcachedClientListener Memcached 客户端事件监听器，允许为 {@code null}
+     * @param memcachedClusterClientListener Memcached 集群客户端事件监听器，允许为 {@code null}
      * @throws IllegalArgumentException 如果 Memcached 地址数组为 {@code null} 或 空数组
      * @throws IllegalStateException 如果在创建过程中所有 Memcached 服务都不可用
      */
@@ -156,7 +156,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                     try {
                         memcachedClusterClientListener.onCreated(host);
                     } catch (Exception e) {
-                        LOG.error("Call MemcachedClusterClientListener#onCreated() failed. Host: `" + host + "`.", e);
+                        LOG.error("Call MemcachedClusterClientListener#onCreated() failed. Host: `" + host + "`. Hosts: `" + Arrays.toString(hosts) + "`.", e);
                     }
                 }
             } else {
@@ -165,7 +165,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                     try {
                         memcachedClusterClientListener.onClosed(host);
                     } catch (Exception e) {
-                        LOG.error("Call MemcachedClusterClientListener#onClosed() failed. Host: `" + host + "`.", e);
+                        LOG.error("Call MemcachedClusterClientListener#onClosed() failed. Host: `" + host + "`. Hosts: `" + Arrays.toString(hosts) + "`.", e);
                     }
                 }
             }
@@ -329,7 +329,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                             try {
                                 memcachedClusterClientListener.onClosed(client.getHost());
                             } catch (Exception e) {
-                                LOG.error("Call MemcachedClusterClientListener#onCreated() failed. Host: `" + client.getHost() + "`.", e);
+                                LOG.error("Call MemcachedClusterClientListener#onClosed() failed. Host: `" + client.getHost() + "`.", e);
                             }
                         }
                     }
@@ -378,10 +378,12 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                                             boolean isSuccess = createClient(i, hosts[i]);
                                             if (isSuccess) {
                                                 MEMCACHED_CONNECTION_LOG.info("Rescue `{}` to cluster success.", hosts[i]);
-                                                try {
-                                                    memcachedClusterClientListener.onRecovered(hosts[i]);
-                                                } catch (Exception e) {
-                                                    LOG.error("Call MemcachedClusterClientListener#onRecovered() failed. Host: `" + hosts[i] + "`.", e);
+                                                if (memcachedClusterClientListener != null) {
+                                                    try {
+                                                        memcachedClusterClientListener.onRecovered(hosts[i]);
+                                                    } catch (Exception e) {
+                                                        LOG.error("Call MemcachedClusterClientListener#onRecovered() failed. Host: `" + hosts[i] + "`.", e);
+                                                    }
                                                 }
                                             } else {
                                                 MEMCACHED_CONNECTION_LOG.warn("Rescue `{}` to cluster failed.", hosts[i]);

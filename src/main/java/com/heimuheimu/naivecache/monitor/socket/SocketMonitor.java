@@ -88,6 +88,23 @@ public class SocketMonitor {
         }
     }
 
+    /**
+     * 获得全局 Socket 统计信息
+     *
+     * @return 全局 Socket 统计信息
+     */
+    @SuppressWarnings("unused")
+    public static SocketInfo getGlobalInfo() {
+        return GLOBAL_INFO;
+    }
+
+    /**
+     * 获得 Socket 统计信息 Map，Key 为 Socket 连接目标地址，Value 为该地址对应的 Socket 统计信息
+     * <p>注意：全局 Socket 统计信息的 Key 为空字符串</p>
+     *
+     * @return Socket 统计信息 Map
+     */
+    @SuppressWarnings("unused")
     public static Map<String, SocketInfo> get() {
         HashMap<String, SocketInfo> socketInfoHashMap = new HashMap<>(SOCKET_INFO_MAP);
         socketInfoHashMap.put("", GLOBAL_INFO);

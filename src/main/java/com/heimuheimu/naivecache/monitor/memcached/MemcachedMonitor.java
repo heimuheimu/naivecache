@@ -76,6 +76,22 @@ public class MemcachedMonitor {
         }
     }
 
+    /**
+     * 获得全局 Memcached 命令请求统计信息
+     *
+     * @return 全局 Memcached 命令请求统计信息
+     */
+    public static MemcachedInfo getGlobalInfo() {
+        return GLOBAL_INFO;
+    }
+
+    /**
+     * 获得 Memcached 命令请求统计信息 Map，Key 为 Memcached 主机地址，Value 为该地址对应的 Memcached 命令请求统计信息
+     * <p>注意：全局 Memcached 命令请求统计信息的 Key 为空字符串</p>
+     *
+     * @return Memcached 命令请求统计信息 Map
+     */
+    @SuppressWarnings("unused")
     public static Map<String, MemcachedInfo> get() {
         HashMap<String, MemcachedInfo> memcachedInfoHashMap = new HashMap<>(MEM_INFO_MAP);
         memcachedInfoHashMap.put("", GLOBAL_INFO);
