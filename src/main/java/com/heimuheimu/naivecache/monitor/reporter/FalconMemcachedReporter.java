@@ -88,7 +88,11 @@ public class FalconMemcachedReporter extends AbstractFalconReporter {
         long totalExecutionTime = executionTimeInfo.getTotalExecutionTime();
         FalconData avgExecTimeData = create();
         avgExecTimeData.metric = "naivecache_avg_exec_time";
-        avgExecTimeData.value = (totalExecutionTime - lastTotalExecutionTime) / (executionCount - lastExecutionCount);
+        if (executionCount > lastExecutionCount) {
+            avgExecTimeData.value = (totalExecutionTime - lastTotalExecutionTime) / (executionCount - lastExecutionCount);
+        } else {
+            avgExecTimeData.value = 0;
+        }
         lastExecutionCount = executionCount;
         lastTotalExecutionTime = totalExecutionTime;
         return avgExecTimeData;
