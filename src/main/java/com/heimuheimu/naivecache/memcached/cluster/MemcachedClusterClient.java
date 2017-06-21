@@ -180,7 +180,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
             }
         }
         if (aliveClientList.isEmpty()) {
-            throw new IllegalStateException("There is no available client. Host: `" + Arrays.toString(hosts) + "`");
+            throw new IllegalStateException("There is no available client. Hosts: `" + Arrays.toString(hosts) + "`");
         }
         MEMCACHED_CONNECTION_LOG.info("MemcachedClusterClient has been initialized. Hosts: `{}`.", Arrays.toString(hosts));
     }
