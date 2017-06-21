@@ -24,10 +24,9 @@
 
 package com.heimuheimu.naivecache.transcoder;
 
+import com.heimuheimu.naivecache.memcached.exception.MemcachedException;
 import com.heimuheimu.naivecache.monitor.compress.CompressionMonitor;
 import com.heimuheimu.naivecache.transcoder.compression.LZFUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -41,8 +40,6 @@ import java.io.ObjectOutputStream;
  * @ThreadSafe
  */
 public class SimpleTranscoder implements Transcoder {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SimpleTranscoder.class);
 
     private static final byte TRANSCODER_VERSION_BYTE = 1;
 
@@ -99,8 +96,7 @@ public class SimpleTranscoder implements Transcoder {
             ObjectInputStream ois = new ObjectInputStream(valueBis);
             return ois.readObject();
         } else {
-            LOG.error("Unknown transcoder version: {}", flagVersion);
-            return null;
+            throw new MemcachedException("Unknown transcoder version: `" + flagVersion + "`");
         }
     }
 
