@@ -61,15 +61,43 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
 
     private static final Charset CHARSET_UTF8 = Charset.forName("utf-8");
 
+    /**
+     * Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:11211
+     */
     private final String host;
 
+    /**
+     * Memcached 操作超时时间，单位：毫秒，不能小于等于0
+     */
     private final int timeout;
 
+    /**
+     * 基于 Memcached 二进制协议与 Memcached 服务进行数据交互的管道
+     */
     private final MemcachedChannel memcachedChannel;
 
+    /**
+     * Java 对象与 Memcached 二进制协议存储的字节数组转换器
+     */
     private final Transcoder transcoder;
 
+    /**
+     * Memcached 客户端事件监听器封装类，对监听器执行遇到异常进行错误捕获
+     */
     private final ClientListenerWrapper clientListener;
+
+    /**
+     * 创建一个 Memcached 直连客户端
+     * <p>该客户端的操作超时时间设置为 1 秒，最小压缩字节数设置为 64 KB</p>
+     *
+     * @param host Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:11211
+     * @throws IllegalArgumentException 如果目标服务器地址不符合规则，将会抛出此异常
+     * @throws RuntimeException 如果创建 {@link MemcachedChannel} 过程中发生错误，将会抛出此异常
+     */
+    @SuppressWarnings("WeakerAccess")
+    public DirectMemcachedClient(String host) throws RuntimeException {
+        this(host, null, 1000, 64 * 1024, null);
+    }
 
     /**
      * 创建一个 Memcached 直连客户端

@@ -119,6 +119,16 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
      */
     private volatile BeanStatusEnum state = BeanStatusEnum.NORMAL;
 
+    /**
+     * 构造一个 Memcached 集群客户端
+     *
+     * @param hosts Memcached 地址数组，Memcached 地址由主机名和端口组成，":"符号分割，例如：localhost:11211。不允许为 {@code null} 或 空数组
+     * @throws IllegalArgumentException 如果 Memcached 地址数组为 {@code null} 或 空数组
+     * @throws IllegalStateException 如果在创建过程中所有 Memcached 服务都不可用
+     */
+    public MemcachedClusterClient(String[] hosts) {
+        this(hosts, null, 1000, 64 * 1024, null, null);
+    }
 
     /**
      * 构造一个 Memcached 集群客户端
@@ -132,7 +142,6 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
      * @throws IllegalArgumentException 如果 Memcached 地址数组为 {@code null} 或 空数组
      * @throws IllegalStateException 如果在创建过程中所有 Memcached 服务都不可用
      */
-    @SuppressWarnings("WeakerAccess")
     public MemcachedClusterClient(String[] hosts, SocketConfiguration configuration,
                                   int timeout, int compressionThreshold,
                                   NaiveMemcachedClientListener naiveMemcachedClientListener,
@@ -171,7 +180,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
             }
         }
         if (aliveClientList.isEmpty()) {
-            throw new IllegalStateException("There is no available client. Host: `" + hosts + "`");
+            throw new IllegalStateException("There is no available client. Host: `" + Arrays.toString(hosts) + "`");
         }
         MEMCACHED_CONNECTION_LOG.info("MemcachedClusterClient has been initialized. Hosts: `{}`.", Arrays.toString(hosts));
     }
