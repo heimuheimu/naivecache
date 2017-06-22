@@ -26,6 +26,7 @@ package com.heimuheimu.naivecache.monitor.reporter;
 
 import com.heimuheimu.naivecache.monitor.ExecutionTimeInfo;
 import com.heimuheimu.naivecache.monitor.memcached.MemcachedMonitor;
+import com.heimuheimu.naivecache.monitor.socket.SocketMonitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,6 @@ import java.util.List;
  *
  * @author heimuheimu
  */
-@SuppressWarnings("unused")
 public class FalconMemcachedReporter extends AbstractFalconReporter {
 
     private volatile long lastTpsCount = 0;
@@ -50,6 +50,11 @@ public class FalconMemcachedReporter extends AbstractFalconReporter {
 
     private volatile long lastErrorCount = 0;
 
+    private volatile long lastReadBytes = 0;
+
+    private volatile long lastWriteBytes = 0;
+
+    @SuppressWarnings("unused")
     public FalconMemcachedReporter(String pushUrl) {
         super(pushUrl);
     }
@@ -63,6 +68,8 @@ public class FalconMemcachedReporter extends AbstractFalconReporter {
         dataList.add(getKeyNotFound());
         dataList.add(getTimeoutCount());
         dataList.add(getErrorCount());
+        dataList.add(getReadBytes());
+        dataList.add(getWriteBytes());
         return dataList;
     }
 
@@ -123,6 +130,24 @@ public class FalconMemcachedReporter extends AbstractFalconReporter {
         errorCountData.value = errorCount - lastErrorCount;
         lastErrorCount = errorCount;
         return errorCountData;
+    }
+
+    private FalconData getReadBytes() {
+        FalconData readBytesData = create();
+        readBytesData.metric = "naivecache_read_bytes";
+        long readBytes = SocketMonitor.getGlobalInfo().getReadSize().getSize();
+        readBytesData.value = readBytes - lastReadBytes;
+        lastReadBytes = readBytes;
+        return readBytesData;
+    }
+
+    private FalconData getWriteBytes() {
+        FalconData writeBytesData = create();
+        writeBytesData.metric = "naivecache_write_bytes";
+        long writeBytes = SocketMonitor.getGlobalInfo().getWriteSize().getSize();
+        writeBytesData.value = writeBytes - lastWriteBytes;
+        lastWriteBytes = writeBytes;
+        return writeBytesData;
     }
 
 }

@@ -38,14 +38,29 @@ import java.util.concurrent.atomic.AtomicLong;
 @SuppressWarnings("unused")
 public class SizeInfo {
 
+    /**
+     * 累计长度，例如总字节长度
+     */
     private final AtomicLong size = new AtomicLong();
 
+    /**
+     * 累计统计次数
+     */
     private final AtomicLong count = new AtomicLong();
 
+    /**
+     * 长度大小区间，以 2 的次方为区间，该数组长度为 32
+     */
     private final long[] sizeLimits;
 
+    /**
+     * 对应不同长度区间的统计次数，该数组长度为 32
+     */
     private final AtomicLong[] sizeCounts;
 
+    /**
+     * 构造一个长度统计信息，通常用于统计字节长度
+     */
     public SizeInfo() {
         sizeLimits = new long[32];
         long limit = 1;
@@ -78,18 +93,38 @@ public class SizeInfo {
         sizeCounts[i].incrementAndGet();
     }
 
-    public AtomicLong getSize() {
-        return size;
+    /**
+     * 获得累计长度，例如总字节长度
+     *
+     * @return 累计长度，例如总字节长度
+     */
+    public long getSize() {
+        return size.get();
     }
 
-    public AtomicLong getCount() {
-        return count;
+    /**
+     * 获得累计统计次数
+     *
+     * @return 累计统计次数
+     */
+    public long getCount() {
+        return count.get();
     }
 
+    /**
+     * 获得长度大小区间，以 2 的次方为区间，该数组长度为 32
+     *
+     * @return 长度大小区间，以 2 的次方为区间，该数组长度为 32
+     */
     public long[] getSizeLimits() {
         return Arrays.copyOf(sizeLimits, sizeLimits.length);
     }
 
+    /**
+     * 获得对应不同长度区间的统计次数，该数组长度为 32
+     *
+     * @return 对应不同长度区间的统计次数，该数组长度为 32
+     */
     public AtomicLong[] getSizeCounts() {
         return Arrays.copyOf(sizeCounts, sizeCounts.length);
     }
