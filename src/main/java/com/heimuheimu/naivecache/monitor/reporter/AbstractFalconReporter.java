@@ -90,10 +90,13 @@ public abstract class AbstractFalconReporter implements Closeable {
         String endpoint = "unknown";
         try {
             InetAddress localInetAddress = InetAddress.getLocalHost();
-            endpoint = localInetAddress.getHostName();
-            if (endpointAliasMap != null && endpointAliasMap.containsKey(endpoint)) {
-                endpoint = endpointAliasMap.get(endpoint);
+            String hostName = localInetAddress.getHostName();
+            if (endpointAliasMap != null && endpointAliasMap.containsKey(hostName)) {
+                endpoint = endpointAliasMap.get(hostName);
+            } else {
+                endpoint = hostName;
             }
+            logger.info("Endpoint: `{}`. Hostname: `{}`. Alias Map: `{}`.", endpoint, hostName, endpointAliasMap);
         } catch (Exception e) {//ignore exception
         } finally {
             this.endpoint = endpoint;
@@ -132,6 +135,8 @@ public abstract class AbstractFalconReporter implements Closeable {
                             if (responseCode != 200) {
                                 logger.error("Push data to Falcon failed. Error response code: `{}`. Url: `{}`. Push json data: `{}`",
                                         responseCode, pushUrl, pushJsonData);
+                            } else {
+                                logger.debug("Push data success: `{}`.", pushJsonData);
                             }
 
                             urlConnection.disconnect();
