@@ -36,6 +36,7 @@ import java.util.List;
  *
  * @author heimuheimu
  */
+@SuppressWarnings("unused")
 public class FalconMemcachedReporter extends AbstractFalconReporter {
 
     private volatile long lastTpsCount = 0;
@@ -54,7 +55,6 @@ public class FalconMemcachedReporter extends AbstractFalconReporter {
 
     private volatile long lastWriteBytes = 0;
 
-    @SuppressWarnings("unused")
     public FalconMemcachedReporter(String pushUrl) {
         super(pushUrl);
     }
