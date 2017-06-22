@@ -90,7 +90,7 @@ public abstract class AbstractFalconReporter implements Closeable {
         String endpoint = "unknown";
         try {
             InetAddress localInetAddress = InetAddress.getLocalHost();
-            endpoint = localInetAddress.getCanonicalHostName();
+            endpoint = localInetAddress.getHostName();
             if (endpointAliasMap != null && endpointAliasMap.containsKey(endpoint)) {
                 endpoint = endpointAliasMap.get(endpoint);
             }
