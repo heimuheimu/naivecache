@@ -30,6 +30,7 @@ import com.heimuheimu.naivecache.monitor.socket.SocketMonitor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 基于 Falcon 系统的 Memcached 命令请求统计信息监控数据上报
@@ -57,6 +58,10 @@ public class FalconMemcachedReporter extends AbstractFalconReporter {
 
     public FalconMemcachedReporter(String pushUrl) {
         super(pushUrl);
+    }
+
+    public FalconMemcachedReporter(String pushUrl, Map<String, String> endpointAliasMap) {
+        super(pushUrl, endpointAliasMap);
     }
 
     @Override

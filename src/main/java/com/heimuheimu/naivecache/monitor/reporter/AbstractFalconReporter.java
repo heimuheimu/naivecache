@@ -34,6 +34,7 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -71,15 +72,28 @@ public abstract class AbstractFalconReporter implements Closeable {
     private BeanStatusEnum state = BeanStatusEnum.UNINITIALIZED;
 
     /**
-     * 构造一个基于 Falcon 系统的监控数据上报服务
+     * 构造一个基于 Falcon 系统的监控数据上报服务，不使用别名 Map
      *
      * @param pushUrl 用于接收监控数据的 Falcon 接口 URL 地址
      */
     public AbstractFalconReporter(String pushUrl) {
+        this (pushUrl, null);
+    }
+
+    /**
+     * 构造一个基于 Falcon 系统的监控数据上报服务
+     *
+     * @param pushUrl 用于接收监控数据的 Falcon 接口 URL 地址
+     * @param endpointAliasMap Endpoint 别名 Map，Key 为机器名， Value 为别名，允许为 {@code null}
+     */
+    public AbstractFalconReporter(String pushUrl, Map<String, String> endpointAliasMap) {
         String endpoint = "unknown";
         try {
             InetAddress localInetAddress = InetAddress.getLocalHost();
             endpoint = localInetAddress.getCanonicalHostName();
+            if (endpointAliasMap != null && endpointAliasMap.containsKey(endpoint)) {
+                endpoint = endpointAliasMap.get(endpoint);
+            }
         } catch (Exception e) {//ignore exception
         } finally {
             this.endpoint = endpoint;
