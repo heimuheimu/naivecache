@@ -98,6 +98,7 @@ public abstract class AbstractFalconReporter implements Closeable {
             }
             logger.info("Endpoint: `{}`. Hostname: `{}`. Alias Map: `{}`.", endpoint, hostName, endpointAliasMap);
         } catch (Exception e) {//ignore exception
+            logger.error("Get endpoint failed.", e);
         } finally {
             this.endpoint = endpoint;
         }
