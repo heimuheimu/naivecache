@@ -217,18 +217,25 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                     thisClientKeySet.add(key);
                 }
             }
-            Map<String, T> result = new HashMap<>();
-            List<Future<Map<String, T>>> futureList = new ArrayList<>();
-            for (NaiveMemcachedClient client : clusterKeyMap.keySet()) {
-                Future<Map<String, T>> future = multiGetExecutor.submit(client, clusterKeyMap.get(client));
-                if (future != null) {
-                    futureList.add(future);
+            if (clusterKeyMap.size() > 1) {
+                Map<String, T> result = new HashMap<>();
+                List<Future<Map<String, T>>> futureList = new ArrayList<>();
+                for (NaiveMemcachedClient client : clusterKeyMap.keySet()) {
+                    Future<Map<String, T>> future = multiGetExecutor.submit(client, clusterKeyMap.get(client));
+                    if (future != null) {
+                        futureList.add(future);
+                    }
                 }
+                for (Future<Map<String, T>> future : futureList) {
+                    result.putAll(future.get());
+                }
+                return result;
+            } else if (clusterKeyMap.size() == 1) { //如果只有一个 Client，不需要使用线程池执行
+                NaiveMemcachedClient singleClient = clusterKeyMap.keySet().iterator().next();
+                return singleClient.multiGet(clusterKeyMap.get(singleClient));
+            } else {
+                return new HashMap<>();
             }
-            for (Future<Map<String, T>> future : futureList) {
-                result.putAll(future.get());
-            }
-            return result;
         } catch (Exception e) {
             LOG.error("[multi-get] Unexpected error: `" + e.getMessage() + "`. Key set: `"
                     + keySet + "`. Hosts: `" + Arrays.toString(hosts) + "`.", e);
