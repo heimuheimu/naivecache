@@ -220,7 +220,10 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
             Map<String, T> result = new HashMap<>();
             List<Future<Map<String, T>>> futureList = new ArrayList<>();
             for (NaiveMemcachedClient client : clusterKeyMap.keySet()) {
-                futureList.add(multiGetExecutor.submit(client, clusterKeyMap.get(client)));
+                Future<Map<String, T>> future = multiGetExecutor.submit(client, clusterKeyMap.get(client));
+                if (future != null) {
+                    futureList.add(future);
+                }
             }
             for (Future<Map<String, T>> future : futureList) {
                 result.putAll(future.get());
@@ -280,8 +283,13 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                 try {
                     aliveClient.close();
                 } catch (Exception e) {
-                    LOG.error("Close client failed: " + aliveClient, e);
+                    LOG.error("Close client failed: `" + aliveClient + "`. Hosts: `" + getHost() + "`.", e);
                 }
+            }
+            try {
+                multiGetExecutor.close();
+            } catch (Exception e) {
+                LOG.error("Close MultiGetExecutor failed. Hosts: `" + getHost() + "`.", e);
             }
             MEMCACHED_CONNECTION_LOG.info("MemcachedClusterClient has been closed. Hosts: `{}`.", Arrays.toString(hosts));
         }
