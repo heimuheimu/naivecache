@@ -73,6 +73,7 @@ public class FalconMemcachedReporter extends AbstractFalconReporter {
         dataList.add(getTps());
         dataList.add(getPeakTps());
         dataList.add(getAverageExecutionTime());
+        dataList.add(getMaxExecutionTime());
         dataList.add(getKeyNotFound());
         dataList.add(getTimeoutCount());
         dataList.add(getErrorCount());
@@ -117,6 +118,15 @@ public class FalconMemcachedReporter extends AbstractFalconReporter {
         lastExecutionCount = executionCount;
         lastTotalExecutionTime = totalExecutionTime;
         return avgExecTimeData;
+    }
+
+    private FalconData getMaxExecutionTime() {
+        ExecutionTimeInfo executionTimeInfo = MemcachedMonitor.getGlobalInfo().getExecutionTimeInfo();
+        FalconData data = create();
+        data.metric = "naivecache_max_exec_time";
+        data.value = executionTimeInfo.getMaxExecutionTime();
+        executionTimeInfo.resetMaxExecutionTime();
+        return data;
     }
 
     private FalconData getKeyNotFound() {

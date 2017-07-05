@@ -103,6 +103,13 @@ public class ExecutionTimeInfo {
         return count.get();
     }
 
+    /**
+     * 重置最大执行时间(nanoTime)
+     */
+    public void resetMaxExecutionTime() {
+        maxExecutionTime = 0;
+    }
+
     @Override
     public String toString() {
         return "ExecutionTimeInfo{" +
