@@ -61,7 +61,7 @@ public class ExecutionTimeInfo {
         long estimatedTime = System.nanoTime() - startTime;
         count.incrementAndGet();
         totalExecutionTime.addAndGet(estimatedTime);
-        //最大执行时间仅使用了 volatile 来保证可见性，并没有保证操作的原子性，但做统计影响不大
+        //最大执行时间仅使用了 volatile 来保证可见性，并没有保证操作的原子性，极端情况下，真正的最大值可能会被覆盖，但做统计影响不大
         if (estimatedTime > maxExecutionTime) {
             maxExecutionTime = estimatedTime;
         }
