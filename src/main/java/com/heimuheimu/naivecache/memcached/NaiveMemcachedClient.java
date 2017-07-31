@@ -71,7 +71,7 @@ public interface NaiveMemcachedClient extends Closeable {
      * </p>
      *
      * @param keySet Memcached key 列表
-     * @return 找到的 Key 将会把对应的 Key 和结果放入 Map 中，未找到或发生异常的 Key 不会出现在返回 Map 中，该方法不会返回 {@code null}
+     * @return Key 列表对应的 Memcached 缓存值 Map，不会返回 {@code null}
      */
     <T> Map<String, T> multiGet(Set<String> keySet);
 

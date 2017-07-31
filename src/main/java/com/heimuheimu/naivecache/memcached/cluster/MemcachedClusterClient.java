@@ -282,6 +282,42 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
         return Arrays.toString(hosts);
     }
 
+    /**
+     * 获得当前集群客户端使用的 Memcached 地址数组，Memcached 地址由主机名和端口组成，":"符号分割，例如：localhost:11211
+     *
+     * @return Memcached 地址数组，Memcached 地址由主机名和端口组成，":"符号分割，例如：localhost:11211
+     */
+    public String[] getHosts() {
+        return hosts;
+    }
+
+    /**
+     * 获得 Memcached 客户端所使用的 Socket 配置信息
+     *
+     * @return Memcached 客户端所使用的 Socket 配置信息
+     */
+    public SocketConfiguration getConfiguration() {
+        return configuration;
+    }
+
+    /**
+     * 获得 Memcached 操作超时时间，单位：毫秒，该值不会小于等于0
+     *
+     * @return Memcached 操作超时时间，单位：毫秒，该值不会小于等于0
+     */
+    public int getTimeout() {
+        return timeout;
+    }
+
+    /**
+     * 获得最小压缩字节数，当 Value 字节数小于或等于该值，不进行压缩，不能小于等于0
+     *
+     * @return 最小压缩字节数，当 Value 字节数小于或等于该值，不进行压缩，不能小于等于0
+     */
+    public int getCompressionThreshold() {
+        return compressionThreshold;
+    }
+
     @Override
     public synchronized void close() {
         if (state != BeanStatusEnum.CLOSED) {
