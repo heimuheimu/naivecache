@@ -83,9 +83,9 @@ public class SimpleTranscoder implements Transcoder {
         return result;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Object decode(byte[] src, int flagsOffset, int valueOffset, int valueLength) throws Exception {
+    @SuppressWarnings("unchecked")
+    public <T> T decode(byte[] src, int flagsOffset, int valueOffset, int valueLength) throws Exception {
         int flagVersion = src[flagsOffset];
         int compressionByte = src[flagsOffset + 1];
         if (flagVersion == TRANSCODER_VERSION_BYTE) {
@@ -97,7 +97,7 @@ public class SimpleTranscoder implements Transcoder {
                 valueBis = new ByteArrayInputStream(value);
             }
             ObjectInputStream ois = new ObjectInputStream(valueBis);
-            return ois.readObject();
+            return (T) ois.readObject();
         } else {
             throw new MemcachedException("Unknown transcoder version: `" + flagVersion + "`");
         }
