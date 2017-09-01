@@ -22,33 +22,27 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.memcached;
+package com.heimuheimu.naivecache.monitor.falcon;
 
 /**
- * Memcached 命令返回结果
+ * Memcached 客户端 Falcon 数据监控常量
  *
  * @author heimuheimu
  */
-public enum OperationResult {
+public class FalconReporterConstant {
+
+    private FalconReporterConstant() {
+        //private constructor
+    }
 
     /**
-     * 操作成功
+     * Falcon 数据使用的模块名
      */
-    SUCCESS,
+    public static final String MODULE_NAME = "naivecache";
 
     /**
-     * Memcached Key 不存在
+     * Falcon 数据上报周期
      */
-    KEY_NOT_FOUND,
-
-    /**
-     * 操作超时
-     */
-    TIMEOUT,
-
-    /**
-     * 操作发生异常
-     */
-    ERROR
+    public static final int REPORT_PERIOD = 15;
 
 }

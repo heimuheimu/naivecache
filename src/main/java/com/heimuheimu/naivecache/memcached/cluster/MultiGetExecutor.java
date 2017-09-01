@@ -25,7 +25,8 @@
 package com.heimuheimu.naivecache.memcached.cluster;
 
 import com.heimuheimu.naivecache.memcached.NaiveMemcachedClient;
-import com.heimuheimu.naivecache.monitor.thread.ThreadPoolMonitor;
+import com.heimuheimu.naivecache.monitor.ThreadPoolMonitorFactory;
+import com.heimuheimu.naivemonitor.monitor.ThreadPoolMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,12 +51,15 @@ class MultiGetExecutor implements Closeable {
 
     private final ThreadPoolExecutor executorService;
 
+    private final ThreadPoolMonitor threadPoolMonitor;
+
     MultiGetExecutor() {
         executorService = new ThreadPoolExecutor(0, 200,
                 60L, TimeUnit.SECONDS,
                 new SynchronousQueue<>(),
                 new NamedThreadFactory());
-        ThreadPoolMonitor.register(executorService);
+        threadPoolMonitor = ThreadPoolMonitorFactory.get();
+        threadPoolMonitor.register(executorService);
     }
 
     @SuppressWarnings("unchecked")
@@ -64,7 +68,7 @@ class MultiGetExecutor implements Closeable {
             return executorService.submit(new MultiGetTask(client, keySet));
         } catch (RejectedExecutionException e) {
             LOG.error("Multi-Get failed. Thread pool is too busy. Host: `" + client.getHost() + "`. Key set: `" + keySet + "`.");
-            ThreadPoolMonitor.addRejectedCount();
+            threadPoolMonitor.onRejected();
             return null;
         }
     }

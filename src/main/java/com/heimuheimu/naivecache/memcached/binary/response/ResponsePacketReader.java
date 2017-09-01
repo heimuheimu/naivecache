@@ -25,7 +25,7 @@
 package com.heimuheimu.naivecache.memcached.binary.response;
 
 import com.heimuheimu.naivecache.memcached.util.ByteUtil;
-import com.heimuheimu.naivecache.monitor.socket.SocketMonitor;
+import com.heimuheimu.naivemonitor.monitor.SocketMonitor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,12 +39,12 @@ public class ResponsePacketReader {
 
     private static final byte RESPONSE_MAGIC_BYTE = ByteUtil.intToByte(0x81);
 
-    private final String host;
+    private final SocketMonitor socketMonitor;
 
     private final InputStream inputStream;
 
-    public ResponsePacketReader(String host, InputStream inputStream) {
-        this.host = host;
+    public ResponsePacketReader(SocketMonitor socketMonitor, InputStream inputStream) {
+        this.socketMonitor = socketMonitor;
         this.inputStream = inputStream;
     }
 
@@ -54,7 +54,7 @@ public class ResponsePacketReader {
         byte[] body = null;
         while (headerPos < 24) {
             int readBytes = inputStream.read(header, headerPos, 24 - headerPos);
-            SocketMonitor.addRead(host, readBytes);
+            socketMonitor.onRead(readBytes);
             if (readBytes >= 0) {
                 headerPos += readBytes;
             } else {
@@ -63,7 +63,8 @@ public class ResponsePacketReader {
             }
         }
         if (header[0] != RESPONSE_MAGIC_BYTE) {
-            throw new IllegalStateException("Could not find response magic byte: 0x81. Actual byte: " + header[0]);
+            throw new IllegalStateException("Could not find response magic byte: 0x81. Actual byte: `" + header[0] + "`. Host: `"
+                + socketMonitor.getHost() + "`.");
         }
         int bodyLength = ByteUtil.fourByteArrayToInt(header, 8);
         if (bodyLength > 0) {
@@ -71,7 +72,7 @@ public class ResponsePacketReader {
             int bodyPos = 0;
             while (bodyPos < bodyLength) {
                 int readBytes = inputStream.read(body, bodyPos, bodyLength - bodyPos);
-                SocketMonitor.addRead(host, readBytes);
+                socketMonitor.onRead(readBytes);
                 if (readBytes >= 0) {
                     bodyPos += readBytes;
                 } else {

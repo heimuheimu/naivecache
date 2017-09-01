@@ -30,9 +30,10 @@ import com.heimuheimu.naivecache.memcached.binary.command.OptimizedCommand;
 import com.heimuheimu.naivecache.memcached.binary.response.ResponsePacket;
 import com.heimuheimu.naivecache.memcached.binary.response.ResponsePacketReader;
 import com.heimuheimu.naivecache.memcached.exception.TimeoutException;
-import com.heimuheimu.naivecache.monitor.socket.SocketMonitor;
+import com.heimuheimu.naivecache.monitor.SocketMonitorFactory;
 import com.heimuheimu.naivecache.net.SocketBuilder;
 import com.heimuheimu.naivecache.net.SocketConfiguration;
+import com.heimuheimu.naivemonitor.monitor.SocketMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +69,14 @@ public class MemcachedChannel implements Closeable {
     private final String host;
 
     /**
-     * 与 Memcached 服务器建立的Socket连接
+     * 与 Memcached 服务器建立的 Socket 连接
      */
     private final Socket socket;
+
+    /**
+     * 当前数据交互管道使用的 Socket 信息监控器
+     */
+    private final SocketMonitor socketMonitor;
 
     /**
      * 当前实例所处状态
@@ -108,6 +114,7 @@ public class MemcachedChannel implements Closeable {
     public MemcachedChannel(String host, SocketConfiguration configuration) throws RuntimeException {
         this.host = host;
         this.socket = SocketBuilder.create(host, configuration);
+        this.socketMonitor = SocketMonitorFactory.get(host);
     }
 
     public List<ResponsePacket> send(Command command, long timeout)
@@ -223,7 +230,7 @@ public class MemcachedChannel implements Closeable {
 
         public IoTask(Integer sendBufferSize) throws IOException {
             this.sendBufferSize = sendBufferSize != null ? sendBufferSize : 64 * 1024;
-            this.reader = new ResponsePacketReader(host, socket.getInputStream());
+            this.reader = new ResponsePacketReader(socketMonitor, socket.getInputStream());
         }
 
         private void sendMergedPacket(OutputStream outputStream) throws IOException {
@@ -254,13 +261,13 @@ public class MemcachedChannel implements Closeable {
                     }
                 }
                 outputStream.write(mergedPacket, 0,  destPos);
-                SocketMonitor.addWrite(host, destPos);
+                socketMonitor.onWritten(destPos);
                 resetMergedPacket();
             } else if (mergedCommandList.size() == 1) {
                 Command command = mergedCommandList.get(0);
                 byte[] requestPacket = command.getRequestByteArray();
                 outputStream.write(requestPacket);
-                SocketMonitor.addWrite(host, requestPacket.length);
+                socketMonitor.onWritten(requestPacket.length);
                 if (command.hasResponsePacket()) {
                     waitingQueue.add(command);
                 }
@@ -304,7 +311,7 @@ public class MemcachedChannel implements Closeable {
                             sendMergedPacket(outputStream);
                             if (commandQueue.size() == 0) {
                                 outputStream.write(requestPacket);
-                                SocketMonitor.addWrite(host, requestPacket.length);
+                                socketMonitor.onWritten(requestPacket.length);
                                 if (command.hasResponsePacket()) {
                                     waitingQueue.add(command);
                                 }

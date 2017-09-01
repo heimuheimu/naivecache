@@ -25,8 +25,9 @@
 package com.heimuheimu.naivecache.transcoder;
 
 import com.heimuheimu.naivecache.memcached.exception.MemcachedException;
-import com.heimuheimu.naivecache.monitor.compress.CompressionMonitor;
+import com.heimuheimu.naivecache.monitor.CompressionMonitorFactory;
 import com.heimuheimu.naivecache.transcoder.compression.LZFUtil;
+import com.heimuheimu.naivemonitor.monitor.CompressionMonitor;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -50,8 +51,14 @@ public class SimpleTranscoder implements Transcoder {
      */
     private final int compressionThreshold;
 
+    /**
+     * 压缩信息监控器
+     */
+    private final CompressionMonitor compressionMonitor;
+
     public SimpleTranscoder(int compressionThreshold) {
         this.compressionThreshold = compressionThreshold;
+        this.compressionMonitor = CompressionMonitorFactory.get();
     }
 
     @Override
@@ -66,11 +73,9 @@ public class SimpleTranscoder implements Transcoder {
         byte[] valueBytes = bos.toByteArray();
         oos.close();
         int preCompressedLength = valueBytes.length;
-        CompressionMonitor.addSize(preCompressedLength);
         if (valueBytes.length > compressionThreshold) {
-            long startTime = System.nanoTime();
             valueBytes = LZFUtil.compress(valueBytes);
-            CompressionMonitor.addCompress(preCompressedLength, valueBytes.length, startTime);
+            compressionMonitor.onCompressed(preCompressedLength - valueBytes.length);
             flags[1] = LZF_COMPRESSION_BYTE;
         }
         result[0] = flags;
@@ -88,9 +93,7 @@ public class SimpleTranscoder implements Transcoder {
             if (compressionByte != LZF_COMPRESSION_BYTE) {
                 valueBis = new ByteArrayInputStream(src, valueOffset, valueLength);
             } else {
-                long startTime = System.nanoTime();
                 byte[] value = LZFUtil.decompress(src, valueOffset, valueLength);
-                CompressionMonitor.addDecompress(valueLength, value.length, startTime);
                 valueBis = new ByteArrayInputStream(value);
             }
             ObjectInputStream ois = new ObjectInputStream(valueBis);
