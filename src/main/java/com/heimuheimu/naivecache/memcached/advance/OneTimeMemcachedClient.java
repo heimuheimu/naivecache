@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
  * @author heimuheimu
  * @ThreadSafe
  */
-@SuppressWarnings("unused")
 public class OneTimeMemcachedClient extends AdvanceMemcachedClient {
 
     /**

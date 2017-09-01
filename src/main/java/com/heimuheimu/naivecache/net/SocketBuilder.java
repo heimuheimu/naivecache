@@ -32,7 +32,6 @@ import java.net.SocketException;
  *
  * @author heimuheimu
  */
-@SuppressWarnings({"WeakerAccess", "unused"})
 public class SocketBuilder {
 	
 	/**

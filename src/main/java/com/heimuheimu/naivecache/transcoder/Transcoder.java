@@ -53,6 +53,6 @@ public interface Transcoder {
      * @return Java 对象
      * @throws Exception 解码过程中发生错误
      */
-    <T> T decode(byte[] src, @SuppressWarnings("SameParameterValue") int flagsOffset, int valueOffset, int valueLength) throws Exception;
+    <T> T decode(byte[] src, int flagsOffset, int valueOffset, int valueLength) throws Exception;
 
 }

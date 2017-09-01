@@ -36,7 +36,6 @@ import com.heimuheimu.naivecache.memcached.util.ByteUtil;
  * @author heimuheimu
  * @ThreadSafe
  */
-@SuppressWarnings("unused")
 public class ResponsePacket {
 
     private final byte[] header;

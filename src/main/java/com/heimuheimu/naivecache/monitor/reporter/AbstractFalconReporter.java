@@ -47,7 +47,6 @@ import java.util.concurrent.TimeUnit;
  *
  * @author heimuheimu
  */
-@SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class AbstractFalconReporter implements Closeable {
 
     /**

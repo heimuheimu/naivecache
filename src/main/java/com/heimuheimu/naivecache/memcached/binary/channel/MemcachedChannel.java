@@ -107,7 +107,7 @@ public class MemcachedChannel implements Closeable {
      */
     public MemcachedChannel(String host, SocketConfiguration configuration) throws RuntimeException {
         this.host = host;
-        this.socket = SocketBuilder.create(host, configuration);;
+        this.socket = SocketBuilder.create(host, configuration);
     }
 
     public List<ResponsePacket> send(Command command, long timeout)
@@ -230,13 +230,12 @@ public class MemcachedChannel implements Closeable {
             if (mergedCommandList.size() > 1) {
                 byte[] mergedPacket = new byte[mergedPacketSize];
                 int destPos = 0;
-                List<OptimizedCommand> sendedOptimizedCommands = new ArrayList<>();
-                for(int i = 0; i < mergedCommandList.size(); i++) {
-                    Command command = mergedCommandList.get(i);
+                List<OptimizedCommand> sentOptimizedCommands = new ArrayList<>();
+                for (Command command : mergedCommandList) {
                     boolean optimized = false;
                     if (command instanceof OptimizedCommand) {
-                        for (OptimizedCommand sendedOptimizedCommand : sendedOptimizedCommands) {
-                            if (sendedOptimizedCommand.optimize((OptimizedCommand) command)) {
+                        for (OptimizedCommand sentOptimizedCommand : sentOptimizedCommands) {
+                            if (sentOptimizedCommand.optimize((OptimizedCommand) command)) {
                                 optimized = true;
                                 break;
                             }
@@ -250,7 +249,7 @@ public class MemcachedChannel implements Closeable {
                             waitingQueue.add(command);
                         }
                         if (command instanceof OptimizedCommand) {
-                            sendedOptimizedCommands.add((OptimizedCommand) command);
+                            sentOptimizedCommands.add((OptimizedCommand) command);
                         }
                     }
                 }

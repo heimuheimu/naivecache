@@ -30,7 +30,6 @@ package com.heimuheimu.naivecache.memcached;
  *
  * @author heimuheimu
  */
-@SuppressWarnings("unused")
 public abstract class NaiveMemcachedClientListenerSkeleton implements NaiveMemcachedClientListener {
 
     @Override

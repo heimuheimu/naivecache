@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
  * @author heimuheimu
  * @ThreadSafe
  */
-@SuppressWarnings("unused")
 public class CompressionMonitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(CompressionMonitor.class);

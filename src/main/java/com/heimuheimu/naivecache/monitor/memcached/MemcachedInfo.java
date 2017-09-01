@@ -36,7 +36,6 @@ import com.heimuheimu.naivecache.monitor.TpsInfo;
  * @author heimuheimu
  * @ThreadSafe
  */
-@SuppressWarnings({"unused", "WeakerAccess"})
 public class MemcachedInfo {
 
     /**

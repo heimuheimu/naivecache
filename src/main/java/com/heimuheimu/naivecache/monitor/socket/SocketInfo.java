@@ -33,7 +33,6 @@ import com.heimuheimu.naivecache.monitor.SizeInfo;
  * @author heimuheimu
  * @ThreadSafe
  */
-@SuppressWarnings({"WeakerAccess", "unused"})
 public class SocketInfo {
 
     /**

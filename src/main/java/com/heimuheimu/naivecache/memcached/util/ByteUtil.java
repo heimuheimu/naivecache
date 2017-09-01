@@ -62,7 +62,7 @@ public class ByteUtil {
 	 * @param offset 数组起始索引
 	 * @throws IllegalArgumentException 如果整数小于0或者大于65535
 	 */
-	public static void intToTwoByteArray(int value, byte[] src, @SuppressWarnings("SameParameterValue") int offset) throws IllegalArgumentException {
+	public static void intToTwoByteArray(int value, byte[] src, int offset) throws IllegalArgumentException {
 		if (value < 0 || value > 65535) {
 			throw new IllegalArgumentException("Invalid integer value: " + value);
 		}
@@ -78,7 +78,7 @@ public class ByteUtil {
 	 * @return 转换后的int值
 	 * @throws IllegalArgumentException 当传入的数组长度不为2
 	 */
-	public static int twoByteArrayToInt(byte[] bytes, @SuppressWarnings("SameParameterValue") int offset) {
+	public static int twoByteArrayToInt(byte[] bytes, int offset) {
 		return ((bytes[offset++] & 0xff) << 8) | ((bytes[offset] & 0xff));
 	}
 
@@ -103,7 +103,7 @@ public class ByteUtil {
 	 * @param offset 数组起始索引
 	 * @return 转换后的int值
 	 */
-	public static int fourByteArrayToInt(byte[] bytes, @SuppressWarnings("SameParameterValue") int offset) {
+	public static int fourByteArrayToInt(byte[] bytes, int offset) {
 		return (((bytes[offset++]) << 24) | ((bytes[offset++] & 0xff) << 16)
 				| ((bytes[offset++] & 0xff) << 8) | ((bytes[offset] & 0xff)));
 	}

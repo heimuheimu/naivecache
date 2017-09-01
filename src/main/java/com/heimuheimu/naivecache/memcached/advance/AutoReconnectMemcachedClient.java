@@ -43,7 +43,6 @@ import java.io.IOException;
  * @author heimuheimu
  * @ThreadSafe
  */
-@SuppressWarnings("unused")
 public class AutoReconnectMemcachedClient extends AdvanceMemcachedClient {
 
     /**

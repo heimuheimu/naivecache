@@ -34,7 +34,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * @ThreadSafe
  * @see System#nanoTime()
  */
-@SuppressWarnings("unused")
 public class ExecutionTimeInfo {
 
     /**

@@ -94,7 +94,6 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
      * @throws IllegalArgumentException 如果目标服务器地址不符合规则，将会抛出此异常
      * @throws RuntimeException 如果创建 {@link MemcachedChannel} 过程中发生错误，将会抛出此异常
      */
-    @SuppressWarnings("WeakerAccess")
     public DirectMemcachedClient(String host) throws RuntimeException {
         this(host, null, 1000, 64 * 1024, null);
     }
@@ -510,7 +509,7 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
 
         private final Logger logger;
 
-        private ClientListenerWrapper(NaiveMemcachedClientListener clientListener, @SuppressWarnings("SameParameterValue") Logger logger) {
+        private ClientListenerWrapper(NaiveMemcachedClientListener clientListener, Logger logger) {
             this.clientListener = clientListener;
             this.logger = logger;
         }

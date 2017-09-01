@@ -38,7 +38,6 @@ import java.util.Map;
  *
  * @author heimuheimu
  */
-@SuppressWarnings("unused")
 public class FalconMemcachedReporter extends AbstractFalconReporter {
 
     private volatile long lastTpsCount = 0;

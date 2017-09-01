@@ -93,7 +93,6 @@ public class SocketMonitor {
      *
      * @return 全局 Socket 统计信息
      */
-    @SuppressWarnings("unused")
     public static SocketInfo getGlobalInfo() {
         return GLOBAL_INFO;
     }
@@ -104,7 +103,6 @@ public class SocketMonitor {
      *
      * @return Socket 统计信息 Map
      */
-    @SuppressWarnings("unused")
     public static Map<String, SocketInfo> get() {
         HashMap<String, SocketInfo> socketInfoHashMap = new HashMap<>(SOCKET_INFO_MAP);
         socketInfoHashMap.put("", GLOBAL_INFO);

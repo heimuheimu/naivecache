@@ -40,7 +40,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author heimuheimu
  * @ThreadSafe
  */
-@SuppressWarnings("unused")
 public class MemcachedMonitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(MemcachedMonitor.class);
@@ -91,7 +90,6 @@ public class MemcachedMonitor {
      *
      * @return Memcached 命令请求统计信息 Map
      */
-    @SuppressWarnings("unused")
     public static Map<String, MemcachedInfo> get() {
         HashMap<String, MemcachedInfo> memcachedInfoHashMap = new HashMap<>(MEM_INFO_MAP);
         memcachedInfoHashMap.put("", GLOBAL_INFO);

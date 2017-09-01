@@ -50,7 +50,6 @@ public abstract class RequestPacket {
      * @throws IllegalArgumentException 如果 Key 长度超过65535
      * @throws IllegalArgumentException 如果 Extras 长度 + Key 长度 + Value 长度超过2147483623
      */
-    @SuppressWarnings("WeakerAccess")
     protected byte[] buildPacket(byte Opcode, byte[] extras, byte[] key, byte[] value) throws IllegalArgumentException {
         int extrasLength = extras != null ? extras.length : 0;
         if (extrasLength > 255) {
@@ -100,7 +99,6 @@ public abstract class RequestPacket {
      *
      * @return 请求操作代码
      */
-    @SuppressWarnings("unused")
     public abstract byte getOpcode();
 
 }

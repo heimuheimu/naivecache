@@ -175,6 +175,9 @@ public class ReloadableMemcachedClusterClient implements NaiveMemcachedClient {
                        NaiveMemcachedClientListener naiveMemcachedClientListener,
                        MemcachedClusterClientListener memcachedClusterClientListener) throws IllegalArgumentException, IllegalStateException {
         if (hosts == null || hosts.length == 0) {
+            LOG.error("Hosts could not be empty. Hosts: " + Arrays.toString(hosts)
+                    + ". SocketConfiguration: " + configuration + ". Timeout: " + timeout
+                    + ". Compression threshold: " + compressionThreshold);
             throw new IllegalArgumentException("Hosts could not be empty. Hosts: " + Arrays.toString(hosts)
                     + ". SocketConfiguration: " + configuration + ". Timeout: " + timeout
                     + ". Compression threshold: " + compressionThreshold);

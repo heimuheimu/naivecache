@@ -31,8 +31,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
+ * Memcached 响应包读取器
+ *
  * @author heimuheimu
- * @NotThreadSafe
  */
 public class ResponsePacketReader {
 

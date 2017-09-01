@@ -29,7 +29,6 @@ package com.heimuheimu.naivecache.memcached.cluster;
  *
  * @author heimuheimu
  */
-@SuppressWarnings({"EmptyMethod", "WeakerAccess", "unused"})
 public interface MemcachedClusterClientListener {
 
     /**

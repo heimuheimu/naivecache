@@ -30,7 +30,6 @@ package com.heimuheimu.naivecache.memcached.cluster;
  *
  * @author heimuheimu
  */
-@SuppressWarnings("unused")
 public abstract class MemcachedClusterClientListenerSkeleton implements MemcachedClusterClientListener {
 
     @Override

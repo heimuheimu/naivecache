@@ -34,7 +34,6 @@ import java.net.SocketOptions;
  * @ThreadSafe
  * @see SocketBuilder
  */
-@SuppressWarnings({"WeakerAccess", "SameParameterValue"})
 public class SocketConfiguration {
 	
 	/**

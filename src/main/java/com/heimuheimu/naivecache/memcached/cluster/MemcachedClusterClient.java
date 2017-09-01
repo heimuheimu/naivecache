@@ -44,7 +44,6 @@ import java.util.concurrent.Future;
  * @author heimuheimu
  * @ThreadSafe
  */
-@SuppressWarnings("unused")
 public class MemcachedClusterClient implements NaiveMemcachedClient {
 
     private static final Logger MEMCACHED_CONNECTION_LOG = LoggerFactory.getLogger("NAIVECACHE_MEMCACHED_CONNECTION_LOG");
