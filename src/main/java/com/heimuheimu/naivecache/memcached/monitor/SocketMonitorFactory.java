@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.monitor;
+package com.heimuheimu.naivecache.memcached.monitor;
 
 import com.heimuheimu.naivemonitor.monitor.SocketMonitor;
 

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.monitor.falcon;
+package com.heimuheimu.naivecache.constant;
 
 /**
  * Memcached 客户端 Falcon 数据监控常量

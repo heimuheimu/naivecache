@@ -25,7 +25,7 @@
 package com.heimuheimu.naivecache.transcoder;
 
 import com.heimuheimu.naivecache.memcached.exception.MemcachedException;
-import com.heimuheimu.naivecache.monitor.CompressionMonitorFactory;
+import com.heimuheimu.naivecache.memcached.monitor.CompressionMonitorFactory;
 import com.heimuheimu.naivecache.transcoder.compression.LZFUtil;
 import com.heimuheimu.naivemonitor.monitor.CompressionMonitor;
 

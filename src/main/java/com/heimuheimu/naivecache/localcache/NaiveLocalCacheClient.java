@@ -22,28 +22,36 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.monitor;
-
-import com.heimuheimu.naivemonitor.monitor.CompressionMonitor;
+package com.heimuheimu.naivecache.localcache;
 
 /**
- * Memcached 客户端使用的压缩信息监控器工厂类
+ * 本地缓存客户端，缓存对象存储在当前运行的 JVM 内存中
  *
  * @author heimuheimu
  */
-public class CompressionMonitorFactory {
-
-    private CompressionMonitorFactory() {
-        //private constructor
-    }
-
-    private static final CompressionMonitor COMPRESSION_MONITOR = new CompressionMonitor();
+public interface NaiveLocalCacheClient {
 
     /**
-     * 获得 Memcached 客户端使用的压缩信息监控器
+     * 查找指定的 Key 在本地缓存中的值，如果不存在，则返回 {@code null}
+     *
+     * @param key 缓存 Key
+     * @return Key 对应的缓存值，如果不存在，则返回 {@code null}
      */
-    public static CompressionMonitor get() {
-        return COMPRESSION_MONITOR;
-    }
+    <T> T get(String key);
 
+    /**
+     * 将指定的对象存入本地缓存中
+     *
+     * @param key 缓存 Key
+     * @param value 缓存对象
+     * @param expiredTime 缓存过期时间，单位：秒
+     */
+    <T> void set(String key, T value, int expiredTime);
+
+    /**
+     * 将本地缓存中对应的 Key 删除
+     *
+     * @param key 缓存 Key
+     */
+    void delete(String key);
 }

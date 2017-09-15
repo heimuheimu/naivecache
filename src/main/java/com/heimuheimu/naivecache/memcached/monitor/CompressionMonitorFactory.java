@@ -22,44 +22,28 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.monitor.falcon;
+package com.heimuheimu.naivecache.memcached.monitor;
 
-import com.heimuheimu.naivecache.monitor.CompressionMonitorFactory;
-import com.heimuheimu.naivemonitor.falcon.support.AbstractCompressionDataCollector;
 import com.heimuheimu.naivemonitor.monitor.CompressionMonitor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Memcached 客户端使用的压缩信息采集器
+ * Memcached 客户端使用的压缩信息监控器工厂类
  *
  * @author heimuheimu
  */
-public class CompressionDataCollector extends AbstractCompressionDataCollector {
+public class CompressionMonitorFactory {
 
-    private final List<CompressionMonitor> compressionMonitorList;
+    private CompressionMonitorFactory() {
+        //private constructor
+    }
+
+    private static final CompressionMonitor COMPRESSION_MONITOR = new CompressionMonitor();
 
     /**
-     * 构造一个 RPC 服务端使用的压缩信息采集器，将会采集 RPC 服务端所有的压缩信息
+     * 获得 Memcached 客户端使用的压缩信息监控器
      */
-    public CompressionDataCollector() {
-        this.compressionMonitorList = new ArrayList<>();
-        this.compressionMonitorList.add(CompressionMonitorFactory.get());
+    public static CompressionMonitor get() {
+        return COMPRESSION_MONITOR;
     }
 
-    @Override
-    protected List<CompressionMonitor> getCompressionMonitorList() {
-        return compressionMonitorList;
-    }
-
-    @Override
-    protected String getModuleName() {
-        return FalconReporterConstant.MODULE_NAME;
-    }
-
-    @Override
-    public int getPeriod() {
-        return FalconReporterConstant.REPORT_PERIOD;
-    }
 }

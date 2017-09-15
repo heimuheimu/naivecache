@@ -22,29 +22,46 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.monitor.falcon;
+package com.heimuheimu.naivecache.memcached.monitor.falcon;
 
-import com.heimuheimu.naivecache.monitor.SocketMonitorFactory;
-import com.heimuheimu.naivemonitor.falcon.support.AbstractSocketDataCollector;
-import com.heimuheimu.naivemonitor.monitor.SocketMonitor;
+import com.heimuheimu.naivecache.constant.FalconReporterConstant;
+import com.heimuheimu.naivecache.memcached.monitor.ExecutionMonitorFactory;
+import com.heimuheimu.naivemonitor.falcon.support.AbstractExecutionDataCollector;
+import com.heimuheimu.naivemonitor.monitor.ExecutionMonitor;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Memcached 客户端使用的 Socket 信息采集器
+ * Memcached 客户端使用的执行信息采集器
  *
  * @author heimuheimu
  */
-public class SocketDataCollector extends AbstractSocketDataCollector {
+public class ExecutionDataCollector extends AbstractExecutionDataCollector {
+
+    private static final Map<Integer, String> ERROR_METRIC_SUFFIX_MAP;
+
+    static {
+        ERROR_METRIC_SUFFIX_MAP = new HashMap<>();
+        ERROR_METRIC_SUFFIX_MAP.put(ExecutionMonitorFactory.ERROR_CODE_KEY_NOT_FOUND, "_key_not_found");
+        ERROR_METRIC_SUFFIX_MAP.put(ExecutionMonitorFactory.ERROR_CODE_TIMEOUT, "_timeout");
+        ERROR_METRIC_SUFFIX_MAP.put(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR, "_error");
+    }
 
     @Override
-    protected List<SocketMonitor> getSocketMonitorList() {
-        return SocketMonitorFactory.getAll();
+    protected List<ExecutionMonitor> getExecutionMonitorList() {
+        return ExecutionMonitorFactory.getAll();
     }
 
     @Override
     protected String getModuleName() {
         return FalconReporterConstant.MODULE_NAME;
+    }
+
+    @Override
+    protected Map<Integer, String> getErrorMetricSuffixMap() {
+        return ERROR_METRIC_SUFFIX_MAP;
     }
 
     @Override

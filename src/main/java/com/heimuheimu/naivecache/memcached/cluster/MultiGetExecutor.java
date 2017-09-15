@@ -25,7 +25,7 @@
 package com.heimuheimu.naivecache.memcached.cluster;
 
 import com.heimuheimu.naivecache.memcached.NaiveMemcachedClient;
-import com.heimuheimu.naivecache.monitor.ThreadPoolMonitorFactory;
+import com.heimuheimu.naivecache.memcached.monitor.ThreadPoolMonitorFactory;
 import com.heimuheimu.naivemonitor.monitor.ThreadPoolMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

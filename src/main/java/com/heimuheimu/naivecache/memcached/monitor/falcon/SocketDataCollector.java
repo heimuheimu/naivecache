@@ -22,32 +22,25 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.monitor.falcon;
+package com.heimuheimu.naivecache.memcached.monitor.falcon;
 
-import com.heimuheimu.naivecache.monitor.ThreadPoolMonitorFactory;
-import com.heimuheimu.naivemonitor.falcon.support.AbstractThreadPoolDataCollector;
-import com.heimuheimu.naivemonitor.monitor.ThreadPoolMonitor;
+import com.heimuheimu.naivecache.constant.FalconReporterConstant;
+import com.heimuheimu.naivecache.memcached.monitor.SocketMonitorFactory;
+import com.heimuheimu.naivemonitor.falcon.support.AbstractSocketDataCollector;
+import com.heimuheimu.naivemonitor.monitor.SocketMonitor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Memcached 客户端使用的线程池信息采集器
+ * Memcached 客户端使用的 Socket 信息采集器
  *
  * @author heimuheimu
  */
-public class ThreadPoolDataCollector extends AbstractThreadPoolDataCollector {
-
-    private final List<ThreadPoolMonitor> threadPoolMonitorList;
-
-    public ThreadPoolDataCollector() {
-        this.threadPoolMonitorList = new ArrayList<>();
-        this.threadPoolMonitorList.add(ThreadPoolMonitorFactory.get());
-    }
+public class SocketDataCollector extends AbstractSocketDataCollector {
 
     @Override
-    protected List<ThreadPoolMonitor> getThreadPoolMonitorList() {
-        return threadPoolMonitorList;
+    protected List<SocketMonitor> getSocketMonitorList() {
+        return SocketMonitorFactory.getAll();
     }
 
     @Override

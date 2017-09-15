@@ -30,7 +30,7 @@ import com.heimuheimu.naivecache.memcached.binary.command.OptimizedCommand;
 import com.heimuheimu.naivecache.memcached.binary.response.ResponsePacket;
 import com.heimuheimu.naivecache.memcached.binary.response.ResponsePacketReader;
 import com.heimuheimu.naivecache.memcached.exception.TimeoutException;
-import com.heimuheimu.naivecache.monitor.SocketMonitorFactory;
+import com.heimuheimu.naivecache.memcached.monitor.SocketMonitorFactory;
 import com.heimuheimu.naivecache.net.SocketBuilder;
 import com.heimuheimu.naivecache.net.SocketConfiguration;
 import com.heimuheimu.naivemonitor.monitor.SocketMonitor;

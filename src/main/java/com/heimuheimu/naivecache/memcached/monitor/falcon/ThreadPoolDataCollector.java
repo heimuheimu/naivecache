@@ -22,45 +22,38 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.monitor.falcon;
+package com.heimuheimu.naivecache.memcached.monitor.falcon;
 
-import com.heimuheimu.naivecache.monitor.ExecutionMonitorFactory;
-import com.heimuheimu.naivemonitor.falcon.support.AbstractExecutionDataCollector;
-import com.heimuheimu.naivemonitor.monitor.ExecutionMonitor;
+import com.heimuheimu.naivecache.constant.FalconReporterConstant;
+import com.heimuheimu.naivecache.memcached.monitor.ThreadPoolMonitorFactory;
+import com.heimuheimu.naivemonitor.falcon.support.AbstractThreadPoolDataCollector;
+import com.heimuheimu.naivemonitor.monitor.ThreadPoolMonitor;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Memcached 客户端使用的执行信息采集器
+ * Memcached 客户端使用的线程池信息采集器
  *
  * @author heimuheimu
  */
-public class ExecutionDataCollector extends AbstractExecutionDataCollector {
+public class ThreadPoolDataCollector extends AbstractThreadPoolDataCollector {
 
-    private static final Map<Integer, String> ERROR_METRIC_SUFFIX_MAP;
+    private final List<ThreadPoolMonitor> threadPoolMonitorList;
 
-    static {
-        ERROR_METRIC_SUFFIX_MAP = new HashMap<>();
-        ERROR_METRIC_SUFFIX_MAP.put(ExecutionMonitorFactory.ERROR_CODE_KEY_NOT_FOUND, "_key_not_found");
-        ERROR_METRIC_SUFFIX_MAP.put(ExecutionMonitorFactory.ERROR_CODE_TIMEOUT, "_timeout");
-        ERROR_METRIC_SUFFIX_MAP.put(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR, "_error");
+    public ThreadPoolDataCollector() {
+        this.threadPoolMonitorList = new ArrayList<>();
+        this.threadPoolMonitorList.add(ThreadPoolMonitorFactory.get());
     }
 
     @Override
-    protected List<ExecutionMonitor> getExecutionMonitorList() {
-        return ExecutionMonitorFactory.getAll();
+    protected List<ThreadPoolMonitor> getThreadPoolMonitorList() {
+        return threadPoolMonitorList;
     }
 
     @Override
     protected String getModuleName() {
         return FalconReporterConstant.MODULE_NAME;
-    }
-
-    @Override
-    protected Map<Integer, String> getErrorMetricSuffixMap() {
-        return ERROR_METRIC_SUFFIX_MAP;
     }
 
     @Override
