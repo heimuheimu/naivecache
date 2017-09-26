@@ -470,7 +470,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                         }
 
                     };
-                    rescueThread.setName("MemcachedClusterClient rescue task");
+                    rescueThread.setName("naivecache-memcached-cluster-rescue-task");
                     rescueThread.setDaemon(true);
                     rescueThread.start();
                     isRescueTaskRunning = true;

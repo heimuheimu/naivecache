@@ -163,7 +163,7 @@ public class MemcachedChannel implements Closeable {
                     String socketAddress = host + "/" + socket.getLocalPort();
                     //启动写入线程
                     ioTask = new IoTask(config.getSendBufferSize());
-                    ioTask.setName("[Memcached IO Thread] " + socketAddress);
+                    ioTask.setName("naivecache-memcached-io-" + socketAddress);
                     ioTask.setDaemon(true);
                     ioTask.start();
                     MEMCACHED_CONNECTION_LOG.info("MemcachedChannel has been initialized. Cost: {}ms. Host: `{}`. Local port: `{}`. Config: `{}`.",

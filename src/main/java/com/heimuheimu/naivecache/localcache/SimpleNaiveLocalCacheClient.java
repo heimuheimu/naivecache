@@ -72,7 +72,7 @@ public class SimpleNaiveLocalCacheClient implements NaiveLocalCacheClient, Close
      */
     public synchronized void init() {
         cleanThread = new CleanThread();
-        cleanThread.setName("NaiveLocalCacheCleanThread");
+        cleanThread.setName("naivecache-localcache-clean-task");
         cleanThread.setDaemon(true);
         cleanThread.start();
     }

@@ -107,7 +107,7 @@ class MultiGetExecutor implements Closeable {
         @Override
         public Thread newThread(Runnable r) {
             Thread t = new Thread(r);
-            t.setName("MultiGetExecutor-" + threadNumber.getAndIncrement());
+            t.setName("naivecache-memcached-multi-get-" + threadNumber.getAndIncrement());
             t.setDaemon(true);
             if (t.getPriority() != Thread.NORM_PRIORITY)
                 t.setPriority(Thread.NORM_PRIORITY);
