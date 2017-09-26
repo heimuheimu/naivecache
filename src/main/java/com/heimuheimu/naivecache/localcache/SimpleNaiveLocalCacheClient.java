@@ -92,7 +92,7 @@ public class SimpleNaiveLocalCacheClient implements NaiveLocalCacheClient, Close
         try {
             LocalCacheEntity entity = cacheMap.get(key);
             if (entity != null && !entity.isExpired()) {
-                monitor.getQueryHitCount();
+                monitor.increaseQueryHitCount();
                 return (T) entity.getValue();
             }
         } catch (Exception e) {
