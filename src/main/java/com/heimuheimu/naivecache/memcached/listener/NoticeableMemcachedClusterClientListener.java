@@ -98,7 +98,7 @@ public class NoticeableMemcachedClusterClientListener extends MemcachedClusterCl
     }
 
     /**
-     * 根据 Memcached 服务主机地址构造一个服务及服务所在的运行环境信息，子类可通过重载此方法自定义调用该服务的主机名称等信息
+     * 根据 Memcached 服务主机地址构造一个服务及服务所在的运行环境信息
      *
      * @param memcachedHost Memcached 服务主机地址
      * @return 服务及服务所在的运行环境信息
@@ -106,6 +106,7 @@ public class NoticeableMemcachedClusterClientListener extends MemcachedClusterCl
     protected ServiceContext getServiceContext(String memcachedHost) {
         ServiceContext serviceContext = new ServiceContext();
         serviceContext.setName("Memcached");
+        serviceContext.setHost(host);
         serviceContext.setProject(project);
         serviceContext.setRemoteHost(memcachedHost);
         return serviceContext;
