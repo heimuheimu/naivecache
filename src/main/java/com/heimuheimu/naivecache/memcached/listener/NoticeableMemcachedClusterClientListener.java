@@ -60,7 +60,18 @@ public class NoticeableMemcachedClusterClientListener extends MemcachedClusterCl
      * 构造一个 Memcached 集群客户端监听器，可在 Memcached 服务不可用或者从不可用状态恢复时，进行实时通知
      *
      * @param project 调用 Memcached 服务的项目名称
-     * @param notifierList 服务不可用或从不可用状态恢复的报警消息通知器列表
+     * @param notifierList 服务不可用或从不可用状态恢复的报警消息通知器列表，不允许 {@code null} 或空
+     * @throws IllegalArgumentException 如果消息通知器列表为 {@code null} 或空时，抛出此异常
+     */
+    public NoticeableMemcachedClusterClientListener(String project, List<ServiceAlarmMessageNotifier> notifierList) {
+        this(project, notifierList, null);
+    }
+
+    /**
+     * 构造一个 Memcached 集群客户端监听器，可在 Memcached 服务不可用或者从不可用状态恢复时，进行实时通知
+     *
+     * @param project 调用 Memcached 服务的项目名称
+     * @param notifierList 服务不可用或从不可用状态恢复的报警消息通知器列表，不允许 {@code null} 或空
      * @param hostAliasMap 别名 Map，Key 为机器名， Value 为别名，允许为 {@code null}
      * @throws IllegalArgumentException 如果消息通知器列表为 {@code null} 或空时，抛出此异常
      */
