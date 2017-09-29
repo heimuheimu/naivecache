@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  * log4j.appender.NAIVECACHE_ERROR_LOG.encoding=UTF-8 <br>
  * log4j.appender.NAIVECACHE_ERROR_LOG.DatePattern=_yyyy-MM-dd <br>
  * log4j.appender.NAIVECACHE_ERROR_LOG.layout=org.apache.log4j.PatternLayout <br>
- * log4j.appender.NAIVECACHE_ERROR_LOG.layout.ConversionPattern=%d{ISO8601} : %m%n <br>
+ * log4j.appender.NAIVECACHE_ERROR_LOG.layout.ConversionPattern=%d{ISO8601} %-5p : %m%n <br>
  * <br>
  * log4j.logger.NAIVECACHE_SLOW_EXECUTION_LOG=INFO, NAIVECACHE_SLOW_EXECUTION_LOG <br>
  * log4j.additivity.NAIVECACHE_SLOW_EXECUTION_LOG=false <br>
@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit;
  * log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.encoding=UTF-8 <br>
  * log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.DatePattern=_yyyy-MM-dd <br>
  * log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.layout=org.apache.log4j.PatternLayout <br>
- * log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.layout.ConversionPattern=%d{ISO8601} : %m%n <br>
+ * log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.layout.ConversionPattern=%d{ISO8601} %-5p : %m%n <br>
  * </code>
  * </p>
  *
