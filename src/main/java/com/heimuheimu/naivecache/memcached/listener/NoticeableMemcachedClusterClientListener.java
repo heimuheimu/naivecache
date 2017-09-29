@@ -89,12 +89,12 @@ public class NoticeableMemcachedClusterClientListener extends MemcachedClusterCl
 
     @Override
     public void onRecovered(String host) {
-        naiveServiceAlarm.onCrashed(getServiceContext(host));
+        naiveServiceAlarm.onRecovered(getServiceContext(host));
     }
 
     @Override
     public void onClosed(String host) {
-        naiveServiceAlarm.onRecovered(getServiceContext(host));
+        naiveServiceAlarm.onCrashed(getServiceContext(host));
     }
 
     /**
