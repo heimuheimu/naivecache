@@ -29,61 +29,130 @@ import com.heimuheimu.naivecache.localcache.monitor.LocalCacheMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Closeable;
+import java.io.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 基于 {@link ConcurrentHashMap} 实现的本地缓存客户端
+ * 基于 {@link ConcurrentHashMap} 实现的本地缓存客户端，可支持非序列化和序列化模式。
+ *
+ * <ul>
+ *   <li>非序列化模式：缓存对象以引用的形式存储，被设置后，不允许再被修改，否则可能导致难以预期的线程错误。该模式没有序列化开销。</li>
+ *   <li>
+ *       序列化模式：缓存对象序列化成字节数组后存储，获取的对象允许修改，不会改变本地缓存中的值。
+ *       该模式要求缓存对象继承 {@link java.io.Serializable} 接口，并存在序列化开销。
+ *   </li>
+ * </ul>
+ *
+ * <h3>数据监控</h3>
+ * <blockquote>
+ * 可通过 {@link LocalCacheMonitor#getInstance()} 获取本地缓存使用信息监控数据。
+ * </blockquote>
+ *
+ * <p>{@code RpcChannel} 实例应调用 {@link #init()} 方法完成初始化，再提供服务。</p>
+ *
+ * <p><strong>说明：</strong>{@code SimpleNaiveLocalCacheClient} 类是线程安全的，可在多个线程中使用同一个实例。</p>
  *
  * @author heimuheimu
  */
 public class SimpleNaiveLocalCacheClient implements NaiveLocalCacheClient, Closeable {
 
+    private static final AtomicLong THREAD_NUMBER_GENERATOR = new AtomicLong();
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleNaiveLocalCacheClient.class);
 
+    /**
+     * 用于存储本地缓存，{@code Map} 的 Key 为 缓存 Key，Value 为 Key 对应的缓存内容 {@code LocalCacheEntity}
+     */
     private final ConcurrentHashMap<String, LocalCacheEntity> cacheMap = new ConcurrentHashMap<>();
 
+    /**
+     * {@code SimpleNaiveLocalCacheClient} 本地缓存使用信息监控器
+     */
     private final LocalCacheMonitor monitor = LocalCacheMonitor.getInstance();
 
+    /**
+     * {@code SimpleNaiveLocalCacheClient} 允许存储的本地缓存最大数量
+     */
     private final int maxCacheSize;
 
+    /**
+     * {@code SimpleNaiveLocalCacheClient} 是否使用序列化模式
+     */
+    private final boolean isSerializationMode;
+
+    /**
+     * 本地缓存过期数据后台清理线程
+     */
     private CleanThread cleanThread;
 
+    /**
+     * {@code SimpleNaiveLocalCacheClient} 当前所处状态
+     */
     private BeanStatusEnum state = BeanStatusEnum.UNINITIALIZED;
 
     /**
-     * 构造一个本地缓存客户端，允许同时存在的最大缓存数量为一百万
+     * 构造一个 {@code SimpleNaiveLocalCacheClient}，使用非序列化模式，允许存储的本地缓存最大数量为一百万。
      */
     public SimpleNaiveLocalCacheClient() {
-        this(1000000);
+        this(false, 1000000);
     }
 
     /**
-     * 构造一个本地缓存客户端
+     * 造一个 {@code SimpleNaiveLocalCacheClient}，允许存储的本地缓存最大数量为一百万。
      *
-     * @param maxCacheSize 允许同时存在的最大缓存数量
+     * @param isSerializationMode 是否使用序列化模式
      */
-    public SimpleNaiveLocalCacheClient(int maxCacheSize) {
+    public SimpleNaiveLocalCacheClient(boolean isSerializationMode) {
+        this(isSerializationMode, 1000000);
+    }
+
+    /**
+     * 构造一个 {@code SimpleNaiveLocalCacheClient}。
+     *
+     * @param isSerializationMode 是否使用序列化模式
+     * @param maxCacheSize 允许存储的本地缓存最大数量
+     */
+    public SimpleNaiveLocalCacheClient(boolean isSerializationMode, int maxCacheSize) {
+        this.isSerializationMode = isSerializationMode;
         this.maxCacheSize = maxCacheSize;
     }
 
     /**
-     * 执行本地缓存客户单初始化操作
+     * 执行 {@code SimpleNaiveLocalCacheClient} 初始化操作。
      */
     public synchronized void init() {
-        cleanThread = new CleanThread();
-        cleanThread.setName("naivecache-localcache-clean-task");
-        cleanThread.setDaemon(true);
-        cleanThread.start();
+        if (state == BeanStatusEnum.UNINITIALIZED) {
+            state = BeanStatusEnum.NORMAL;
+            try {
+                cleanThread = new CleanThread();
+                cleanThread.setName("naivecache-localcache-clean-task-" + THREAD_NUMBER_GENERATOR.incrementAndGet());
+                cleanThread.setDaemon(true);
+                cleanThread.start();
+            } catch (Exception e) { //should not happen
+                LOGGER.error("Initialize SimpleNaiveLocalCacheClient failed: `" + e.getMessage() + "`. MaxCacheSize: `"
+                        + maxCacheSize + "`. IsSerializationMode: `" + isSerializationMode + "`.", e);
+                close();
+            }
+        }
     }
 
     /**
-     * 执行本地缓存客户单关闭操作
+     * 执行 {@code SimpleNaiveLocalCacheClient} 关闭操作。
      */
     @Override
     public synchronized void close() {
-        cleanThread.stopSignal = true;
-        cleanThread.interrupt();
+        if (state != BeanStatusEnum.CLOSED) {
+            state = BeanStatusEnum.CLOSED;
+            try {
+                cleanThread.stopSignal = true;
+                cleanThread.interrupt();
+            } catch (Exception e) { //should not happen
+                LOGGER.error("Close SimpleNaiveLocalCacheClient failed: `" + e.getMessage() + "`. MaxCacheSize: `"
+                        + maxCacheSize + "`. IsSerializationMode: `" + isSerializationMode + "`.", e);
+            }
+        }
+
     }
 
     @Override
@@ -107,6 +176,10 @@ public class SimpleNaiveLocalCacheClient implements NaiveLocalCacheClient, Close
 
     @Override
     public <T> void set(String key, T value, int expiredTime) {
+        if (state != BeanStatusEnum.NORMAL) {
+            LOGGER.error("Invalid SimpleNaiveLocalCacheClient state: `{}`.", state);
+            monitor.increaseErrorCount();
+        }
         try {
             if (key == null || key.isEmpty() || value == null) { // 如果Key为空或值为null
                 monitor.increaseErrorCount();
@@ -123,7 +196,7 @@ public class SimpleNaiveLocalCacheClient implements NaiveLocalCacheClient, Close
                 monitor.increaseErrorCount();
                 return;
             }
-            LocalCacheEntity entity = new LocalCacheEntity(value, expiredTime);
+            LocalCacheEntity entity = new LocalCacheEntity(value, expiredTime, isSerializationMode);
             cacheMap.put(key, entity);
             monitor.increaseAddedCount();
         } catch (Exception e) {
@@ -181,19 +254,34 @@ public class SimpleNaiveLocalCacheClient implements NaiveLocalCacheClient, Close
 
         private final long timestamp;
 
-        private LocalCacheEntity(Object value, int expiredTime) {
-            this.value = value;
+        private final boolean isSerializationMode;
+
+        private LocalCacheEntity(Object value, int expiredTime, boolean isSerializationMode) throws IOException {
+            if (isSerializationMode) {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ObjectOutputStream oos = new ObjectOutputStream(bos);
+                oos.writeObject(value);
+                this.value = bos.toByteArray();
+            } else {
+                this.value = value;
+            }
             this.expiredTime = expiredTime;
+            this.isSerializationMode = isSerializationMode;
             this.timestamp = System.currentTimeMillis();
         }
 
-        private Object getValue() {
-            return value;
+        private Object getValue() throws IOException, ClassNotFoundException {
+            if (isSerializationMode) {
+                ByteArrayInputStream valueBis = new ByteArrayInputStream((byte[]) value);
+                ObjectInputStream ois = new ObjectInputStream(valueBis);
+                return ois.readObject();
+            } else {
+                return value;
+            }
         }
 
         private boolean isExpired() {
             return (System.currentTimeMillis() - timestamp) > (expiredTime * 1000);
         }
-
     }
 }
