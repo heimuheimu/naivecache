@@ -34,29 +34,30 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 提供 Memcached 客户端事件监听器的一个简单实现，将 Error 和 SlowExecution 事件打印至日志文件中。
- * <p>
- * Log4j 配置：
- * <br>
- * <code>
- * log4j.logger.NAIVECACHE_ERROR_LOG=INFO, NAIVECACHE_ERROR_LOG <br>
- * log4j.additivity.NAIVECACHE_ERROR_LOG=false <br>
- * log4j.appender.NAIVECACHE_ERROR_LOG=org.apache.log4j.DailyRollingFileAppender <br>
- * log4j.appender.NAIVECACHE_ERROR_LOG.file=${log.output.directory}/naivecache/error.log <br>
- * log4j.appender.NAIVECACHE_ERROR_LOG.encoding=UTF-8 <br>
- * log4j.appender.NAIVECACHE_ERROR_LOG.DatePattern=_yyyy-MM-dd <br>
- * log4j.appender.NAIVECACHE_ERROR_LOG.layout=org.apache.log4j.PatternLayout <br>
- * log4j.appender.NAIVECACHE_ERROR_LOG.layout.ConversionPattern=%d{ISO8601} %-5p : %m%n <br>
- * <br>
- * log4j.logger.NAIVECACHE_SLOW_EXECUTION_LOG=INFO, NAIVECACHE_SLOW_EXECUTION_LOG <br>
- * log4j.additivity.NAIVECACHE_SLOW_EXECUTION_LOG=false <br>
- * log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG=org.apache.log4j.DailyRollingFileAppender <br>
- * log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.file=${log.output.directory}/naivecache/slow_execution.log <br>
- * log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.encoding=UTF-8 <br>
- * log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.DatePattern=_yyyy-MM-dd <br>
- * log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.layout=org.apache.log4j.PatternLayout <br>
- * log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.layout.ConversionPattern=%d{ISO8601} %-5p : %m%n <br>
- * </code>
- * </p>
+ *
+ * <h3>建议的 Log4j 配置：</h3>
+ * <strong>注意：</strong> <code>${log.output.directory} 为占位替换符</code>
+ * <blockquote>
+ * <pre>
+ * log4j.logger.NAIVECACHE_ERROR_LOG=INFO, NAIVECACHE_ERROR_LOG
+ * log4j.additivity.NAIVECACHE_ERROR_LOG=false
+ * log4j.appender.NAIVECACHE_ERROR_LOG=org.apache.log4j.DailyRollingFileAppender
+ * log4j.appender.NAIVECACHE_ERROR_LOG.file=${log.output.directory}/naivecache/error.log
+ * log4j.appender.NAIVECACHE_ERROR_LOG.encoding=UTF-8
+ * log4j.appender.NAIVECACHE_ERROR_LOG.DatePattern=_yyyy-MM-dd
+ * log4j.appender.NAIVECACHE_ERROR_LOG.layout=org.apache.log4j.PatternLayout
+ * log4j.appender.NAIVECACHE_ERROR_LOG.layout.ConversionPattern=%d{ISO8601} %-5p : %m%n
+ *
+ * log4j.logger.NAIVECACHE_SLOW_EXECUTION_LOG=INFO, NAIVECACHE_SLOW_EXECUTION_LOG
+ * log4j.additivity.NAIVECACHE_SLOW_EXECUTION_LOG=false
+ * log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG=org.apache.log4j.DailyRollingFileAppender
+ * log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.file=${log.output.directory}/naivecache/slow_execution.log
+ * log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.encoding=UTF-8
+ * log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.DatePattern=_yyyy-MM-dd
+ * log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.layout=org.apache.log4j.PatternLayout
+ * log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.layout.ConversionPattern=%d{ISO8601} %-5p : %m%n
+ * </pre>
+ * </blockquote>
  *
  * @author heimuheimu
  */
