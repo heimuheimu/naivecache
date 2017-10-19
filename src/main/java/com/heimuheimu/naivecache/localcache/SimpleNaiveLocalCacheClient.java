@@ -197,8 +197,9 @@ public class SimpleNaiveLocalCacheClient implements NaiveLocalCacheClient, Close
                 return;
             }
             LocalCacheEntity entity = new LocalCacheEntity(value, expiredTime, isSerializationMode);
-            cacheMap.put(key, entity);
-            monitor.increaseAddedCount();
+            if (cacheMap.put(key, entity) == null) {
+                monitor.increaseAddedCount();
+            }
         } catch (Exception e) {
             //should not happen
             LOGGER.error("Set value to local cache failed. key: `" + key + "`. value: `"
