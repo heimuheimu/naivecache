@@ -158,6 +158,11 @@ public class SimpleNaiveLocalCacheClient implements NaiveLocalCacheClient, Close
     @Override
     @SuppressWarnings("unchecked")
     public <T> T get(String key) {
+        if (key == null || key.isEmpty()) { // 如果 Key 为空或值为 null
+            LOGGER.error("Get value from local cache failed: `key could not be null or empty`.");
+            monitor.increaseErrorCount();
+            return null;
+        }
         try {
             LocalCacheEntity entity = cacheMap.get(key);
             if (entity != null && !entity.isExpired()) {
@@ -176,12 +181,20 @@ public class SimpleNaiveLocalCacheClient implements NaiveLocalCacheClient, Close
 
     @Override
     public <T> void set(String key, T value, int expiredTime) {
+        if (key == null || key.isEmpty()) { // 如果 Key 为空或值为 null
+            LOGGER.error("Set value to local cache failed: `key could not be null or empty`. Key: `{}`. Value: `{}`. ExpiredTime: `{}`.",
+                    key, value, expiredTime);
+            monitor.increaseErrorCount();
+            return;
+        }
         if (state != BeanStatusEnum.NORMAL) {
             LOGGER.error("Invalid SimpleNaiveLocalCacheClient state: `{}`.", state);
             monitor.increaseErrorCount();
         }
         try {
-            if (key == null || key.isEmpty() || value == null) { // 如果Key为空或值为null
+            if (value == null) { // 如果Key为空或值为null
+                LOGGER.error("Set value to local cache failed: `value could not be null`. Key: `{}`. Value: `{}`. ExpiredTime: `{}`.",
+                        key, value, expiredTime);
                 monitor.increaseErrorCount();
                 return;
             }
@@ -210,12 +223,26 @@ public class SimpleNaiveLocalCacheClient implements NaiveLocalCacheClient, Close
 
     @Override
     public void delete(String key) {
-        if (key == null || key.isEmpty()) { // 如果Key为空或值为null
+        if (key == null || key.isEmpty()) { // 如果 Key 为空或值为 null
+            LOGGER.error("Delete value from local cache failed: `key could not be null or empty`.");
             monitor.increaseErrorCount();
             return;
         }
         if (cacheMap.remove(key) != null) {
             monitor.increaseDeletedCount();
+        }
+    }
+
+    @Override
+    public void touch(String key, int expiredTime) {
+        if (key == null || key.isEmpty()) { // 如果 Key 为空或值为 null
+            LOGGER.error("Touch key from local cache failed: `key could not be null or empty`.");
+            monitor.increaseErrorCount();
+            return;
+        }
+        LocalCacheEntity entity = cacheMap.get(key);
+        if (entity != null) {
+            entity.touch(expiredTime);
         }
     }
 
@@ -251,9 +278,7 @@ public class SimpleNaiveLocalCacheClient implements NaiveLocalCacheClient, Close
 
         private final Object value;
 
-        private final int expiredTime;
-
-        private final long timestamp;
+        private volatile long expiry;
 
         private final boolean isSerializationMode;
 
@@ -266,9 +291,8 @@ public class SimpleNaiveLocalCacheClient implements NaiveLocalCacheClient, Close
             } else {
                 this.value = value;
             }
-            this.expiredTime = expiredTime;
             this.isSerializationMode = isSerializationMode;
-            this.timestamp = System.currentTimeMillis();
+            touch(expiredTime);
         }
 
         private Object getValue() throws IOException, ClassNotFoundException {
@@ -281,8 +305,12 @@ public class SimpleNaiveLocalCacheClient implements NaiveLocalCacheClient, Close
             }
         }
 
+        private void touch(int expiredTime) {
+            this.expiry = System.currentTimeMillis() + (expiredTime * 1000);
+        }
+
         private boolean isExpired() {
-            return (System.currentTimeMillis() - timestamp) > (expiredTime * 1000);
+            return System.currentTimeMillis() > expiry;
         }
     }
 }

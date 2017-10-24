@@ -25,33 +25,41 @@
 package com.heimuheimu.naivecache.localcache;
 
 /**
- * 本地缓存客户端，缓存对象存储在当前运行的 JVM 内存中
+ * 本地缓存客户端，缓存对象存储在当前运行的 JVM 内存中。
  *
  * @author heimuheimu
  */
 public interface NaiveLocalCacheClient {
 
     /**
-     * 查找指定的 Key 在本地缓存中的值，如果不存在，则返回 {@code null}
+     * 查找指定的 Key 在本地缓存中的值，如果不存在，则返回 {@code null}。
      *
-     * @param key 缓存 Key
+     * @param key 缓存 Key，不允许为 {@code null} 或空字符串
      * @return Key 对应的缓存值，如果不存在，则返回 {@code null}
      */
     <T> T get(String key);
 
     /**
-     * 将指定的对象存入本地缓存中
+     * 将指定的对象存入本地缓存中。
      *
-     * @param key 缓存 Key
-     * @param value 缓存对象
+     * @param key 缓存 Key，不允许为 {@code null} 或空字符串
+     * @param value 缓存对象，不允许为 {@code null}
      * @param expiredTime 缓存过期时间，单位：秒
      */
     <T> void set(String key, T value, int expiredTime);
 
     /**
-     * 将本地缓存中对应的 Key 删除
+     * 将本地缓存中对应的 Key 删除。
      *
-     * @param key 缓存 Key
+     * @param key 缓存 Key，不允许为 {@code null} 或空字符串
      */
     void delete(String key);
+
+    /**
+     * 更新 Key 对应的缓存过期时间。
+     *
+     * @param key 缓存 Key，不允许为 {@code null} 或空字符串
+     * @param expiredTime 缓存过期时间，单位：秒
+     */
+    void touch(String key, int expiredTime);
 }
