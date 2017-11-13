@@ -38,11 +38,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
 
 /**
- * Memcached 集群客户端，连接多台 Memcached 服务，根据 Key 进行 Hash 选择
- * <p>当前实现是线程安全的</p>
+ * Memcached 集群客户端，连接多台 Memcached 服务，根据 Key 进行 Hash 选择。
+ *
+ * <p><strong>说明：</strong>{@code MemcachedClusterClient} 类是线程安全的，可在多个线程中使用同一个实例。</p>
  *
  * @author heimuheimu
- * @ThreadSafe
  */
 public class MemcachedClusterClient implements NaiveMemcachedClient {
 

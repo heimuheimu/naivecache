@@ -35,10 +35,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 /**
- * 使用 Java 序列化实现的 Java 对象与 Memcached 二进制协议存储的字节数组转换器
+ * 使用 Java 序列化实现的 Java 对象与 Memcached 二进制协议存储的字节数组转换器。
+ *
+ * <p><strong>说明：</strong>{@code SimpleTranscoder} 类是线程安全的，可在多个线程中使用同一个实例。</p>
  *
  * @author heimuheimu
- * @ThreadSafe
  */
 public class SimpleTranscoder implements Transcoder {
 

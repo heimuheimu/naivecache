@@ -23,19 +23,19 @@
  */
 
 /**
- * <ul>
- * 使用单个 Memcached 服务的扩展客户端
- * <li>
- *     一次性 Memcached 客户端：{@link com.heimuheimu.naivecache.memcached.advance.OneTimeMemcachedClient}<br>
- *     <b>特性：</b>每次操作都会新建立 Socket 连接，在操作结束后关闭该连接。<br>
- *     <b>适用场景：</b> 连接单台 Memcached 服务器，Memcached 操作频次很低，例如几秒钟发起一次 Memcached 访问。
- * </li>
- * <li>
- *     自动重连 Memcached 客户端：{@link com.heimuheimu.naivecache.memcached.advance.AutoReconnectMemcachedClient}<br>
- *     <b>特性：</b>在 Memcached 操作之前均会检查客户端是否可用，如果不可用，则立即尝试重连<br>
- *     <b>适用场景：</b> 当只有单个 Memcached 服务可以使用时
- * </li>
- * </ul>
+ * 使用单个 Memcached 服务的扩展客户端。
+ *
+ * <h3>一次性 Memcached 客户端</h3>
+ * <blockquote>
+ *     <strong>特性：</strong>每次操作都会新建立 Socket 连接，在操作结束后关闭该连接。<br>
+ *     <strong>适用场景：</strong> 连接单台 Memcached 服务器，Memcached 操作频次很低，例如几秒钟发起一次 Memcached 访问。
+ * </blockquote>
+ *
+ * <h3>自动重连 Memcached 客户端</h3>
+ * <blockquote>
+ *     <strong>特性：</strong>在 Memcached 操作之前均会检查客户端是否可用，如果不可用，则立即尝试重连。<br>
+ *     <strong>适用场景：</strong> 连接单台 Memcached 服务器。
+ * </blockquote>
  *
  * @author heimuheimu
  */

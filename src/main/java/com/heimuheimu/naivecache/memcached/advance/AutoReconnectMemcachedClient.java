@@ -35,13 +35,21 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 /**
- * 连接单个 Memcached 服务的自动重连 Memcached 客户端：<br>
- * <b>特性：</b>在 Memcached 操作之前均会检查客户端是否可用，如果不可用，则立即尝试重连<br>
- * <b>适用场景：</b> 当只有单个 Memcached 服务可以使用时
- * <p>当前实现是线程安全的</p>
+ * 连接单个 Memcached 服务的自动重连 Memcached 客户端。
+ *
+ * <h3>特性</h3>
+ * <blockquote>
+ *     在 Memcached 操作之前均会检查客户端是否可用，如果不可用，则立即尝试重连。
+ * </blockquote>
+ *
+ * <h3>适用场景</h3>
+ * <blockquote>
+ *     连接单台 Memcached 服务器。
+ * </blockquote>
+ *
+ * <p><strong>说明：</strong>{@code AutoReconnectMemcachedClient} 类是线程安全的，可在多个线程中使用同一个实例。</p>
  *
  * @author heimuheimu
- * @ThreadSafe
  */
 public class AutoReconnectMemcachedClient extends AdvanceMemcachedClient {
 

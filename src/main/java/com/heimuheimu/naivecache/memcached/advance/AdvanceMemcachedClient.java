@@ -32,11 +32,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 使用单个 Memcached 服务的扩展客户端抽象类，由子类实现具体客户端的创建及释放
- * <p>子类必须保证实现是线程安全的</p>
+ * 使用单个 Memcached 服务的扩展客户端抽象类，由子类实现具体客户端的创建及释放。
+ *
+ * <p><strong>说明：</strong>{@code AdvanceMemcachedClient} 的实现类必须是线程安全的。</p>
  *
  * @author heimuheimu
- * @ThreadSafe
  */
 public abstract class AdvanceMemcachedClient implements NaiveMemcachedClient {
 

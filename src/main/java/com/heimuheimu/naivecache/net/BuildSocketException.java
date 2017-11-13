@@ -22,9 +22,19 @@
  * SOFTWARE.
  */
 
+package com.heimuheimu.naivecache.net;
+
 /**
- * Memcached 二进制协议命令。
+ * 创建 {@link java.net.Socket} 实例、设置 {@code Socket} 配置信息或读取 {@code Socket} 配置信息时发生错误，将抛出此异常。
  *
  * @author heimuheimu
+ * @see SocketBuilder
  */
-package com.heimuheimu.naivecache.memcached.binary.command;
+public class BuildSocketException extends RuntimeException {
+
+    private static final long serialVersionUID = -3296663797345543780L;
+
+    public BuildSocketException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}

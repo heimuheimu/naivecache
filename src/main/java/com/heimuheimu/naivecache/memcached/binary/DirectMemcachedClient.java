@@ -35,6 +35,7 @@ import com.heimuheimu.naivecache.memcached.binary.command.SetCommand;
 import com.heimuheimu.naivecache.memcached.binary.response.ResponsePacket;
 import com.heimuheimu.naivecache.memcached.exception.TimeoutException;
 import com.heimuheimu.naivecache.memcached.monitor.ExecutionMonitorFactory;
+import com.heimuheimu.naivecache.net.BuildSocketException;
 import com.heimuheimu.naivecache.net.SocketConfiguration;
 import com.heimuheimu.naivecache.transcoder.SimpleTranscoder;
 import com.heimuheimu.naivecache.transcoder.Transcoder;
@@ -47,11 +48,14 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 /**
- * Memcached 直连客户端，基于二进制协议进行通信
- * <p>当前实现是线程安全的</p>
+ * Memcached 直连客户端，基于二进制协议进行通信，协议定义请参考文档：
+ * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped">
+ * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped
+ * </a>。
+ *
+ * <p><strong>说明：</strong>{@code MemcachedChannel} 类是线程安全的，可在多个线程中使用同一个实例。</p>
  *
  * @author heimuheimu
- * @ThreadSafe
  */
 public class DirectMemcachedClient implements NaiveMemcachedClient {
 
@@ -104,7 +108,7 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
     }
 
     /**
-     * 创建一个 Memcached 直连客户端
+     * 创建一个 Memcached 直连客户端。
      *
      * @param host Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:11211
      * @param configuration Socket 配置信息，如果传 {@code null}，将会使用 {@link SocketConfiguration#DEFAULT} 配置信息
@@ -113,12 +117,12 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
      * @param clientListener Memcached 客户端事件监听器，允许为 {@code null}
      * @throws IllegalArgumentException 如果 timeout 小于等于0
      * @throws IllegalArgumentException 如果 compressionThreshold 小于等于0
-     * @throws IllegalArgumentException 如果目标服务器地址不符合规则，将会抛出此异常
-     * @throws RuntimeException 如果创建 {@link MemcachedChannel} 过程中发生错误，将会抛出此异常
+     * @throws IllegalArgumentException 如果 Memcached 地址不符合规则，将会抛出此异常
+     * @throws BuildSocketException 如果创建 {@link MemcachedChannel} 过程中发生错误，将会抛出此异常
      */
     public DirectMemcachedClient(String host, SocketConfiguration configuration,
                                  int timeout, int compressionThreshold,
-                                 NaiveMemcachedClientListener clientListener) throws RuntimeException {
+                                 NaiveMemcachedClientListener clientListener) throws IllegalArgumentException, BuildSocketException {
         if (timeout <= 0) {
             throw new IllegalArgumentException("Create DirectMemcachedClient failed. Timeout could not be equal or less than 0. Host: `" + host + "`. Configuration: `"
                 + configuration + "`. Timeout: `" + timeout + "`. compressionThreshold: `" + compressionThreshold + "`. clientListener: `"

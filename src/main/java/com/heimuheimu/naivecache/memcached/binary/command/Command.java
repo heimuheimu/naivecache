@@ -31,13 +31,11 @@ import com.heimuheimu.naivecache.memcached.exception.TimeoutException;
 import java.util.List;
 
 /**
- * Memcached 命令，提供获取该命令的请求数据包、解析该命令的响应数据包等操作
- * <p>
- * <b>Memcached 命令的实现必须是线程安全的</b>
- * </p>
+ * Memcached 命令，提供获取该命令的请求数据包、解析该命令的响应数据包等操作。
+ *
+ * <p><strong>说明：</strong>{@code Command} 的实现类必须是线程安全的。</p>
  *
  * @author heimuheimu
- * @ThreadSafe
  */
 public interface Command {
 

@@ -38,12 +38,11 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Memcached multi-get 命令执行器，用于同时执行多台 Memcached 服务的 multi-get 命令
+ * Memcached multi-get 命令执行器，用于同时执行多台 Memcached 服务的 multi-get 命令。
  *
- * <p>当前实现是线程安全的</p>
+ * <p><strong>说明：</strong>{@code MultiGetExecutor} 类是线程安全的，可在多个线程中使用同一个实例。</p>
  *
  * @author heimuheimu
- * @ThreadSafe
  */
 class MultiGetExecutor implements Closeable {
 

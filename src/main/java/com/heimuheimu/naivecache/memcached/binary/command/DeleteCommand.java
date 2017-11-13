@@ -42,8 +42,9 @@ import java.util.concurrent.TimeUnit;
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#delete
  * </a>
  *
+ * <p><strong>说明：</strong>{@code DeleteCommand} 类是线程安全的，可在多个线程中使用同一个实例。</p>
+ *
  * @author heimuheimu
- * @ThreadSafe
  */
 public class DeleteCommand implements Command {
 

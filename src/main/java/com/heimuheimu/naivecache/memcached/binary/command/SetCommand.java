@@ -40,10 +40,11 @@ import java.util.concurrent.TimeUnit;
  * Memcached Get 命令，命令定义请参考文档：
  * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#set-add-replace">
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#set-add-replace
- * </a>
+ * </a>。
+ *
+ * <p><strong>说明：</strong>{@code SetCommand} 类是线程安全的，可在多个线程中使用同一个实例。</p>
  *
  * @author heimuheimu
- * @ThreadSafe
  */
 public class SetCommand implements Command {
 

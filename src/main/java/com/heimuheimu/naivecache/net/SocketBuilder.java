@@ -21,46 +21,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package com.heimuheimu.naivecache.net;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketException;
 
 /**
- * {@link Socket} 实例构造器
+ * {@link Socket} 实例创建、配置信息读取、配置信息设置工具类。
  *
  * @author heimuheimu
  */
 public class SocketBuilder {
 	
+	private final static Logger LOGGER = LoggerFactory.getLogger(SocketBuilder.class);
+
+	private SocketBuilder() {
+		//prevent create instance
+	}
+	
 	/**
-	 * 根据目标服务器地址（由主机名和端口组成，":"符号分割，例如：localhost:11211）生成 {@link Socket} 实例并返回。
-	 * Socket 配置信息使用 {@link SocketConfiguration#DEFAULT} 配置信息。
-	 * <p>如果目标服务器地址不符合规则，将会抛出 {@link IllegalArgumentException} 异常
-	 * <p>如果创建过程中发生错误，将会抛出 {@link RuntimeException} 异常
-	 * 
-	 * @param host 目标服务器地址（由主机名和端口组成，":"符号分割，例如：localhost:11211）
-	 * @return Socket 实例
-	 * @throws IllegalArgumentException 如果目标服务器地址不符合规则，将会抛出此异常
-	 * @throws RuntimeException 如果创建过程中发生错误，将会抛出此异常
+	 * 根据目标主机地址（由主机名和端口组成，":" 符号分割，例如：localhost:4182）创建一个 {@link Socket} 实例，
+	 * 使用 {@link SocketConfiguration#DEFAULT}  作为其配置信息。
+	 *
+	 * @param host 目标主机地址（由主机名和端口组成，":" 符号分割，例如：localhost:4182）
+	 * @return {@code Socket} 实例
+	 * @throws IllegalArgumentException 如果目标主机地址不符合规则，将会抛出此异常
+	 * @throws BuildSocketException 如果在创建 {@code Socket} 过程中发生错误，将会抛出此异常
 	 */
-	public static Socket create(String host) throws RuntimeException {
+	public static Socket create(String host) throws IllegalArgumentException, BuildSocketException {
 		return create(host, null);
 	}
 	
 	/**
-	 * 根据目标服务器地址（由主机名和端口组成，":"符号分割，例如：localhost:11211）、Socket 配置信息生成 {@link Socket} 实例并返回。
-	 * <p>如果目标服务器地址不符合规则，将会抛出 {@link IllegalArgumentException} 异常
-	 * <p>如果创建过程中发生错误，将会抛出 {@link RuntimeException} 异常
+	 * 根据目标主机地址（由主机名和端口组成，":" 符号分割，例如：localhost:4182） 创建一个 {@link Socket} 实例，
+	 * 如果 {@code config} 为 {@code null}，将使用 {@link SocketConfiguration#DEFAULT}  作为其配置信息。
 	 * 
-	 * @param host 目标服务器地址（由主机名和端口组成，":"符号分割，例如：localhost:11211）
-	 * @param config Socket 配置信息，如果传 {@code null}，将会使用 {@link SocketConfiguration#DEFAULT} 配置信息
-	 * @return Socket 实例
-	 * @throws IllegalArgumentException 如果目标服务器地址不符合规则，将会抛出此异常
-	 * @throws RuntimeException 如果创建过程中发生错误，将会抛出此异常
+	 * @param host 目标主机地址（由主机名和端口组成，":" 符号分割，例如：localhost:4182）
+	 * @param config {@code Socket} 配置信息，允许为 {@code null}
+	 * @return {@code Socket} 实例
+	 * @throws IllegalArgumentException 如果目标主机地址不符合规则，将会抛出此异常
+	 * @throws BuildSocketException 如果在创建 {@code Socket} 过程中发生错误，将会抛出此异常
 	 */
-	public static Socket create(String host, SocketConfiguration config) throws RuntimeException {
+	public static Socket create(String host, SocketConfiguration config) throws IllegalArgumentException, BuildSocketException {
 		String hostname;
 		int port;
 		try {
@@ -68,37 +74,35 @@ public class SocketBuilder {
 			hostname = hostParts[0];
 			port = Integer.parseInt(hostParts[1]);
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Invalid host: " + host, e);
+			LOGGER.error("Create socket failed: `invalid host`. Host: `" + host + "`. Config: `" + config + "`.", e);
+			throw new IllegalArgumentException("Create socket failed: `invalid host`. Host: `" + host + "`. Config: `" + config + "`.", e);
 		}
 		return create(hostname, port, config);
 	}
 	
 	/**
-	 * 根据目标服务器主机名、端口号生成 {@link Socket} 实例并返回。Socket配置信息使用 {@link SocketConfiguration#DEFAULT} 配置信息。
-	 * <p>如果创建过程中发生错误，将会抛出 {@link RuntimeException} 异常
+	 * 根据目标主机名、端口号创建一个 {@link Socket} 实例，使用 {@link SocketConfiguration#DEFAULT}  作为其配置信息。
 	 * 
-	 * @param hostname 目标服务器主机名
+	 * @param hostname 目标主机名
 	 * @param port 端口号
-	 * @return Socket 实例
-	 * @throws RuntimeException 如果创建过程中发生错误，将会抛出此异常
-	 * @see #create(String, int, SocketConfiguration)
+	 * @return {@code Socket} 实例
+	 * @throws BuildSocketException 如果在创建 {@code Socket} 过程中发生错误，将会抛出此异常
 	 */
-	public static Socket create(String hostname, int port) throws RuntimeException {
+	public static Socket create(String hostname, int port) throws BuildSocketException {
 		return create(hostname, port, null);
 	}
 	
 	/**
-	 * 根据目标服务器主机名、端口号、Socket 配置信息生成 {@link Socket} 实例并返回。
-	 * <p>如果创建过程中发生错误，将会抛出 {@link RuntimeException} 异常
+	 * 根据目标主机名、端口号创建一个 {@link Socket} 实例，如果 {@code config} 为 {@code null}，
+	 * 将使用 {@link SocketConfiguration#DEFAULT}  作为其配置信息。
 	 * 
-	 * @param hostname 目标服务器主机名
+	 * @param hostname 目标主机名
 	 * @param port 端口号
-	 * @param config Socket 配置信息，如果传 {@code null}，将会使用 {@link SocketConfiguration#DEFAULT} 配置信息
-	 * @return Socket 实例
-	 * @throws RuntimeException 如果创建过程中发生错误，将会抛出此异常
+	 * @param config {@code Socket} 配置信息，允许为 {@code null}
+	 * @return {@code Socket} 实例
+	 * @throws BuildSocketException 如果在创建 {@code Socket} 过程中发生错误，将会抛出此异常
 	 */
-	public static Socket create(String hostname, int port, SocketConfiguration config)
-		throws RuntimeException {
+	public static Socket create(String hostname, int port, SocketConfiguration config) throws BuildSocketException {
 		try {
 			if (config == null) {
 				config = SocketConfiguration.DEFAULT;
@@ -112,21 +116,21 @@ public class SocketBuilder {
 			socket.connect(new InetSocketAddress(hostname, port), connectionTimeout);
 			return socket;
 		} catch (Exception e) {
-			throw new RuntimeException("Create socket failed. Hostname: " 
-					+ hostname + ". Port: " + port + ". " + config, e);
+			LOGGER.error("Create socket failed: `" + e.getMessage() + "`. Hostname: `"
+					+ hostname + "`. Port: `" + port + "`. Config: `" + config + "`.", e);
+			throw new BuildSocketException("Create socket failed: `" + e.getMessage() + "`. Hostname: `"
+					+ hostname + "`. Port: `" + port + "`. Config: `" + config + "`.", e);
 		}
 	}
 	
 	/**
-	 * 根据 Socket 配置信息设置 {@link Socket} 实例
-	 * <p>如果设置过程中发生错误，将会抛出 {@link RuntimeException} 异常
+	 * 设置 {@link Socket} 配置信息，如果 {@code config} 为 {@code null}，将使用 {@link SocketConfiguration#DEFAULT}  作为其配置信息。
 	 * 
-	 * @param socket Socket 连接
-	 * @param config Socket 配置信息，如果传 {@code null}，将会使用 {@link SocketConfiguration#DEFAULT} 配置信息
-	 * @throws RuntimeException 如果设置过程中发生错误，将会抛出此异常
+	 * @param socket {@code Socket} 实例
+	 * @param config {@code Socket} 配置信息，允许为 {@code null}
+	 * @throws BuildSocketException 如果设置 {@link Socket} 配置信息过程中发生错误，将会抛出此异常
 	 */
-	public static void setConfig(Socket socket, SocketConfiguration config)
-		throws RuntimeException {
+	public static void setConfig(Socket socket, SocketConfiguration config) throws BuildSocketException {
 		try {
 			if (config == null) {
 				config = SocketConfiguration.DEFAULT;
@@ -150,27 +154,34 @@ public class SocketBuilder {
 				socket.setSoLinger(true, config.getSoLinger());
 			}
 		} catch (Exception e) {
-			throw new RuntimeException("Set socket config failed. Socket: " 
-					+ socket + ". Config: " + config, e);
+			LOGGER.error("Set socket config failed: `" + e.getMessage() + "`. Socket: `"
+					+ socket + "`. Config: `" + config + "`.", e);
+			throw new BuildSocketException("Set socket config failed: `" + e.getMessage() + "`. Socket: `"
+					+ socket + "`. Config: `" + config + "`.", e);
 		}
 	}
 	
 	/**
-	 * 获得该 {@link Socket} 实例的配置信息，但不包含 {@link SocketConfiguration#getConnectionTimeout()} 配置项
+	 * 读取 {@link Socket} 配置信息，返回的配置信息中不包含 {@link SocketConfiguration#getConnectionTimeout()} 配置项。
 	 * 
-	 * @param socket Socket 连接
-	 * @return Socket 配置信息
-	 * @throws SocketException 如果获取过程中发生错误，将会抛出此异常
+	 * @param socket {@code Socket} 实例
+	 * @return {@code Socket} 配置信息，不会返回 {@code null}
+	 * @throws BuildSocketException 如果读取 {@link Socket} 配置信息过程中发生错误，将会抛出此异常
 	 */
-	public static SocketConfiguration getConfig(Socket socket) throws SocketException {
-		SocketConfiguration config = new SocketConfiguration();
-		config.setKeepAlive(socket.getKeepAlive());
-		config.setTcpNoDelay(socket.getTcpNoDelay());
-		config.setSendBufferSize(socket.getSendBufferSize());
-		config.setReceiveBufferSize(socket.getReceiveBufferSize());
-		config.setSoTimeout(socket.getSoTimeout());
-		config.setSoLinger(socket.getSoLinger());
-		return config;
+	public static SocketConfiguration getConfig(Socket socket) throws BuildSocketException {
+		try {
+		    SocketConfiguration config = new SocketConfiguration();
+    		config.setKeepAlive(socket.getKeepAlive());
+    		config.setTcpNoDelay(socket.getTcpNoDelay());
+    		config.setSendBufferSize(socket.getSendBufferSize());
+    		config.setReceiveBufferSize(socket.getReceiveBufferSize());
+    		config.setSoTimeout(socket.getSoTimeout());
+    		config.setSoLinger(socket.getSoLinger());
+    		return config;
+		} catch (Exception e) {
+		    LOGGER.error("Get socket config failed: `" + e.getMessage() + "`. Socket: `" + socket + "`.", e);
+		    throw new BuildSocketException("Get socket config failed: `" + e.getMessage() + "`. Socket: `" + socket + "`.", e);
+		}
 	}
 	
 }

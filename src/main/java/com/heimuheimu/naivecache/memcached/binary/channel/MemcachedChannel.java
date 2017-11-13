@@ -31,6 +31,7 @@ import com.heimuheimu.naivecache.memcached.binary.response.ResponsePacket;
 import com.heimuheimu.naivecache.memcached.binary.response.ResponsePacketReader;
 import com.heimuheimu.naivecache.memcached.exception.TimeoutException;
 import com.heimuheimu.naivecache.memcached.monitor.SocketMonitorFactory;
+import com.heimuheimu.naivecache.net.BuildSocketException;
 import com.heimuheimu.naivecache.net.SocketBuilder;
 import com.heimuheimu.naivecache.net.SocketConfiguration;
 import com.heimuheimu.naivemonitor.monitor.SocketMonitor;
@@ -50,12 +51,11 @@ import java.util.concurrent.LinkedBlockingQueue;
  * 基于 Memcached 二进制协议与 Memcached 服务进行数据交互的管道，协议定义请参考文档：
  * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped">
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped
- * </a>
+ * </a>。
  *
- * <p>当前实现是线程安全的</p>
+ * <p><strong>说明：</strong>{@code MemcachedChannel} 类是线程安全的，可在多个线程中使用同一个实例。</p>
  *
  * @author heimuheimu
- * @ThreadSafe
  */
 public class MemcachedChannel implements Closeable {
 
@@ -104,14 +104,14 @@ public class MemcachedChannel implements Closeable {
     private volatile long lastTimeoutExceptionTime = 0;
 
     /**
-     * 创建基于 Memcached 二进制协议与 Memcached 服务进行数据交互的管道
+     * 创建基于 Memcached 二进制协议与 Memcached 服务进行数据交互的管道。
      *
      * @param host Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:11211
      * @param configuration {@link Socket} 配置信息，如果传 {@code null}，将会使用 {@link SocketConfiguration#DEFAULT} 配置信息
-     * @throws IllegalArgumentException 如果目标服务器地址不符合规则，将会抛出此异常
-     * @throws RuntimeException 如果创建 {@link Socket} 过程中发生错误，将会抛出此异常
+     * @throws IllegalArgumentException 如果 Memcached 地址不符合规则，将会抛出此异常
+     * @throws BuildSocketException 如果创建 {@link Socket} 过程中发生错误，将会抛出此异常
      */
-    public MemcachedChannel(String host, SocketConfiguration configuration) throws RuntimeException {
+    public MemcachedChannel(String host, SocketConfiguration configuration) throws IllegalArgumentException, BuildSocketException {
         this.host = host;
         this.socket = SocketBuilder.create(host, configuration);
         this.socketMonitor = SocketMonitorFactory.get(host);
