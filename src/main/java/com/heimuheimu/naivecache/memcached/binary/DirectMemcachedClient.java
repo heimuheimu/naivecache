@@ -28,13 +28,11 @@ import com.heimuheimu.naivecache.memcached.NaiveMemcachedClient;
 import com.heimuheimu.naivecache.memcached.NaiveMemcachedClientListener;
 import com.heimuheimu.naivecache.memcached.OperationType;
 import com.heimuheimu.naivecache.memcached.binary.channel.MemcachedChannel;
-import com.heimuheimu.naivecache.memcached.binary.command.DeleteCommand;
-import com.heimuheimu.naivecache.memcached.binary.command.GetCommand;
-import com.heimuheimu.naivecache.memcached.binary.command.MultiGetCommand;
-import com.heimuheimu.naivecache.memcached.binary.command.SetCommand;
+import com.heimuheimu.naivecache.memcached.binary.command.*;
 import com.heimuheimu.naivecache.memcached.binary.response.ResponsePacket;
 import com.heimuheimu.naivecache.memcached.exception.TimeoutException;
 import com.heimuheimu.naivecache.memcached.monitor.ExecutionMonitorFactory;
+import com.heimuheimu.naivecache.memcached.util.ByteUtil;
 import com.heimuheimu.naivecache.net.BuildSocketException;
 import com.heimuheimu.naivecache.net.SocketConfiguration;
 import com.heimuheimu.naivecache.transcoder.SimpleTranscoder;
@@ -200,7 +198,7 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
             clientListener.onTimeout(this, OperationType.GET, key);
             return null;
         } catch (IllegalStateException e) {
-            LOG.error("[get] MemcachedChannel has benn closed. Key: `{}`. Host: `{}`.", key, host);
+            LOG.error("[get] MemcachedChannel has been closed. Key: `{}`. Host: `{}`.", key, host);
             executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
             clientListener.onClosed(this, OperationType.GET, key);
             return null;
@@ -300,7 +298,7 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
             clientListener.onTimeout(this, OperationType.MULTI_GET, joinKeyCollection(keySet));
             return result;
         } catch (IllegalStateException e) {
-            LOG.error("[multi-get] MemcachedChannel has benn closed. Key set: `{}`. Host: `{}`.", keySet, host);
+            LOG.error("[multi-get] MemcachedChannel has been closed. Key set: `{}`. Host: `{}`.", keySet, host);
             executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
             clientListener.onClosed(this, OperationType.MULTI_GET, joinKeyCollection(keySet));
             return result;
@@ -425,7 +423,7 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
             clientListener.onTimeout(this, OperationType.SET, key);
             return false;
         } catch (IllegalStateException e) {
-            LOG.error("[set] MemcachedChannel has benn closed. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
+            LOG.error("[set] MemcachedChannel has been closed. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
                     key, value, expiry, host);
             executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
             clientListener.onClosed(this, OperationType.SET, key);
@@ -495,7 +493,7 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
             clientListener.onTimeout(this, OperationType.DELETE, key);
             return false;
         } catch (IllegalStateException e) {
-            LOG.error("[delete] MemcachedChannel has benn closed. Key: `{}`. Host: `{}`.", key, host);
+            LOG.error("[delete] MemcachedChannel has been closed. Key: `{}`. Host: `{}`.", key, host);
             executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
             clientListener.onClosed(this, OperationType.DELETE, key);
             return false;
@@ -509,6 +507,110 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
             long executedNanoTime = System.nanoTime() - startTime;
             if (executedNanoTime > NaiveMemcachedClientListener.SLOW_EXECUTION_THRESHOLD) {
                 clientListener.onSlowExecution(this, OperationType.DELETE, key, executedNanoTime);
+            }
+            executionMonitor.onExecuted(startTime);
+        }
+    }
+
+    @Override
+    public long addAndGet(String key, long delta, long initialValue, int expiry) {
+        long startTime = System.nanoTime();
+        try {
+            if (key == null || key.isEmpty()) {
+                LOG.error("[AddAndGet] Key could not be empty. Key: `{}`. Host: `{}`. Delta: `{}`. InitialValue: `{}`. Expiry: `{}`.",
+                        key, host, delta, initialValue, expiry);
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+                clientListener.onInvalidKey(this, OperationType.ADD_AND_GET, key);
+                return 0;
+            }
+            byte[] keyBytes = key.getBytes(CHARSET_UTF8);
+            if (keyBytes.length > MAX_KEY_LENGTH) {
+                LOG.error("[AddAndGet] Key is too large. Key length could not greater than {}. Key: `{}`. Host: `{}`. Delta: `{}`. InitialValue: `{}`. Expiry: `{}`.",
+                        MAX_KEY_LENGTH, key, host, delta, initialValue, expiry);
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+                clientListener.onInvalidKey(this, OperationType.ADD_AND_GET, key);
+                return 0;
+            }
+            if (initialValue < 0) {
+                LOG.error("[AddAndGet] InitialValue could not less than 0. Key: `{}`. Host: `{}`. Delta: `{}`. InitialValue: `{}`. Expiry: `{}`.",
+                        key, host, delta, initialValue, expiry);
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+                clientListener.onInvalidValue(this, OperationType.ADD_AND_GET, key);
+                return 0;
+            }
+            if (expiry < 0) {
+                LOG.error("[AddAndGet] Expiry could not less than 0. Key: `{}`. Host: `{}`. Delta: `{}`. InitialValue: `{}`. Expiry: `{}`.",
+                        key, host, delta, initialValue, expiry);
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+                clientListener.onInvalidExpiry(this, OperationType.ADD_AND_GET, key);
+                return 0;
+            }
+            Command incrOrDecrCommand;
+            if (delta >= 0) {
+                incrOrDecrCommand = new IncrementCommand(keyBytes, delta, initialValue, expiry);
+            } else {
+                incrOrDecrCommand = new DecrementCommand(keyBytes, Math.abs(delta), initialValue, expiry);
+            }
+            List<ResponsePacket> responsePacketList = memcachedChannel.send(incrOrDecrCommand, timeout);
+            if (!responsePacketList.isEmpty()) {
+                ResponsePacket responsePacket = responsePacketList.get(0);
+                if (responsePacket.isSuccess()) {
+                    if (responsePacket.getValueLength() == 8) {
+                        long result = ByteUtil.eightByteArrayToLong(responsePacket.getBody(), responsePacket.getExtrasLength() + responsePacket.getKeyLength());
+                        LOG.debug("[AddAndGet] Success. Key: `{}`. Result: `{}`. Host: `{}`. Delta: `{}`. InitialValue: `{}`. Expiry: `{}`.",
+                                key, result, host, delta, initialValue, expiry);
+                        return result;
+                    } else {//should not happen
+                        LOG.error("[AddAndGet] Invalid response value length: `{}`. Key: `{}`. Host: `{}`. Delta: `{}`. InitialValue: `{}`. Expiry: `{}`.",
+                                responsePacket.getValueLength(), key, host, delta, initialValue, expiry);
+                        executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+                        clientListener.onError(this, OperationType.ADD_AND_GET, key, "invalid response value length");
+                        return 0;
+                    }
+                } else {
+                    if (responsePacket.isKeyNotFound()) {
+                        LOG.info("[AddAndGet] Key not found. Key: `{}`. Host: `{}`. Delta: `{}`. InitialValue: `{}`. Expiry: `{}`.",
+                                key, host, delta, initialValue, expiry);
+                        executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_KEY_NOT_FOUND);
+                        clientListener.onKeyNotFound(this, OperationType.ADD_AND_GET, key);
+                    } else {
+                        LOG.error("[AddAndGet] Memcached error: `{}`. Key: `{}`. Host: `{}`. Delta: `{}`. InitialValue: `{}`. Expiry: `{}`.",
+                                responsePacket.getErrorMessage(), key, host, delta, initialValue, expiry);
+                        executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+                        clientListener.onError(this, OperationType.ADD_AND_GET, key, responsePacket.getErrorMessage());
+                    }
+                    return 0;
+                }
+            } else {
+                LOG.error("[AddAndGet] Empty response. Key: `{}`. Host: `{}`. Delta: `{}`. InitialValue: `{}`. Expiry: `{}`.",
+                        key, host, delta, initialValue, expiry);
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+                clientListener.onError(this, OperationType.ADD_AND_GET, key, NO_RESPONSE_PACKET_MESSAGE);
+                return 0;
+            }
+        } catch (TimeoutException e) {
+            LOG.error("[AddAndGet] Wait response timeout: `{} ms`. Key: `{}`. Host: `{}`. Delta: `{}`. InitialValue: `{}`. Expiry: `{}`.",
+                    timeout, key, host, delta, initialValue, expiry);
+            executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_TIMEOUT);
+            clientListener.onTimeout(this, OperationType.ADD_AND_GET, key);
+            return 0;
+        } catch (IllegalStateException e) {
+            LOG.error("[AddAndGet] MemcachedChannel has been closed. Key: `{}`. Host: `{}`. Delta: `{}`. InitialValue: `{}`. Expiry: `{}`.",
+                    key, host, delta, initialValue, expiry);
+            executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+            clientListener.onClosed(this, OperationType.ADD_AND_GET, key);
+            return 0;
+        } catch (Exception e) {
+            LOG.error("[AddAndGet] Unexpected error: `" + e.getMessage() + "`. Key: `" + key
+                    + "`. Host: `" + host + "`. Delta: `" + delta + "`. InitialValue: `" + initialValue + "`. Expiry: `"
+                    + expiry + "`.", e);
+            executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+            clientListener.onError(this, OperationType.ADD_AND_GET, key, e.getMessage());
+            return 0;
+        } finally {
+            long executedNanoTime = System.nanoTime() - startTime;
+            if (executedNanoTime > NaiveMemcachedClientListener.SLOW_EXECUTION_THRESHOLD) {
+                clientListener.onSlowExecution(this, OperationType.ADD_AND_GET, key, executedNanoTime);
             }
             executionMonitor.onExecuted(startTime);
         }

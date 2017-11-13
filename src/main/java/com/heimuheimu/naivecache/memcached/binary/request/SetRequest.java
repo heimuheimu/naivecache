@@ -43,11 +43,11 @@ public class SetRequest extends RequestPacket {
     private final byte[] packet;
 
     /**
-     * 构造一个 Memcached set 命令
+     * 构造一个 Memcached set 命令。
      *
      * @param key Key 值，必须存在，不允许为 {@code null} 或者为空
      * @param value Value 值，可以为 {@code null} 或者为空
-     * @param expiry 过期时间，单位：秒，不允许负数
+     * @param expiry 过期时间，单位：秒，不允许小于 0
      * @param flags Flags 值，可以为 {@code null} 或者为空，如果存在，长度必须为4
      * @throws IllegalArgumentException Key 值为 {@code null} 或者为空
      * @throws IllegalArgumentException Expiry 值小于0

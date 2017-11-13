@@ -43,7 +43,7 @@ public class DeleteRequest extends RequestPacket {
     private final byte[] packet;
 
     /**
-     * 构造一个 Memcached delete 命令
+     * 构造一个 Memcached delete 命令。
      *
      * @param key Key 值，必须存在，不允许为 {@code null} 或者为空
      * @throws IllegalArgumentException Key 值为 {@code null} 或者为空

@@ -49,6 +49,11 @@ public enum OperationType {
     /**
      * Memcached delete 命令
      */
-    DELETE
+    DELETE,
+
+    /**
+     * Memcached increment 或 decrement 命令
+     */
+    ADD_AND_GET
 
 }

@@ -117,6 +117,17 @@ public interface NaiveMemcachedClient extends Closeable {
     boolean delete(String key);
 
     /**
+     * 对 Key 对应的 long 数值执行原子加（或减）操作，并返回操作后的结果值，如果 Key 不存在，则设置并返回指定初始值。
+     *
+     * @param key Memcached key，字节长度不应超过 {@link #MAX_KEY_LENGTH}
+     * @param delta 需要增加的值，如果为负数，则为减少的值
+     * @param initialValue 如果 Key 不存在，设置并返回指定初始值
+     * @param expiry 过期时间，单位：秒，不允许小于0
+     * @return 操作后的结果值
+     */
+    long addAndGet(String key, long delta, long initialValue, int expiry);
+
+    /**
      * 判断当前客户端是否处于可用状态
      *
      * @return 当前客户端是否处于可用状态

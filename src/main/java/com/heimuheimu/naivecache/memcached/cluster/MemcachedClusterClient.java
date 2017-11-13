@@ -272,6 +272,22 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
     }
 
     @Override
+    public long addAndGet(String key, long delta, long initialValue, int expiry) {
+        try {
+            NaiveMemcachedClient client = getClient(key);
+            if (client != null) {
+                return client.addAndGet(key, delta, initialValue, expiry);
+            } else {
+                return 0;
+            }
+        } catch (Exception e) {
+            LOG.error("[AddAndGet] Unexpected error: `" + e.getMessage() + "`. Key: `" + key + "`. Delta: `" + delta
+                    + "`. InitialValue: `" + initialValue  + "`. Expiry: `" + expiry + "`. Hosts: `" + Arrays.toString(hosts) + "`.", e);
+            return 0;
+        }
+    }
+
+    @Override
     public boolean isActive() {
         return !aliveClientList.isEmpty();
     }

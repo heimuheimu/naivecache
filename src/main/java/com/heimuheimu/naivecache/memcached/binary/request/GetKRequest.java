@@ -42,6 +42,12 @@ public class GetKRequest extends RequestPacket {
 
     private final byte[] packet;
 
+    /**
+     * 构造一个 Memcached getk 命令。
+     *
+     * @param key Key 值，必须存在，不允许为 {@code null} 或者为空
+     * @throws IllegalArgumentException Key 值为 {@code null} 或者为空
+     */
     public GetKRequest(byte[] key) {
         if (key == null || key.length == 0) {
             throw new IllegalArgumentException("Key could not be empty. Key: " + Arrays.toString(key));

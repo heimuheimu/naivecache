@@ -134,6 +134,11 @@ public class ReloadableMemcachedClusterClient implements NaiveMemcachedClient {
     }
 
     @Override
+    public long addAndGet(String key, long delta, long initialValue, int expiry) {
+        return memcachedClusterClient.addAndGet(key, delta, initialValue, expiry);
+    }
+
+    @Override
     public boolean isActive() {
         return memcachedClusterClient.isActive();
     }
