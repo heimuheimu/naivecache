@@ -471,7 +471,6 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
                 } else {
                     if (responsePacket.isKeyNotFound()) {
                         LOG.info("[delete] Key not found. Key: `{}`. Host: `{}`", key, host);
-                        executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_KEY_NOT_FOUND);
                         clientListener.onKeyNotFound(this, OperationType.DELETE, key);
                     } else {
                         LOG.error("[delete] Memcached error: `{}`. Key: `{}`. Host: `{}`.", responsePacket.getErrorMessage(), key, host);
