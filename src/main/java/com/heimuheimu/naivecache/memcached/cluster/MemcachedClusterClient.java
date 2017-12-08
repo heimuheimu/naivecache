@@ -288,6 +288,19 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
     }
 
     @Override
+    public void touch(String key, int expiry) {
+        try {
+            NaiveMemcachedClient client = getClient(key);
+            if (client != null) {
+                client.touch(key, expiry);
+            }
+        } catch (Exception e) {
+            LOG.error("[touch] Unexpected error: `" + e.getMessage() + "`. Key: `" + key + "`. Expiry: `" + expiry
+                    + "`. Hosts: `" + Arrays.toString(hosts) + "`.", e);
+        }
+    }
+
+    @Override
     public boolean isActive() {
         return !aliveClientList.isEmpty();
     }

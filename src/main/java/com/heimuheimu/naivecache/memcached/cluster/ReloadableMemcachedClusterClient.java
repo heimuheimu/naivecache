@@ -139,6 +139,11 @@ public class ReloadableMemcachedClusterClient implements NaiveMemcachedClient {
     }
 
     @Override
+    public void touch(String key, int expiry) {
+        memcachedClusterClient.touch(key, expiry);
+    }
+
+    @Override
     public boolean isActive() {
         return memcachedClusterClient.isActive();
     }

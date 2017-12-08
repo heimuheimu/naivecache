@@ -197,6 +197,18 @@ public abstract class AdvanceMemcachedClient implements NaiveMemcachedClient {
     }
 
     @Override
+    public void touch(String key, int expiry) {
+        NaiveMemcachedClient client = getClient();
+        if (client != null) {
+            try {
+                client.touch(key, expiry);
+            } finally {
+                releaseClient(client);
+            }
+        }
+    }
+
+    @Override
     public String getHost() {
         return host;
     }
