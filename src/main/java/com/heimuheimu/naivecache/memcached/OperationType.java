@@ -54,6 +54,10 @@ public enum OperationType {
     /**
      * Memcached increment 或 decrement 命令
      */
-    ADD_AND_GET
+    ADD_AND_GET,
 
+    /**
+     * Memcached touch 命令
+     */
+    TOUCH
 }
