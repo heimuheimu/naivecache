@@ -43,6 +43,6 @@ public class FalconReporterConstant {
     /**
      * Falcon 数据上报周期
      */
-    public static final int REPORT_PERIOD = 15;
+    public static final int REPORT_PERIOD = 30;
 
 }
