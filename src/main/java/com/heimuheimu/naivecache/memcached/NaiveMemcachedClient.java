@@ -124,6 +124,8 @@ public interface NaiveMemcachedClient extends Closeable {
      *     如果需要持续更新过期时间，应结合 {@link #touch(String, int)} 命令使用。
      * </p>
      *
+     * <p><strong>注意：</strong>{@link #get(String)} 无法获取执行原子加（或减）操作的 Key 对应的值，可将 {@code delta} 设置为 0 进行获取。</p>
+     *
      * @param key Memcached key，字节长度不应超过 {@link #MAX_KEY_LENGTH}
      * @param delta 需要增加的值，如果为负数，则为减少的值
      * @param initialValue 如果 Key 不存在，设置并返回指定初始值
