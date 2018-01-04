@@ -119,6 +119,16 @@ public class ReloadableMemcachedClusterClient implements NaiveMemcachedClient {
     }
 
     @Override
+    public boolean add(String key, Object value) {
+        return memcachedClusterClient.add(key, value);
+    }
+
+    @Override
+    public boolean add(String key, Object value, int expiry) {
+        return memcachedClusterClient.add(key, value, expiry);
+    }
+
+    @Override
     public boolean set(String key, Object value) {
         return memcachedClusterClient.set(key, value);
     }

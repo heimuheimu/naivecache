@@ -42,6 +42,11 @@ public enum OperationType {
     MULTI_GET,
 
     /**
+     * Memcached add 命令
+     */
+    ADD,
+
+    /**
      * Memcached set 命令
      */
     SET,

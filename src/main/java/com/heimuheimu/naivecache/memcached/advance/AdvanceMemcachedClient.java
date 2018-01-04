@@ -150,6 +150,25 @@ public abstract class AdvanceMemcachedClient implements NaiveMemcachedClient {
     }
 
     @Override
+    public boolean add(String key, Object value) {
+        return add(key, value, 0);
+    }
+
+    @Override
+    public boolean add(String key, Object value, int expiry) {
+        NaiveMemcachedClient client = getClient();
+        if (client != null) {
+            try {
+                return client.add(key, value, expiry);
+            } finally {
+                releaseClient(client);
+            }
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public boolean set(String key, Object value) {
         return set(key, value, 0);
     }

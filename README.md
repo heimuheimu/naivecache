@@ -1,4 +1,4 @@
-# NaiveCache: Memcached Java 客户端，简单易用
+# NaiveCache: 简单易用的 Memcached Java 客户端
 
 ## 单台 Memcached 服务器
 ```

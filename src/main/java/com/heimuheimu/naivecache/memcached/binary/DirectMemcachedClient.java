@@ -337,6 +337,113 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
     }
 
     @Override
+    public boolean add(String key, Object value) {
+        return add(key, value, 0);
+    }
+
+    @Override
+    public boolean add(String key, Object value, int expiry) {
+        long startTime = System.nanoTime();
+        try {
+            if (key == null || key.isEmpty()) {
+                LOG.error("[add] Key could not be empty. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.", key, value, expiry, host);
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+                clientListener.onInvalidKey(this, OperationType.ADD, key);
+                return false;
+            }
+            byte[] keyBytes = key.getBytes(CHARSET_UTF8);
+            if (keyBytes.length > MAX_KEY_LENGTH) {
+                LOG.error("[add] Key is too large. Key length could not greater than {}. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
+                        MAX_KEY_LENGTH, key, value, expiry, host);
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+                clientListener.onInvalidKey(this, OperationType.ADD, key);
+                return false;
+            }
+            if (value == null) {
+                LOG.error("[add] Value could not be null. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
+                        key, "null", expiry, host);
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+                clientListener.onInvalidValue(this, OperationType.ADD, key);
+                return false;
+            }
+            if (!(value instanceof Serializable)) {
+                LOG.error("[add] Value is not serializable. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
+                        key, value, expiry, host);
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+                clientListener.onInvalidValue(this, OperationType.ADD, key);
+                return false;
+            }
+            if (expiry < 0) {
+                LOG.error("[add] Expiry could not less than 0. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
+                        key, value, expiry, host);
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+                clientListener.onInvalidExpiry(this, OperationType.ADD, key);
+                return false;
+            }
+            if (!memcachedChannel.isActive()) {
+                LOG.error("[add] Inactive channel. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.", key, value, expiry, host);
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+                clientListener.onClosed(this, OperationType.ADD, key);
+                return false;
+            }
+            byte[][] encodedBytes = transcoder.encode(value);
+            if (encodedBytes[1].length > MAX_VALUE_LENGTH) {
+                LOG.error("[add] Value is too large. Value length could not greater than {}. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
+                        MAX_VALUE_LENGTH, key, value, expiry, host);
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+                clientListener.onInvalidValue(this, OperationType.ADD, key);
+                return false;
+            }
+            AddCommand addCommand = new AddCommand(keyBytes, encodedBytes[1], expiry, encodedBytes[0]);
+            List<ResponsePacket> responsePacketList = memcachedChannel.send(addCommand, timeout);
+            if (!responsePacketList.isEmpty()) {
+                ResponsePacket responsePacket = responsePacketList.get(0);
+                if (responsePacket.isSuccess()) {
+                    LOG.debug("[add] Success. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
+                            key, value, expiry, host);
+                    return true;
+                } else {
+                    LOG.error("[add] Memcached error: `{}`. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
+                            responsePacket.getErrorMessage(), key, value, expiry, host);
+                    executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+                    clientListener.onError(this, OperationType.ADD, key, responsePacket.getErrorMessage());
+                    return false;
+                }
+            } else {
+                LOG.error("[add] Empty response. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`",
+                        key, value, expiry, host);
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+                clientListener.onError(this, OperationType.ADD, key, NO_RESPONSE_PACKET_MESSAGE);
+                return false;
+            }
+        } catch (TimeoutException e) {
+            LOG.error("[add] Wait response timeout: {}ms. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
+                    timeout, key, value, expiry, host);
+            executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_TIMEOUT);
+            clientListener.onTimeout(this, OperationType.ADD, key);
+            return false;
+        } catch (IllegalStateException e) {
+            LOG.error("[add] MemcachedChannel has been closed. Key: `{}`. Value: `{}`. Expiry: `{}`. Host: `{}`.",
+                    key, value, expiry, host);
+            executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+            clientListener.onClosed(this, OperationType.ADD, key);
+            return false;
+        } catch (Exception e) {
+            LOG.error("[add] Unexpected error: `" + e.getMessage() + "`. Key: `" + key + "`. Value: `" + value
+                    + "`. Expiry: `" + expiry + "`. Host: `" + host + "`.", e);
+            executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
+            clientListener.onError(this, OperationType.ADD, key, e.getMessage());
+            return false;
+        } finally {
+            long executedNanoTime = System.nanoTime() - startTime;
+            if (executedNanoTime > NaiveMemcachedClientListener.SLOW_EXECUTION_THRESHOLD) {
+                clientListener.onSlowExecution(this, OperationType.ADD, key, executedNanoTime);
+            }
+            executionMonitor.onExecuted(startTime);
+        }
+    }
+
+    @Override
     public boolean set(String key, Object value) {
         return set(key, value, 0);
     }
