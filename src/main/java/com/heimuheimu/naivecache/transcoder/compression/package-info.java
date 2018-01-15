@@ -21,29 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.heimuheimu.naivecache.transcoder.compression;
-
-import com.ning.compress.lzf.LZFDecoder;
-import com.ning.compress.lzf.LZFEncoder;
-import com.ning.compress.lzf.LZFException;
 
 /**
- * LZF 压缩、解压工具。更多 LZF 信息可参考：
- * <p>
- *     <a href="https://github.com/ning/compress">https://github.com/ning/compress</a>
- * </p>
- *
+ * 提供压缩、解压功能。
  *
  * @author heimuheimu
  */
-public class LZFUtil {
-	
-	public static byte[] compress(byte[] src) {
-		return LZFEncoder.encode(src);
-	}
-	
-	public static byte[] decompress(byte[] compressedBytes, int offset, int length) throws LZFException {
-		return LZFDecoder.decode(compressedBytes, offset, length);
-	}
-
-}
+package com.heimuheimu.naivecache.transcoder.compression;

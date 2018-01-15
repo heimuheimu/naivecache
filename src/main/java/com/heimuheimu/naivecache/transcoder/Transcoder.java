@@ -25,7 +25,7 @@
 package com.heimuheimu.naivecache.transcoder;
 
 /**
- * Java 对象与 Memcached 二进制协议存储的字节数组转换器。
+ * Java 对象与 Memcached 二进制协议约定的字节数组转换器。
  *
  * <p><strong>说明：</strong>{@code Transcoder} 的实现类必须是线程安全的。</p>
  *
