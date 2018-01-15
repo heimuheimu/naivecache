@@ -27,7 +27,7 @@ package com.heimuheimu.naivecache.localcache.monitor;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 本地缓存操作信息监控器
+ * 本地缓存操作信息监控器。
  *
  * @author heimuheimu
  */
@@ -50,12 +50,12 @@ public class LocalCacheMonitor {
     private final AtomicLong queryHitCount = new AtomicLong();
 
     /**
-     * 本地缓存 set 操作总次数
+     * 本地缓存新增 Key 的总数
      */
     private final AtomicLong addedCount = new AtomicLong();
 
     /**
-     * 本地缓存 delete 操作总次数
+     * 本地缓存删除 Key 的总数
      */
     private final AtomicLong deletedCount = new AtomicLong();
 
@@ -79,14 +79,14 @@ public class LocalCacheMonitor {
     }
 
     /**
-     * 本地缓存 set 操作总次数 +1
+     * 本地缓存新增 Key 的总数 +1
      */
     public void increaseAddedCount() {
         addedCount.incrementAndGet();
     }
 
     /**
-     * 本地缓存 delete 操作总次数 +1
+     * 本地缓存删除 Key 的总数 +1
      */
     public void increaseDeletedCount() {
         deletedCount.incrementAndGet();
@@ -118,18 +118,18 @@ public class LocalCacheMonitor {
     }
 
     /**
-     * 获得本地缓存 set 操作总次数
+     * 获得本地缓存新增 Key 的总数
      *
-     * @return 本地缓存 set 操作总次数
+     * @return 本地缓存新增 Key 的总数
      */
     public long getAddedCount() {
         return addedCount.get();
     }
 
     /**
-     * 获得本地缓存 delete 操作总次数
+     * 获得本地缓存删除 Key 的总数
      *
-     * @return 本地缓存 delete 操作总次数
+     * @return 本地缓存删除 Key 的总数
      */
     public long getDeletedCount() {
         return deletedCount.get();

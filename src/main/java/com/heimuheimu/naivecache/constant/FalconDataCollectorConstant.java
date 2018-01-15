@@ -22,42 +22,26 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.memcached.monitor.falcon;
-
-import com.heimuheimu.naivecache.constant.FalconDataCollectorConstant;
-import com.heimuheimu.naivecache.memcached.monitor.ThreadPoolMonitorFactory;
-import com.heimuheimu.naivemonitor.falcon.support.AbstractThreadPoolDataCollector;
-import com.heimuheimu.naivemonitor.monitor.ThreadPoolMonitor;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.heimuheimu.naivecache.constant;
 
 /**
- * Memcached 客户端使用的线程池信息采集器
+ * Falcon 监控数据采集器使用的常量。
  *
  * @author heimuheimu
  */
-public class ThreadPoolDataCollector extends AbstractThreadPoolDataCollector {
+public class FalconDataCollectorConstant {
 
-    private final List<ThreadPoolMonitor> threadPoolMonitorList;
-
-    public ThreadPoolDataCollector() {
-        this.threadPoolMonitorList = new ArrayList<>();
-        this.threadPoolMonitorList.add(ThreadPoolMonitorFactory.get());
+    private FalconDataCollectorConstant() {
+        //private constructor
     }
 
-    @Override
-    protected List<ThreadPoolMonitor> getThreadPoolMonitorList() {
-        return threadPoolMonitorList;
-    }
+    /**
+     * 当前监控数据所在的模块名称。
+     */
+    public static final String MODULE_NAME = "naivecache";
 
-    @Override
-    protected String getModuleName() {
-        return FalconDataCollectorConstant.MODULE_NAME;
-    }
-
-    @Override
-    public int getPeriod() {
-        return FalconDataCollectorConstant.REPORT_PERIOD;
-    }
+    /**
+     * 采集器执行的时间周期，单位：秒
+     */
+    public static final int REPORT_PERIOD = 30;
 }

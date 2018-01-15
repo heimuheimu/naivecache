@@ -22,42 +22,9 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.memcached.monitor.falcon;
-
-import com.heimuheimu.naivecache.constant.FalconDataCollectorConstant;
-import com.heimuheimu.naivecache.memcached.monitor.ThreadPoolMonitorFactory;
-import com.heimuheimu.naivemonitor.falcon.support.AbstractThreadPoolDataCollector;
-import com.heimuheimu.naivemonitor.monitor.ThreadPoolMonitor;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Memcached 客户端使用的线程池信息采集器
+ * 提供本地缓存 Falcon 监控数据采集器。
  *
  * @author heimuheimu
  */
-public class ThreadPoolDataCollector extends AbstractThreadPoolDataCollector {
-
-    private final List<ThreadPoolMonitor> threadPoolMonitorList;
-
-    public ThreadPoolDataCollector() {
-        this.threadPoolMonitorList = new ArrayList<>();
-        this.threadPoolMonitorList.add(ThreadPoolMonitorFactory.get());
-    }
-
-    @Override
-    protected List<ThreadPoolMonitor> getThreadPoolMonitorList() {
-        return threadPoolMonitorList;
-    }
-
-    @Override
-    protected String getModuleName() {
-        return FalconDataCollectorConstant.MODULE_NAME;
-    }
-
-    @Override
-    public int getPeriod() {
-        return FalconDataCollectorConstant.REPORT_PERIOD;
-    }
-}
+package com.heimuheimu.naivecache.localcache.monitor.falcon;

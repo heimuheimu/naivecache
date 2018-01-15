@@ -22,27 +22,9 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.constant;
-
 /**
- * Memcached 客户端 Falcon 数据监控常量
+ * 提供 NaiveCache 项目使用的常量类。
  *
  * @author heimuheimu
  */
-public class FalconReporterConstant {
-
-    private FalconReporterConstant() {
-        //private constructor
-    }
-
-    /**
-     * Falcon 数据使用的模块名
-     */
-    public static final String MODULE_NAME = "naivecache";
-
-    /**
-     * Falcon 数据上报周期
-     */
-    public static final int REPORT_PERIOD = 30;
-
-}
+package com.heimuheimu.naivecache.constant;

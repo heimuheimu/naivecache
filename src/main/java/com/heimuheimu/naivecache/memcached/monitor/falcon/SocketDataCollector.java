@@ -24,7 +24,7 @@
 
 package com.heimuheimu.naivecache.memcached.monitor.falcon;
 
-import com.heimuheimu.naivecache.constant.FalconReporterConstant;
+import com.heimuheimu.naivecache.constant.FalconDataCollectorConstant;
 import com.heimuheimu.naivecache.memcached.monitor.SocketMonitorFactory;
 import com.heimuheimu.naivemonitor.falcon.support.AbstractSocketDataCollector;
 import com.heimuheimu.naivemonitor.monitor.SocketMonitor;
@@ -45,11 +45,11 @@ public class SocketDataCollector extends AbstractSocketDataCollector {
 
     @Override
     protected String getModuleName() {
-        return FalconReporterConstant.MODULE_NAME;
+        return FalconDataCollectorConstant.MODULE_NAME;
     }
 
     @Override
     public int getPeriod() {
-        return FalconReporterConstant.REPORT_PERIOD;
+        return FalconDataCollectorConstant.REPORT_PERIOD;
     }
 }

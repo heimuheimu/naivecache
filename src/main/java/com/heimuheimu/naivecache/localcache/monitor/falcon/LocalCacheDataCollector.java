@@ -24,7 +24,7 @@
 
 package com.heimuheimu.naivecache.localcache.monitor.falcon;
 
-import com.heimuheimu.naivecache.constant.FalconReporterConstant;
+import com.heimuheimu.naivecache.constant.FalconDataCollectorConstant;
 import com.heimuheimu.naivecache.localcache.monitor.LocalCacheMonitor;
 import com.heimuheimu.naivemonitor.falcon.FalconData;
 import com.heimuheimu.naivemonitor.falcon.support.AbstractFalconDataCollector;
@@ -33,7 +33,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 本地缓存操作信息采集器
+ * 本地缓存 Falcon 监控数据采集器。该采集器采集周期为 30 秒，每次采集将会返回以下数据项：
+ * <ul>
+ *     <li>naivecache_local_error/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内本地缓存操作出现异常总次数</li>
+ *     <li>naivecache_local_query/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内本地缓存 get 操作总次数</li>
+ *     <li>naivecache_local_query_hit/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内本地缓存 get 操作命中总次数</li>
+ *     <li>naivecache_local_added/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内本地缓存新增 Key 的总数</li>
+ *     <li>naivecache_local_deleted/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内本地缓存删除 Key 的总数</li>
+ *     <li>naivecache_local_size/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 当前本地缓存 Key 的总数</li>
+ * </ul>
  *
  * @author heimuheimu
  */
@@ -51,12 +59,12 @@ public class LocalCacheDataCollector extends AbstractFalconDataCollector {
 
     @Override
     protected String getModuleName() {
-        return FalconReporterConstant.MODULE_NAME;
+        return FalconDataCollectorConstant.MODULE_NAME;
     }
 
     @Override
     public int getPeriod() {
-        return FalconReporterConstant.REPORT_PERIOD;
+        return FalconDataCollectorConstant.REPORT_PERIOD;
     }
 
     @Override
