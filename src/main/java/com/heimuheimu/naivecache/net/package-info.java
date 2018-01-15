@@ -23,7 +23,7 @@
  */
 
 /**
- * 类 {@link com.heimuheimu.naiverpc.net.SocketBuilder} 提供了创建 {@link java.net.Socket} 实例、读取 {@code Socket} 配置信息、
+ * 类 {@link com.heimuheimu.naivecache.net.SocketBuilder} 提供了创建 {@link java.net.Socket} 实例、读取 {@code Socket} 配置信息、
  * 设置 {@code Socket} 配置信息等静态方法。
  *
  * @author heimuheimu
