@@ -34,7 +34,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Memcached 客户端使用的执行信息采集器
+ * Memcached 客户端使用的执行信息 Falcon 监控数据采集器。该采集器采集周期为 30 秒，每次采集将会返回以下数据项：
+ *
+ * <ul>
+ *     <li>naivecache_key_not_found/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内 Get 操作未找到 Key 的次数</li>
+ *     <li>naivecache_timeout/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内 Memcached 操作发生超时的错误次数</li>
+ *     <li>naivecache_error/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内 Memcached 操作发生异常的错误次数</li>
+ *     <li>naivecache_tps/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内每秒平均执行次数</li>
+ *     <li>naivecache_peak_tps/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内每秒最大执行次数</li>
+ *     <li>naivecache_avg_exec_time/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内单次 Memcached 操作平均执行时间</li>
+ *     <li>naivecache_max_exec_time/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内单次 Memcached 操作最大执行时间</li>
+ * </ul>
  *
  * @author heimuheimu
  */

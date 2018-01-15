@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Memcached 客户端使用的 Socket 信息监控工厂类
+ * Memcached 客户端使用的 Socket 信息监控工厂类。
  *
  * @author heimuheimu
  */

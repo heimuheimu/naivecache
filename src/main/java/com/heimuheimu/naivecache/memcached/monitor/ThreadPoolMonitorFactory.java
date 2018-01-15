@@ -27,7 +27,7 @@ package com.heimuheimu.naivecache.memcached.monitor;
 import com.heimuheimu.naivemonitor.monitor.ThreadPoolMonitor;
 
 /**
- * Memcached 客户端使用的线程池信息监控器工厂类
+ * Memcached 客户端使用的线程池信息监控器工厂类。
  *
  * @author heimuheimu
  */
@@ -45,5 +45,4 @@ public class ThreadPoolMonitorFactory {
     public static ThreadPoolMonitor get() {
         return THREAD_POOL_MONITOR;
     }
-
 }

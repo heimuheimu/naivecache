@@ -27,7 +27,7 @@ package com.heimuheimu.naivecache.memcached.cluster.hash;
 import com.heimuheimu.naivecache.memcached.cluster.MemcachedClientLocator;
 
 /**
- * 使用一致性 Hash 算法实现的 Memcached 客户端定位器，一致性 Hash 算法定义可参考文档：
+ * 使用一致性 Hash 算法实现的 Memcached 客户端定位器。一致性 Hash 算法定义可参考文档：
  * <p>
  *     <a href="https://en.wikipedia.org/wiki/Consistent_hashing">https://en.wikipedia.org/wiki/Consistent_hashing</a>
  * </p>
@@ -83,5 +83,4 @@ public class ConsistentHashLocator implements MemcachedClientLocator {
             return ((double) ((int) (state >>> 33) + 1)) / (0x1.0p31);
         }
     }
-
 }

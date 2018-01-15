@@ -37,7 +37,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Memcached Delete 命令，命令定义请参考文档：
+ * Memcached Delete 命令。命令定义请参考文档：
  * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#delete">
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#delete
  * </a>
@@ -110,5 +110,4 @@ public class DeleteCommand implements Command {
     public void close() {
         latch.countDown();
     }
-
 }

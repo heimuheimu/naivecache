@@ -25,28 +25,32 @@
 package com.heimuheimu.naivecache.memcached.cluster;
 
 /**
- * Memcached 集群客户端事件监听器
+ * Memcached 集群客户端事件监听器。
+ * <p>
+ *     <strong>说明：</strong>监听器的实现类必须是线程安全的。应优先考虑继承 {@link MemcachedClusterClientListenerSkeleton} 骨架类进行实现，
+ *     防止 {@code MemcachedClusterClientListener} 在后续版本增加方法时，带来的编译错误。
+ * </p>
  *
  * @author heimuheimu
  */
 public interface MemcachedClusterClientListener {
 
     /**
-     * 当 Memcached 服务在 Memcached 集群客户端初始化过程被创建成功时，将会触发此事件
+     * 当 Memcached 服务在 Memcached 集群客户端初始化过程被创建成功时，将会触发此事件。
      *
      * @param host 创建成功的 Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:11211
      */
     void onCreated(String host);
 
     /**
-     * 当 Memcached 服务恢复时，将会触发此事件
+     * 当 Memcached 服务恢复时，将会触发此事件。
      *
      * @param host 已恢复的 Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:11211
      */
     void onRecovered(String host);
 
     /**
-     * 当 Memcached 服务关闭时，将会触发此事件
+     * 当 Memcached 服务关闭时，将会触发此事件。
      *
      * @param host 已关闭的 Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:11211
      */

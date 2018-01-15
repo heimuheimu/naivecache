@@ -46,10 +46,10 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 /**
- * Memcached 直连客户端，基于二进制协议进行通信，协议定义请参考文档：
+ * Memcached 直连客户端，基于二进制协议进行通信。协议定义请参考文档：
  * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped">
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped
- * </a>。
+ * </a>
  *
  * <p><strong>说明：</strong>{@code MemcachedChannel} 类是线程安全的，可在多个线程中使用同一个实例。</p>
  *

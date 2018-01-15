@@ -35,8 +35,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 提供 Memcached 客户端事件监听器的一个简单实现，将 Error 和 SlowExecution 事件打印至日志文件中。
  *
- * <h3>建议的 Log4j 配置：</h3>
- * <strong>注意：</strong> <code>${log.output.directory} 为占位替换符</code>
+ * <h3>Log4j 配置：</h3>
  * <blockquote>
  * <pre>
  * log4j.logger.NAIVECACHE_ERROR_LOG=INFO, NAIVECACHE_ERROR_LOG

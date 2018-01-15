@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Memcached 客户端工厂类
+ * Memcached 客户端工厂类。
  *
  * @author heimuheimu
  */
@@ -39,9 +39,9 @@ public class NaiveMemcachedClientFactory {
     private static final Logger LOG = LoggerFactory.getLogger(NaiveMemcachedClientFactory.class);
 
     /**
-     * 创建一个 Memcached 客户端，该方法不会抛出异常，如果创建失败，则返回 {@code null}
+     * 创建一个 Memcached 客户端，该方法不会抛出异常，如果创建失败，则返回 {@code null}。
      *
-     * @param host Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:9610
+     * @param host Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:11211
      * @param configuration Socket配置信息，如果传 {@code null}，将会使用{@link SocketConfiguration#DEFAULT}配置信息
      * @param timeout Memcached 操作超时时间，单位：毫秒，如果传入的值小于等于 0，将会使用默认值 1000ms
      * @param compressionThreshold 最小压缩字节数，当 Value 字节数小于或等于该值，不进行压缩，如果传入的值小于等于 0，将会使用默认值 64KB
@@ -69,5 +69,4 @@ public class NaiveMemcachedClientFactory {
             return null;
         }
     }
-
 }

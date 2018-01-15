@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 使用单个 Memcached 服务的扩展客户端抽象类，由子类实现具体客户端的创建及释放。
+ * 连接单个 Memcached 服务的扩展客户端抽象类，由子类实现具体客户端的创建及释放。
  *
  * <p><strong>说明：</strong>{@code AdvanceMemcachedClient} 的实现类必须是线程安全的。</p>
  *
@@ -66,8 +66,9 @@ public abstract class AdvanceMemcachedClient implements NaiveMemcachedClient {
     protected final NaiveMemcachedClientListener naiveMemcachedClientListener;
 
     /**
-     * 构造一个使用单个 Memcached 服务的扩展客户端
-     * <p>该客户端的操作超时时间设置为 1 秒，最小压缩字节数设置为 64 KB</p>
+     * 构造一个使用单个 Memcached 服务的扩展客户端。
+     *
+     * <p>该客户端的操作超时时间设置为 1 秒，最小压缩字节数设置为 64 KB。</p>
      *
      * @param host Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:11211
      */
@@ -76,7 +77,7 @@ public abstract class AdvanceMemcachedClient implements NaiveMemcachedClient {
     }
 
     /**
-     * 构造一个使用单个 Memcached 服务的扩展客户端
+     * 构造一个使用单个 Memcached 服务的扩展客户端。
      *
      * @param host Memcached 地址，由主机名和端口组成，":"符号分割，例如：localhost:11211
      * @param configuration Socket 配置信息，如果为 {@code null}，将会使用 {@link SocketConfiguration#DEFAULT} 配置信息
@@ -107,15 +108,16 @@ public abstract class AdvanceMemcachedClient implements NaiveMemcachedClient {
     }
 
     /**
-     * 获得一个可用的 Memcached 客户端，如果当前没有可用的客户端，则返回 {@code null}
-     * <p><b>注意：该方法不允许抛出任何异常</b></p>
+     * 获得一个可用的 Memcached 客户端，如果当前没有可用的客户端，则返回 {@code null}。
+     *
+     * <p><strong>注意：</strong>该方法不允许抛出任何异常</p>
      *
      * @return 可用的 Memcached 客户端，如果当前没有可用的客户端，则返回 {@code null}
      */
     protected abstract NaiveMemcachedClient getClient();
 
     /**
-     * 在 Memcached 单次操作结束后，将会回调当前方法，进行客户端释放
+     * 在 Memcached 单次操作结束后，将会回调当前方法，进行客户端释放。
      *
      * @param client 进行 Memcached 操作的客户端
      */
@@ -231,5 +233,4 @@ public abstract class AdvanceMemcachedClient implements NaiveMemcachedClient {
     public String getHost() {
         return host;
     }
-
 }

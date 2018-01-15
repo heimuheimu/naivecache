@@ -217,6 +217,7 @@ public interface NaiveMemcachedClient extends Closeable {
 
     /**
      * 获得当前客户端所连的 Memcached 地址。
+     *
      * <p><strong>说明：</strong>客户端可能支持多 Memcached 地址，输出格式由实现类自行定义。</p>
      *
      * @return 当前客户端所连的 Memcached 地址

@@ -25,16 +25,16 @@
 package com.heimuheimu.naivecache.memcached.listener;
 
 import com.heimuheimu.naivecache.memcached.cluster.MemcachedClusterClientListenerSkeleton;
-import com.heimuheimu.naivemonitor.MonitorUtil;
 import com.heimuheimu.naivemonitor.alarm.NaiveServiceAlarm;
 import com.heimuheimu.naivemonitor.alarm.ServiceAlarmMessageNotifier;
 import com.heimuheimu.naivemonitor.alarm.ServiceContext;
+import com.heimuheimu.naivemonitor.util.MonitorUtil;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * 该监听器可用于当 Memcached 集群客户端发生 Memcached 服务不可用或者从不可用状态恢复时，进行实时通知
+ * 该监听器可用于当 Memcached 集群客户端发生 Memcached 服务不可用或者从不可用状态恢复时，进行实时通知。
  *
  * @author heimuheimu
  * @see NaiveServiceAlarm
@@ -57,7 +57,7 @@ public class NoticeableMemcachedClusterClientListener extends MemcachedClusterCl
     private final NaiveServiceAlarm naiveServiceAlarm;
 
     /**
-     * 构造一个 Memcached 集群客户端监听器，可在 Memcached 服务不可用或者从不可用状态恢复时，进行实时通知
+     * 构造一个 Memcached 集群客户端监听器，可在 Memcached 服务不可用或者从不可用状态恢复时，进行实时通知。
      *
      * @param project 调用 Memcached 服务的项目名称
      * @param notifierList 服务不可用或从不可用状态恢复的报警消息通知器列表，不允许 {@code null} 或空
@@ -68,7 +68,7 @@ public class NoticeableMemcachedClusterClientListener extends MemcachedClusterCl
     }
 
     /**
-     * 构造一个 Memcached 集群客户端监听器，可在 Memcached 服务不可用或者从不可用状态恢复时，进行实时通知
+     * 构造一个 Memcached 集群客户端监听器，可在 Memcached 服务不可用或者从不可用状态恢复时，进行实时通知。
      *
      * @param project 调用 Memcached 服务的项目名称
      * @param notifierList 服务不可用或从不可用状态恢复的报警消息通知器列表，不允许 {@code null} 或空
@@ -98,7 +98,7 @@ public class NoticeableMemcachedClusterClientListener extends MemcachedClusterCl
     }
 
     /**
-     * 根据 Memcached 服务主机地址构造一个服务及服务所在的运行环境信息
+     * 根据 Memcached 服务主机地址构造一个服务及服务所在的运行环境信息。
      *
      * @param memcachedHost Memcached 服务主机地址
      * @return 服务及服务所在的运行环境信息

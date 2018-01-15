@@ -37,10 +37,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Memcached touch 命令，命令定义请参考文档：
+ * Memcached touch 命令。命令定义请参考文档：
  * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#touch-gat-and-gatq">
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#touch-gat-and-gatq
- * </a>。
+ * </a>
  *
  * <p><strong>说明：</strong>{@code TouchCommand} 类是线程安全的，可在多个线程中使用同一个实例。</p>
  *

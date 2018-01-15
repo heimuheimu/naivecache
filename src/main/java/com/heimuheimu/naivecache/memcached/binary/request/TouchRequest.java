@@ -29,10 +29,10 @@ import com.heimuheimu.naivecache.memcached.util.ByteUtil;
 import java.util.Arrays;
 
 /**
- * Memcached touch 命令请求包，命令定义请参考文档：
+ * Memcached Touch 命令请求包。命令定义请参考文档：
  * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#touch-gat-and-gatq">
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#touch-gat-and-gatq
- * </a>。
+ * </a>
  *
  * @author heimuheimu
  */
@@ -74,5 +74,4 @@ public class TouchRequest extends RequestPacket {
     public byte getOpcode() {
         return TOUCH_OPCODE;
     }
-
 }

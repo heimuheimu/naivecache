@@ -29,10 +29,10 @@ import com.heimuheimu.naivecache.memcached.util.ByteUtil;
 import java.util.Arrays;
 
 /**
- * Memcached get-key-quietly 命令请求包，命令定义请参考文档：
+ * Memcached get-key-quietly 命令请求包。命令定义请参考文档：
  * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#get-get-quietly-get-key-get-key-quietly">
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#get-get-quietly-get-key-get-key-quietly
- * </a>。
+ * </a>
  *
  * @author heimuheimu
  */

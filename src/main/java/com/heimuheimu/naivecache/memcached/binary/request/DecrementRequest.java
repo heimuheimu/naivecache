@@ -29,10 +29,10 @@ import com.heimuheimu.naivecache.memcached.util.ByteUtil;
 import java.util.Arrays;
 
 /**
- * Memcached decrement 命令请求包，命令定义请参考文档：
+ * Memcached Decrement 命令请求包。命令定义请参考文档：
  * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#increment-decrement">
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#increment-decrement
- * </a>。
+ * </a>
  *
  * @author heimuheimu
  */

@@ -23,7 +23,7 @@
  */
 
 /**
- * 使用单个 Memcached 服务的扩展客户端。
+ * 提供各类连接单个 Memcached 服务的扩展客户端。
  *
  * <h3>一次性 Memcached 客户端</h3>
  * <blockquote>

@@ -37,10 +37,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Memcached Get 命令，命令定义请参考文档：
+ * Memcached Get 命令。命令定义请参考文档：
  * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#get-get-quietly-get-key-get-key-quietly">
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#get-get-quietly-get-key-get-key-quietly
- * </a>。
+ * </a>
  *
  * <p><strong>说明：</strong>{@code GetCommand} 类是线程安全的，可在多个线程中使用同一个实例。</p>
  *
@@ -133,5 +133,4 @@ public class GetCommand implements OptimizedCommand {
     public void close() {
         latch.countDown();
     }
-
 }

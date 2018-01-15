@@ -33,7 +33,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Memcached 客户端使用的压缩信息采集器
+ * Memcached 客户端使用的压缩信息 Falcon 监控数据采集器。该采集器采集周期为 30 秒，每次采集将会返回以下数据项：
+ * <ul>
+ *     <li>naivecache_compression_reduce_bytes/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内压缩操作已节省的字节数</li>
+ *     <li>naivecache_compression_avg_reduce_bytes/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内平均每次压缩操作节省的字节数</li>
+ * </ul>
  *
  * @author heimuheimu
  */

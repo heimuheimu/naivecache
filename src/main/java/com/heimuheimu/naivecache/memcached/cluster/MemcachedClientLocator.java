@@ -25,7 +25,7 @@
 package com.heimuheimu.naivecache.memcached.cluster;
 
 /**
- * Memcached 客户端定位器，根据 Memcached Key 获取对应的 Memcached 客户端索引
+ * Memcached 客户端定位器，根据 Memcached Key 获取对应的 Memcached 客户端索引。
  *
  * @author heimuheimu
  */

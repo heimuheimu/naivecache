@@ -23,7 +23,7 @@
  */
 
 /**
- * Memcached 二进制协议客户端实现
+ * Memcached 二进制协议客户端实现。
  *
  * @author heimuheimu
  */

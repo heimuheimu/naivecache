@@ -22,22 +22,9 @@
  * SOFTWARE.
  */
 
-package com.heimuheimu.naivecache.memcached.binary.command;
-
 /**
- * 可优化的 Memcached 命令，如果目标命令允许被当前命令优化，则目标命令不会进行实际发送至 Memcached 服务，并将共享当前命令的响应数据包。
- *
- * <p><strong>说明：</strong>{@code OptimizedCommand} 的实现类必须是线程安全的。</p>
+ * 提供 Memcached 客户端监听器和集群客户端监听器的默认实现。
  *
  * @author heimuheimu
  */
-public interface OptimizedCommand extends Command {
-
-    /**
-     * 当前命令是否可以对目标命令进行优化，如果可以，则返回 {@code true} , 否则返回 {@code false}
-     *
-     * @param target 目标命令
-     * @return 是否可以对目标命令进行优化
-     */
-    boolean optimize(OptimizedCommand target);
-}
+package com.heimuheimu.naivecache.memcached.listener;

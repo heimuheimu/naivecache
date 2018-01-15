@@ -27,10 +27,10 @@ package com.heimuheimu.naivecache.memcached.binary.request;
 import com.heimuheimu.naivecache.memcached.util.ByteUtil;
 
 /**
- * Memcached 请求数据包抽象类，格式定义请参考文档：
+ * Memcached 请求数据包抽象类。格式定义请参考文档：
  * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#packet-structure">
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#packet-structure
- * </a>。
+ * </a>
  *
  * @author heimuheimu
  */
@@ -92,10 +92,10 @@ public abstract class RequestPacket {
     public abstract byte[] getByteArray();
 
     /**
-     * 获得请求操作代码，代码定义：
+     * 获得请求操作代码。代码定义：
      * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#command-opcodes">
      * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#command-opcodes
-     * </a>。
+     * </a>
      *
      * @return 请求操作代码
      */

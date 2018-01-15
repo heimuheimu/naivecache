@@ -48,10 +48,24 @@ import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * 基于 Memcached 二进制协议与 Memcached 服务进行数据交互的管道，协议定义请参考文档：
+ * 基于 Memcached 二进制协议与 Memcached 服务进行数据交互的管道。协议定义请参考文档：
  * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped">
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped
- * </a>。
+ * </a>
+ *
+ * <h3>Memcached 连接信息 Log4j 配置</h3>
+ * <blockquote>
+ * <pre>
+ * log4j.logger.NAIVECACHE_MEMCACHED_CONNECTION_LOG=INFO, NAIVECACHE_MEMCACHED_CONNECTION_LOG
+ * log4j.additivity.NAIVECACHE_MEMCACHED_CONNECTION_LOG=false
+ * log4j.appender.NAIVECACHE_MEMCACHED_CONNECTION_LOG=org.apache.log4j.DailyRollingFileAppender
+ * log4j.appender.NAIVECACHE_MEMCACHED_CONNECTION_LOG.file=${log.output.directory}/naivecache/connection.log
+ * log4j.appender.NAIVECACHE_MEMCACHED_CONNECTION_LOG.encoding=UTF-8
+ * log4j.appender.NAIVECACHE_MEMCACHED_CONNECTION_LOG.DatePattern=_yyyy-MM-dd
+ * log4j.appender.NAIVECACHE_MEMCACHED_CONNECTION_LOG.layout=org.apache.log4j.PatternLayout
+ * log4j.appender.NAIVECACHE_MEMCACHED_CONNECTION_LOG.layout.ConversionPattern=%d{ISO8601} %-5p : %m%n
+ * </pre>
+ * </blockquote>
  *
  * <p><strong>说明：</strong>{@code MemcachedChannel} 类是线程安全的，可在多个线程中使用同一个实例。</p>
  *

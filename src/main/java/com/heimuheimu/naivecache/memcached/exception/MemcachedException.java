@@ -25,7 +25,7 @@
 package com.heimuheimu.naivecache.memcached.exception;
 
 /**
- * Memcached请求异常
+ * Memcached 命令执行过程中出现错误将抛出此异常。
  *
  * @author heimuheimu
  */
@@ -36,5 +36,4 @@ public class MemcachedException extends RuntimeException {
     public MemcachedException(String message) {
         super(message);
     }
-
 }

@@ -24,7 +24,7 @@
 package com.heimuheimu.naivecache.memcached.exception;
 
 /**
- * 远程请求超时时，将会抛出此异常
+ * Memcached 命令执行超时时，将会抛出此异常。
  *
  * @author heimuheimu
  */
@@ -35,5 +35,4 @@ public class TimeoutException extends RuntimeException {
 	public TimeoutException(String message) {
 		super(message);
 	}
-
 }

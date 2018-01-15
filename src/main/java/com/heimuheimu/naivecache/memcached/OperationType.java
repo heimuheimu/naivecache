@@ -25,7 +25,7 @@
 package com.heimuheimu.naivecache.memcached;
 
 /**
- * Memcached 命令类型
+ * Memcached 命令枚举类。
  *
  * @author heimuheimu
  */

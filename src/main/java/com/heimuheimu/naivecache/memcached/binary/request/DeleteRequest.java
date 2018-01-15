@@ -29,10 +29,10 @@ import com.heimuheimu.naivecache.memcached.util.ByteUtil;
 import java.util.Arrays;
 
 /**
- * Memcached delete 命令请求包，命令定义请参考文档：
+ * Memcached Delete 命令请求包。命令定义请参考文档：
  * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#delete">
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#delete
- * </a>。
+ * </a>
  *
  * @author heimuheimu
  */
@@ -64,5 +64,4 @@ public class DeleteRequest extends RequestPacket {
     public byte getOpcode() {
         return DELETE_OPCODE;
     }
-
 }

@@ -84,5 +84,4 @@ public interface Command {
      * 关闭该命令，如果该命令处于等待响应数据包状态，应立刻释放
      */
     void close();
-
 }

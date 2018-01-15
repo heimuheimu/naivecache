@@ -23,7 +23,7 @@
  */
 
 /**
- * Memcached 二进制协议命令。
+ * 提供 Memcached 二进制协议命令。
  *
  * @author heimuheimu
  */

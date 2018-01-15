@@ -36,7 +36,9 @@ import java.util.Set;
 
 /**
  * 热加载 Memcached 集群客户端，允许在运行期间变更 Memcached 集群客户端配置信息，更多信息请参考 {@link #reload(String[])}
- * 和 {@link #reload(String[], SocketConfiguration, int, int, NaiveMemcachedClientListener, MemcachedClusterClientListener)} 方法说明
+ * 和 {@link #reload(String[], SocketConfiguration, int, int, NaiveMemcachedClientListener, MemcachedClusterClientListener)} 方法说明。
+ *
+ * <p><strong>说明：</strong>{@code ReloadableMemcachedClusterClient} 类是线程安全的，可在多个线程中使用同一个实例。</p>
  *
  * @author heimuheimu
  */

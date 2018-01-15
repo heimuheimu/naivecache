@@ -25,8 +25,9 @@
 package com.heimuheimu.naivecache.memcached.cluster;
 
 /**
- * Memcached 客户端事件监听器抽象实现类，继承该类的监听器，仅需重载自己所关心的事件，
- * 可防止 {@link MemcachedClusterClientListener} 在后续版本增加方法时，需重新调整监听器实现类。
+ * Memcached 集群客户端事件监听器骨架类，可防止 {@link MemcachedClusterClientListener} 在后续版本增加方法时，带来的编译错误。
+ *
+ * <p><strong>说明：</strong>监听器的实现类必须是线程安全的。</p>
  *
  * @author heimuheimu
  */

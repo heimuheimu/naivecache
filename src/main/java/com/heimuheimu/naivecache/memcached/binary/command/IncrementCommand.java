@@ -37,10 +37,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Memcached Increment 命令，命令定义请参考文档：
+ * Memcached Increment 命令。命令定义请参考文档：
  * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#increment-decrement">
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#increment-decrement
- * </a>。
+ * </a>
  *
  * <p><strong>说明：</strong>{@code IncrementCommand} 类是线程安全的，可在多个线程中使用同一个实例。</p>
  *

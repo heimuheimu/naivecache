@@ -27,12 +27,12 @@ package com.heimuheimu.naivecache.memcached.binary.response;
 import com.heimuheimu.naivecache.memcached.util.ByteUtil;
 
 /**
- * Memcached 响应数据包，格式定义请参考文档：
+ * Memcached 响应数据包。格式定义请参考文档：
  * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#packet-structure">
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#packet-structure
- * </a>。
+ * </a>
  *
- * <p><strong>注意：</strong> 响应数据包通常不应该被修改，否则无法保证线程安全</p>
+ * <p><strong>注意：</strong> 响应数据包通常不应该被修改，否则无法保证线程安全。</p>
  *
  * <p><strong>说明：</strong>{@code ResponsePacket} 类是线程安全的，可在多个线程中使用同一个实例。</p>
  *

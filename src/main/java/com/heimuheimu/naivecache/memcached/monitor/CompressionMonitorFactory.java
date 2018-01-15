@@ -27,7 +27,7 @@ package com.heimuheimu.naivecache.memcached.monitor;
 import com.heimuheimu.naivemonitor.monitor.CompressionMonitor;
 
 /**
- * Memcached 客户端使用的压缩信息监控器工厂类
+ * Memcached 客户端使用的压缩信息监控器工厂类。
  *
  * @author heimuheimu
  */
@@ -45,5 +45,4 @@ public class CompressionMonitorFactory {
     public static CompressionMonitor get() {
         return COMPRESSION_MONITOR;
     }
-
 }

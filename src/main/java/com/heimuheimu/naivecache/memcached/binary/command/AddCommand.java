@@ -37,7 +37,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Memcached Add 命令，命令定义请参考文档：
+ * Memcached Add 命令。命令定义请参考文档：
  * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#set-add-replace">
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#set-add-replace
  * </a>。

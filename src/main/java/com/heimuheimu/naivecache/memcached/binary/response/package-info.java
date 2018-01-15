@@ -23,7 +23,7 @@
  */
 
 /**
- * Memcached 二进制协议命令响应数据包
+ * Memcached 二进制协议命令响应数据包。
  *
  * @author heimuheimu
  */

@@ -35,10 +35,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Memcached 批量 get 命令，使用 getkq 和 getk 命令组合实现，实现方式请参考文档：
+ * Memcached 批量 get 命令，使用 getkq 和 getk 命令组合实现。实现方式请参考文档：
  * <a href="https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#get-get-quietly-get-key-get-key-quietly">
  * https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped#get-get-quietly-get-key-get-key-quietly
- * </a>。
+ * </a>
  *
  * <p><strong>说明：</strong>{@code MultiGetCommand} 类是线程安全的，可在多个线程中使用同一个实例。</p>
  *
@@ -143,5 +143,4 @@ public class MultiGetCommand implements Command {
     public void close() {
         latch.countDown();
     }
-
 }

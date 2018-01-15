@@ -32,7 +32,13 @@ import com.heimuheimu.naivemonitor.monitor.SocketMonitor;
 import java.util.List;
 
 /**
- * Memcached 客户端使用的 Socket 信息采集器
+ * Memcached 客户端使用的 Socket 信息 Falcon 监控数据采集器。该采集器采集周期为 30 秒，每次采集将会返回以下数据项：
+ * <ul>
+ *     <li>naivecache_socket_read_bytes/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内 Socket 读取的总字节数</li>
+ *     <li>naivecache_socket_avg_read_bytes/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内 Socket 每次读取的平均字节数</li>
+ *     <li>naivecache_socket_written_bytes/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内 Socket 写入的总字节数</li>
+ *     <li>naivecache_socket_avg_written_bytes/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内 Socket 每次写入的平均字节数</li>
+ * </ul>
  *
  * @author heimuheimu
  */

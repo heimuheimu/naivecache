@@ -24,7 +24,7 @@
 package com.heimuheimu.naivecache.memcached.util;
 
 /**
- * 字节转换工具。
+ * 字节转换工具类。
  *
  * @author heimuheimu
  */
