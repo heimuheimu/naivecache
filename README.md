@@ -36,7 +36,7 @@ log4j.appender.NAIVECACHE_MEMCACHED_CONNECTION_LOG.DatePattern=_yyyy-MM-dd
 log4j.appender.NAIVECACHE_MEMCACHED_CONNECTION_LOG.layout=org.apache.log4j.PatternLayout
 log4j.appender.NAIVECACHE_MEMCACHED_CONNECTION_LOG.layout.ConversionPattern=%d{ISO8601} %-5p : %m%n
 
-# Cache 错误信息日志，只打印 Key 和 错误原因
+# Memcached 错误日志，只打印 Key 和 错误原因
 log4j.logger.NAIVECACHE_ERROR_LOG=INFO, NAIVECACHE_ERROR_LOG
 log4j.additivity.NAIVECACHE_ERROR_LOG=false
 log4j.appender.NAIVECACHE_ERROR_LOG=org.apache.log4j.DailyRollingFileAppender
@@ -46,7 +46,7 @@ log4j.appender.NAIVECACHE_ERROR_LOG.DatePattern=_yyyy-MM-dd
 log4j.appender.NAIVECACHE_ERROR_LOG.layout=org.apache.log4j.PatternLayout
 log4j.appender.NAIVECACHE_ERROR_LOG.layout.ConversionPattern=%d{ISO8601} : %m%n
 
-# Cache 慢查日志，打印执行时间 > 50ms 的操作
+# Memcached 慢查日志，打印执行时间 > 50ms 的操作
 log4j.logger.NAIVECACHE_SLOW_EXECUTION_LOG=INFO, NAIVECACHE_SLOW_EXECUTION_LOG
 log4j.additivity.NAIVECACHE_SLOW_EXECUTION_LOG=false
 log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG=org.apache.log4j.DailyRollingFileAppender
