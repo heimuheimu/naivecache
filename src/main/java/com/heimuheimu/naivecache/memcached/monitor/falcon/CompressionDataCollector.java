@@ -46,7 +46,7 @@ public class CompressionDataCollector extends AbstractCompressionDataCollector {
     private final List<CompressionMonitor> compressionMonitorList;
 
     /**
-     * 构造一个 RPC 服务端使用的压缩信息采集器，将会采集 RPC 服务端所有的压缩信息
+     * 构造一个 Memcached 客户端使用的压缩信息采集器。
      */
     public CompressionDataCollector() {
         this.compressionMonitorList = new ArrayList<>();
