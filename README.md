@@ -177,7 +177,7 @@ log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.layout.ConversionPattern=%d{ISO8601
 
 ### Spring 配置
 ```xml
-    <bean class="com.heimuheimu.naivecache.localcache.SimpleNaiveLocalCacheClient" init-method="init" destroy-method="close">
+    <bean id="simpleNaiveLocalCacheClient" class="com.heimuheimu.naivecache.localcache.SimpleNaiveLocalCacheClient" init-method="init" destroy-method="close">
         <constructor-arg index="0" value="false"/> <!-- 是否开启序列化存储，如果无法控制从缓存中获取的实例被外部修改，可设置为 true -->
         <constructor-arg index="1" value="1000000"/> <!-- 允许存储的本地缓存最大数量，默认为 1 百万 -->
     </bean>
