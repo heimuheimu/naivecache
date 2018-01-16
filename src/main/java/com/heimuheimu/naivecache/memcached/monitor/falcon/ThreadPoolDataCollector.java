@@ -36,11 +36,11 @@ import java.util.List;
  * Memcached 客户端使用的线程池信息 Falcon 监控数据采集器。该采集器采集周期为 30 秒，每次采集将会返回以下数据项：
  * <ul>
  *     <li>naivecache_threadPool_rejected_count/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内所有线程池拒绝执行的任务总数</li>
- *     <li>naivecache_threadPool_active_count/module=naivecache 采集时刻所有线程池活跃线程数近似值总和</li>
- *     <li>naivecache_threadPool_pool_size/module=naivecache 采集时刻所有线程池线程数总和</li>
- *     <li>naivecache_threadPool_peak_pool_size/module=naivecache 所有线程池出现过的最大线程数总和</li>
- *     <li>naivecache_threadPool_core_pool_size/module=naivecache 所有线程池配置的核心线程数总和</li>
- *     <li>naivecache_threadPool_maximum_pool_size/module=naivecache 所有线程池配置的最大线程数总和</li>
+ *     <li>naivecache_threadPool_active_count/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 采集时刻所有线程池活跃线程数近似值总和</li>
+ *     <li>naivecache_threadPool_pool_size/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 采集时刻所有线程池线程数总和</li>
+ *     <li>naivecache_threadPool_peak_pool_size/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 所有线程池出现过的最大线程数总和</li>
+ *     <li>naivecache_threadPool_core_pool_size/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 所有线程池配置的核心线程数总和</li>
+ *     <li>naivecache_threadPool_maximum_pool_size/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 所有线程池配置的最大线程数总和</li>
  * </ul>
  *
  * @author heimuheimu
