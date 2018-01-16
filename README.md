@@ -228,3 +228,6 @@ log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.layout.ConversionPattern=%d{ISO8601
 ## 更多信息
 * [Memcached 官网](https://www.memcached.org)
 * [NaiveMonitor 项目主页](https://github.com/heimuheimu/naivemonitor)
+* [NaiveCache v1.0 API Doc](https://heimuheimu.github.io/naivecache/api/v1.0/)
+* [NaiveCache v1.0 源码下载](https://heimuheimu.github.io/naivecache/download/naivecache-1.0-sources.jar)
+* [NaiveCache v1.0 Jar包下载](https://heimuheimu.github.io/naivecache/download/naivecache-1.0.jar)
