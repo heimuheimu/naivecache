@@ -35,21 +35,22 @@ public interface Transcoder {
 
     /**
      * 将 Java 对象编码成字节数组，并返回长度为2的二维数组，
-     * 索引0的为 flags 字节数组，长度为4。索引1的为 value 字节数组，长度不固定
+     * 索引 0 的为 flags 字节数组，长度为 4。索引 1 的为 value 字节数组，长度不固定。
      *
      * @param value Java 对象
-     * @return 长度为2的二维数组，索引0的为 flags 字节数组，长度为4，索引1的为 value 字节数组，长度不固定
+     * @return 长度为2的二维数组，索引 0 的为 flags 字节数组，长度为 4，索引 1 的为 value 字节数组，长度不固定
      * @throws Exception 编码过程中发生错误
      */
     byte[][] encode(Object value) throws Exception;
 
     /**
-     * 将字节数组还原成 Java 对象并返回，如果当前转换器不支持该 flags 对应的转换，将会返回 {@code null}
+     * 将字节数组还原成 Java 对象并返回，如果当前转换器不支持该 flags 对应的转换，将会返回 {@code null}。
      *
      * @param src 需要解码的字节数组
      * @param flagsOffset flags 在字节数组中的起始索引
      * @param valueOffset Value 在字节数组中的起始索引
      * @param valueLength Value 字节数组的长度
+     * @param <T> Java 对象类型
      * @return Java 对象
      * @throws Exception 解码过程中发生错误
      */

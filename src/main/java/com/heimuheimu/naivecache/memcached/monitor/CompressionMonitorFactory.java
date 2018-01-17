@@ -40,7 +40,9 @@ public class CompressionMonitorFactory {
     private static final CompressionMonitor COMPRESSION_MONITOR = new CompressionMonitor();
 
     /**
-     * 获得 Memcached 客户端使用的压缩信息监控器
+     * 获得 Memcached 客户端使用的压缩信息监控器。
+     *
+     * @return 压缩信息监控器
      */
     public static CompressionMonitor get() {
         return COMPRESSION_MONITOR;

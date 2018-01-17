@@ -57,6 +57,7 @@ public interface NaiveMemcachedClient extends Closeable {
      * <p><strong>注意：</strong>Key 的字节长度不应超过 {@link #MAX_KEY_LENGTH}</p>
      *
      * @param key Memcached key，字节长度不应超过 {@link #MAX_KEY_LENGTH}
+     * @param <T> Value 类型
      * @return key 对应的值，，如果找不到或者发生异常，则会返回 {@code null}
      */
     <T> T get(String key);
@@ -72,6 +73,7 @@ public interface NaiveMemcachedClient extends Closeable {
      * <p><strong>注意：</strong>Key 的字节长度不应超过 {@link #MAX_KEY_LENGTH}</p>
      *
      * @param keySet Memcached key 列表，Key 字节长度不应超过 {@link #MAX_KEY_LENGTH}
+     * @param <T> Value 类型
      * @return Key 列表对应的 Memcached 缓存值 Map，不会返回 {@code null}
      */
     <T> Map<String, T> multiGet(Set<String> keySet);
