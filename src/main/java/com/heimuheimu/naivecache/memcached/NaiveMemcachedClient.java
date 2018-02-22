@@ -54,6 +54,9 @@ public interface NaiveMemcachedClient extends Closeable {
      *     https://github.com/memcached/memcached/wiki/Commands#get
      * </a>
      *
+     *
+     * <p><strong>说明：</strong> 通过 {@link #addAndGet(String, long, long, int)} 设置的值为 {@link Long} 类型。</p>
+     *
      * <p><strong>注意：</strong>Key 的字节长度不应超过 {@link #MAX_KEY_LENGTH}</p>
      *
      * @param key Memcached key，字节长度不应超过 {@link #MAX_KEY_LENGTH}
@@ -186,9 +189,6 @@ public interface NaiveMemcachedClient extends Closeable {
      *     <strong>说明：</strong>过期时间从 Key 第一次被初始化后开始计算，后续原子加（或减）操作不会对过期时间进行重新设置，
      *     如果需要持续更新过期时间，应结合 {@link #touch(String, int)} 命令使用。
      * </p>
-     *
-     * <p><strong>注意：</strong>{@link #get(String)} 无法获取执行原子加（或减）操作的 Key 对应的值，
-     * 可将 {@code delta} 设置为 0 进行获取。</p>
      *
      * @param key Memcached key，字节长度不应超过 {@link #MAX_KEY_LENGTH}
      * @param delta 需要增加的值，如果为负数，则为减少的值

@@ -33,6 +33,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.charset.Charset;
 
 /**
  * 使用 Java 序列化实现的 Java 对象与 Memcached 二进制协议约定的字节数组转换器。
@@ -43,8 +44,19 @@ import java.io.ObjectOutputStream;
  */
 public class SimpleTranscoder implements Transcoder {
 
+    /**
+     * 由 incr /decr 命令设置的值使用的序列化方式
+     */
+    private static final byte TRANSCODER_VERSION_DEFAULT = 0;
+
+    /**
+     * Java 序列化方式
+     */
     private static final byte TRANSCODER_VERSION_BYTE = 1;
 
+    /**
+     * 使用 LZF 算法进行压缩的值
+     */
     private static final byte LZF_COMPRESSION_BYTE = 1;
 
     /**
@@ -64,7 +76,6 @@ public class SimpleTranscoder implements Transcoder {
 
     @Override
     public byte[][] encode(Object value) throws Exception {
-
         byte[][] result = new byte[2][0];
         byte[] flags = new byte[4];
         flags[0] = TRANSCODER_VERSION_BYTE;
@@ -89,7 +100,7 @@ public class SimpleTranscoder implements Transcoder {
     public <T> T decode(byte[] src, int flagsOffset, int valueOffset, int valueLength) throws Exception {
         int flagVersion = src[flagsOffset];
         int compressionByte = src[flagsOffset + 1];
-        if (flagVersion == TRANSCODER_VERSION_BYTE) {
+        if (flagVersion == TRANSCODER_VERSION_BYTE) { // Java 序列化方式
             ByteArrayInputStream valueBis;
             if (compressionByte != LZF_COMPRESSION_BYTE) {
                 valueBis = new ByteArrayInputStream(src, valueOffset, valueLength);
@@ -99,6 +110,9 @@ public class SimpleTranscoder implements Transcoder {
             }
             ObjectInputStream ois = new ObjectInputStream(valueBis);
             return (T) ois.readObject();
+        } else if (flagVersion == TRANSCODER_VERSION_DEFAULT) { // 由 incr /decr 命令设置的值使用的序列化方式
+            String textValue = new String(src, valueOffset, valueLength, Charset.forName("utf-8"));
+            return (T) Long.valueOf(textValue);
         } else {
             throw new MemcachedException("Unknown transcoder version: `" + flagVersion + "`");
         }
