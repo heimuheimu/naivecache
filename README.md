@@ -12,7 +12,7 @@
     <dependency>
         <groupId>com.heimuheimu</groupId>
         <artifactId>naivecache</artifactId>
-        <version>1.0</version>
+        <version>1.1</version>
     </dependency>
 ```
 ## Log4J 配置
@@ -224,10 +224,25 @@ log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.layout.ConversionPattern=%d{ISO8601
         }
     }
 ```
+## 版本发布记录
+### V1.1
+### 新增特性：
+ * NaiveMemcachedClient#get(String) 方法可以直接获取由 NaiveMemcachedClient#addAndGet(String, long, long, int) 方法设置的值。
+
+***
+
+### V1.0
+### 特性：
+ * 配置简单
+ * Memcached 常用命令支持
+ * 通过 Falcon 可快速实现 Memcached 数据监控
+ * 通过钉钉实现 Memcached 服务故障实时报警 
+ * 集成一个简单高效的本地缓存实现
+
 
 ## 更多信息
 * [Memcached 官网](https://www.memcached.org)
 * [NaiveMonitor 项目主页](https://github.com/heimuheimu/naivemonitor)
-* [NaiveCache v1.0 API Doc](https://heimuheimu.github.io/naivecache/api/v1.0/)
-* [NaiveCache v1.0 源码下载](https://heimuheimu.github.io/naivecache/download/naivecache-1.0-sources.jar)
-* [NaiveCache v1.0 Jar包下载](https://heimuheimu.github.io/naivecache/download/naivecache-1.0.jar)
+* [NaiveCache v1.1 API Doc](https://heimuheimu.github.io/naivecache/api/v1.1/)
+* [NaiveCache v1.1 源码下载](https://heimuheimu.github.io/naivecache/download/naivecache-1.1-sources.jar)
+* [NaiveCache v1.1 Jar包下载](https://heimuheimu.github.io/naivecache/download/naivecache-1.1.jar)
