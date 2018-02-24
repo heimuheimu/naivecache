@@ -46,17 +46,17 @@ public class ExecutionMonitorFactory {
     private static final Object lock = new Object();
 
     /**
-     * RPC  客户端操作执行错误码：执行超时
+     * Memcached 客户端操作执行错误码：执行超时
      */
     public static final int ERROR_CODE_TIMEOUT = -1;
 
     /**
-     * RPC 客户端操作执行错误码：缓存 Key 不存在
+     * Memcached 客户端操作执行错误码：缓存 Key 不存在
      */
     public static final int ERROR_CODE_KEY_NOT_FOUND = -2;
 
     /**
-     * RPC  客户端操作执行错误码：缓存操作错误
+     * Memcached 客户端操作执行错误码：缓存操作错误
      */
     public static final int ERROR_CODE_MEMCACHED_ERROR = -3;
 
