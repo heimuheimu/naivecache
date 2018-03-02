@@ -111,8 +111,22 @@ public class SimpleTranscoder implements Transcoder {
             ObjectInputStream ois = new ObjectInputStream(valueBis);
             return (T) ois.readObject();
         } else if (flagVersion == TRANSCODER_VERSION_DEFAULT) { // 由 incr /decr 命令设置的值使用的序列化方式
-            String textValue = new String(src, valueOffset, valueLength, Charset.forName("utf-8"));
-            return (T) Long.valueOf(textValue);
+            int longValueLength = 0;
+            for (int i = 0, j = valueOffset; i < valueLength; i++) {
+                if (src[j] >= 48 && src[j] <= 57) {
+                    longValueLength ++;
+                    j ++;
+                } else {
+                    break;
+                }
+            }
+            String textValue = new String(src, valueOffset, longValueLength, Charset.forName("US-ASCII"));
+            try {
+                return (T) Long.valueOf(textValue);
+            } catch (Exception e) {
+                throw new RuntimeException("Decode long value failed. Text value: `" +
+                        new String(src, valueOffset, valueLength, Charset.forName("US-ASCII")) + "`.", e);
+            }
         } else {
             throw new MemcachedException("Unknown transcoder version: `" + flagVersion + "`");
         }
