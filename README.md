@@ -17,6 +17,7 @@
 ```
 ## Log4J 配置
 ```
+# NaiveCache 错误信息根日志
 log4j.logger.com.heimuheimu.naivecache=WARN, NAIVECACHE
 log4j.additivity.com.heimuheimu.naivecache=false
 log4j.appender.NAIVECACHE=org.apache.log4j.DailyRollingFileAppender
