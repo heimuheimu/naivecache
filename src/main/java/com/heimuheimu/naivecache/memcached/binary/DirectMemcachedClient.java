@@ -210,6 +210,7 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
         } finally {
             long executedNanoTime = System.nanoTime() - startTime;
             if (executedNanoTime > NaiveMemcachedClientListener.SLOW_EXECUTION_THRESHOLD) {
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_SLOW_EXECUTION);
                 clientListener.onSlowExecution(this, OperationType.GET, key, executedNanoTime);
             }
             executionMonitor.onExecuted(startTime);
@@ -310,6 +311,7 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
         } finally {
             long executedNanoTime = System.nanoTime() - startTime;
             if (executedNanoTime > NaiveMemcachedClientListener.SLOW_EXECUTION_THRESHOLD) {
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_SLOW_EXECUTION);
                 clientListener.onSlowExecution(this, OperationType.MULTI_GET, joinKeyCollection(keySet), executedNanoTime);
             }
             executionMonitor.onExecuted(startTime);
@@ -437,6 +439,7 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
         } finally {
             long executedNanoTime = System.nanoTime() - startTime;
             if (executedNanoTime > NaiveMemcachedClientListener.SLOW_EXECUTION_THRESHOLD) {
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_SLOW_EXECUTION);
                 clientListener.onSlowExecution(this, OperationType.ADD, key, executedNanoTime);
             }
             executionMonitor.onExecuted(startTime);
@@ -544,6 +547,7 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
         } finally {
             long executedNanoTime = System.nanoTime() - startTime;
             if (executedNanoTime > NaiveMemcachedClientListener.SLOW_EXECUTION_THRESHOLD) {
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_SLOW_EXECUTION);
                 clientListener.onSlowExecution(this, OperationType.SET, key, executedNanoTime);
             }
             executionMonitor.onExecuted(startTime);
@@ -612,6 +616,7 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
         } finally {
             long executedNanoTime = System.nanoTime() - startTime;
             if (executedNanoTime > NaiveMemcachedClientListener.SLOW_EXECUTION_THRESHOLD) {
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_SLOW_EXECUTION);
                 clientListener.onSlowExecution(this, OperationType.DELETE, key, executedNanoTime);
             }
             executionMonitor.onExecuted(startTime);
@@ -716,6 +721,7 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
         } finally {
             long executedNanoTime = System.nanoTime() - startTime;
             if (executedNanoTime > NaiveMemcachedClientListener.SLOW_EXECUTION_THRESHOLD) {
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_SLOW_EXECUTION);
                 clientListener.onSlowExecution(this, OperationType.ADD_AND_GET, key, executedNanoTime);
             }
             executionMonitor.onExecuted(startTime);
@@ -790,6 +796,7 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
         } finally {
             long executedNanoTime = System.nanoTime() - startTime;
             if (executedNanoTime > NaiveMemcachedClientListener.SLOW_EXECUTION_THRESHOLD) {
+                executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_SLOW_EXECUTION);
                 clientListener.onSlowExecution(this, OperationType.TOUCH, key, executedNanoTime);
             }
             executionMonitor.onExecuted(startTime);

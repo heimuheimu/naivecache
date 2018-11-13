@@ -103,6 +103,7 @@ log4j.appender.NAIVECACHE_SLOW_EXECUTION_LOG.layout.ConversionPattern=%d{ISO8601
  * naivecache_key_not_found/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内 Get 操作未找到 Key 的次数
  * naivecache_timeout/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内 Memcached 操作发生超时的错误次数
  * naivecache_error/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内 Memcached 操作发生异常的错误次数
+ * naivecache_slow_execution/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内 Memcached 操作发生的慢执行次数
  * naivecache_tps/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内每秒平均执行次数
  * naivecache_peak_tps/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内每秒最大执行次数
  * naivecache_avg_exec_time/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内单次 Memcached 操作平均执行时间

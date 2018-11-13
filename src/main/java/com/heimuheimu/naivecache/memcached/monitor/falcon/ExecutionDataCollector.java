@@ -40,6 +40,7 @@ import java.util.Map;
  *     <li>naivecache_key_not_found/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内 Get 操作未找到 Key 的次数</li>
  *     <li>naivecache_timeout/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内 Memcached 操作发生超时的错误次数</li>
  *     <li>naivecache_error/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内 Memcached 操作发生异常的错误次数</li>
+ *     <li>naivecache_slow_execution/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内 Memcached 操作发生的慢执行次数</li>
  *     <li>naivecache_tps/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内每秒平均执行次数</li>
  *     <li>naivecache_peak_tps/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内每秒最大执行次数</li>
  *     <li>naivecache_avg_exec_time/module=naivecache &nbsp;&nbsp;&nbsp;&nbsp; 30 秒内单次 Memcached 操作平均执行时间</li>
@@ -57,6 +58,7 @@ public class ExecutionDataCollector extends AbstractExecutionDataCollector {
         ERROR_METRIC_SUFFIX_MAP.put(ExecutionMonitorFactory.ERROR_CODE_KEY_NOT_FOUND, "_key_not_found");
         ERROR_METRIC_SUFFIX_MAP.put(ExecutionMonitorFactory.ERROR_CODE_TIMEOUT, "_timeout");
         ERROR_METRIC_SUFFIX_MAP.put(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR, "_error");
+        ERROR_METRIC_SUFFIX_MAP.put(ExecutionMonitorFactory.ERROR_CODE_SLOW_EXECUTION, "_slow_execution");
     }
 
     @Override
