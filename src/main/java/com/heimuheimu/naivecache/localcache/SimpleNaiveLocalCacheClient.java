@@ -306,7 +306,7 @@ public class SimpleNaiveLocalCacheClient implements NaiveLocalCacheClient, Close
         }
 
         private void touch(int expiredTime) {
-            this.expiry = System.currentTimeMillis() + (expiredTime * 1000);
+            this.expiry = System.currentTimeMillis() + (expiredTime * 1000L);
         }
 
         private boolean isExpired() {
