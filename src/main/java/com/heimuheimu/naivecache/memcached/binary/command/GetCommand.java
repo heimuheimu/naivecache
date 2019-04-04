@@ -117,7 +117,7 @@ public class GetCommand implements OptimizedCommand {
 
     @Override
     public boolean optimize(OptimizedCommand target) {
-        if (target != null && target instanceof GetCommand) {
+        if (target instanceof GetCommand) {
             GetCommand targetGetCommand = (GetCommand) target;
             if (Arrays.equals(key, targetGetCommand.key)) {
                 synchronized (optimizedLock) {

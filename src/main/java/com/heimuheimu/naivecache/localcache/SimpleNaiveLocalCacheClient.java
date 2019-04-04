@@ -193,6 +193,7 @@ public class SimpleNaiveLocalCacheClient implements NaiveLocalCacheClient, Close
         }
         try {
             if (value == null) { // 如果Key为空或值为null
+                //noinspection ConstantConditions
                 LOGGER.error("Set value to local cache failed: `value could not be null`. Key: `{}`. Value: `{}`. ExpiredTime: `{}`.",
                         key, value, expiredTime);
                 monitor.increaseErrorCount();

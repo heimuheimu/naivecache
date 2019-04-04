@@ -89,7 +89,7 @@ class MultiGetExecutor implements Closeable {
         }
 
         @Override
-        public Map<String, T> call() throws Exception {
+        public Map<String, T> call() {
             if (!keySet.isEmpty()) {
                 return client.multiGet(keySet);
             } else {

@@ -147,6 +147,7 @@ public class MemcachedChannel implements Closeable {
         } catch (TimeoutException e) {
             //如果两次超时异常发生在 1s 以内，则认为是连续失败
             if (System.currentTimeMillis() - lastTimeoutExceptionTime < 1000) {
+                //noinspection NonAtomicOperationOnVolatileField
                 continuousTimeoutExceptionTimes ++;
             } else {
                 continuousTimeoutExceptionTimes = 1;
@@ -313,6 +314,7 @@ public class MemcachedChannel implements Closeable {
                 Command command;
                 while (!stopSignal) {
                     command = commandQueue.take();
+                    //noinspection ConstantConditions
                     if (command != null) {
                         byte[] requestPacket = command.getRequestByteArray();
                         if ((mergedPacketSize + requestPacket.length) < sendBufferSize) {

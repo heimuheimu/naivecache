@@ -136,7 +136,7 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
         this.host = host;
         this.timeout = timeout;
         this.transcoder = new SimpleTranscoder(compressionThreshold);
-        this.clientListener = new ClientListenerWrapper(clientListener, LOG);
+        this.clientListener = new ClientListenerWrapper(clientListener);
         this.executionMonitor = ExecutionMonitorFactory.get(host);
     }
 
@@ -758,7 +758,6 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
                 ResponsePacket responsePacket = responsePacketList.get(0);
                 if (responsePacket.isSuccess()) {
                     LOG.debug("[Touch] Success. Key: `{}`. Host: `{}`. Expiry: `{}`.", key, host, expiry);
-                    return;
                 } else {
                     if (responsePacket.isKeyNotFound()) {
                         LOG.info("[Touch] Key not found. Key: `{}`. Host: `{}`. Expiry: `{}`.", key, host, expiry);
@@ -769,30 +768,25 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
                         executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
                         clientListener.onError(this, OperationType.TOUCH, key, responsePacket.getErrorMessage());
                     }
-                    return;
                 }
             } else {
                 LOG.error("[Touch] Empty response. Key: `{}`. Host: `{}`. Expiry: `{}`.", key, host, expiry);
                 executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
                 clientListener.onError(this, OperationType.TOUCH, key, NO_RESPONSE_PACKET_MESSAGE);
-                return;
             }
         } catch (TimeoutException e) {
             LOG.error("[Touch] Wait response timeout: `{} ms`. Key: `{}`. Host: `{}`. Expiry: `{}`.", timeout, key, host, expiry);
             executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_TIMEOUT);
             clientListener.onTimeout(this, OperationType.TOUCH, key);
-            return;
         } catch (IllegalStateException e) {
             LOG.error("[Touch] MemcachedChannel has been closed. Key: `{}`. Host: `{}`. Expiry: `{}`.", key, host, expiry);
             executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
             clientListener.onClosed(this, OperationType.TOUCH, key);
-            return;
         } catch (Exception e) {
             LOG.error("[Touch] Unexpected error: `" + e.getMessage() + "`. Key: `" + key + "`. Host: `" + host
                     + "`. Expiry: `" + expiry + "`.", e);
             executionMonitor.onError(ExecutionMonitorFactory.ERROR_CODE_MEMCACHED_ERROR);
             clientListener.onError(this, OperationType.TOUCH, key, e.getMessage());
-            return;
         } finally {
             long executedNanoTime = System.nanoTime() - startTime;
             if (executedNanoTime > NaiveMemcachedClientListener.SLOW_EXECUTION_THRESHOLD) {
@@ -832,9 +826,9 @@ public class DirectMemcachedClient implements NaiveMemcachedClient {
 
         private final Logger logger;
 
-        private ClientListenerWrapper(NaiveMemcachedClientListener clientListener, Logger logger) {
+        private ClientListenerWrapper(NaiveMemcachedClientListener clientListener) {
             this.clientListener = clientListener;
-            this.logger = logger;
+            this.logger = DirectMemcachedClient.LOG;
         }
 
         private boolean hasClientListener() {
