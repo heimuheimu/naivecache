@@ -1,5 +1,7 @@
 # NaiveCache: 简单易用的 Memcached Java 客户端。
 
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/heimuheimu/naivecache.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/heimuheimu/naivecache/context:java)
+
 ## 使用要求
 * JDK 版本：1.8+ 
 * 依赖类库：
