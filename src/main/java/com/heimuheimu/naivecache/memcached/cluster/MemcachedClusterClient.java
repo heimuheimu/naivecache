@@ -159,7 +159,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
         for (String host : hosts) {
             boolean isSuccess = createClient(-1, host);
             if (isSuccess) {
-                MEMCACHED_CONNECTION_LOG.info("Add `{}` to cluster is success. Hosts: `{}`.", host, hosts);
+                MEMCACHED_CONNECTION_LOG.info("Add `{}` to cluster is success. Hosts: `{}`.", host, hosts); // lgtm [java/print-array]
                 if (memcachedClusterClientListener != null) {
                     try {
                         memcachedClusterClientListener.onCreated(host);
@@ -168,7 +168,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                     }
                 }
             } else {
-                MEMCACHED_CONNECTION_LOG.error("Add `{}` to cluster failed. Hosts: `{}`.", host, hosts);
+                MEMCACHED_CONNECTION_LOG.error("Add `{}` to cluster failed. Hosts: `{}`.", host, hosts); // lgtm [java/print-array]
                 if (memcachedClusterClientListener != null) {
                     try {
                         memcachedClusterClientListener.onClosed(host);
@@ -419,7 +419,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
 
     private NaiveMemcachedClient getClient(String key) {
         if (state != BeanStatusEnum.NORMAL) {
-            LOG.warn("Could not find client for key `{}`. MemcachedClusterClient has been closed. Hosts: `{}`.", key, hosts);
+            LOG.warn("Could not find client for key `{}`. MemcachedClusterClient has been closed. Hosts: `{}`.", key, hosts); // lgtm [java/print-array]
             return null;
         }
         try {
@@ -474,7 +474,7 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                         public void run() {
                             long startTime = System.currentTimeMillis();
                             MEMCACHED_CONNECTION_LOG.info("Rescue task has been started. Cost: {}ms. Hosts: `{}`",
-                                    System.currentTimeMillis() - startTime, hosts);
+                                    System.currentTimeMillis() - startTime, hosts); // lgtm [java/print-array]
                             try {
                                 while (state == BeanStatusEnum.NORMAL &&
                                         aliveClientList.size() < hosts.length) {
@@ -499,11 +499,11 @@ public class MemcachedClusterClient implements NaiveMemcachedClient {
                                 }
                                 rescueOver();
                                 MEMCACHED_CONNECTION_LOG.info("Rescue task has been finished. Cost: {}ms. Hosts: `{}`",
-                                        System.currentTimeMillis() - startTime, hosts);
+                                        System.currentTimeMillis() - startTime, hosts); // lgtm [java/print-array]
                             } catch (Exception e) {
                                 rescueOver();
                                 MEMCACHED_CONNECTION_LOG.info("Rescue task executed failed: `{}`. Cost: {}ms. Hosts: `{}`",
-                                        e.getMessage(), System.currentTimeMillis() - startTime, hosts);
+                                        e.getMessage(), System.currentTimeMillis() - startTime, hosts); // lgtm [java/print-array]
                                 LOG.error("Rescue task executed failed. Hosts: `" + Arrays.toString(hosts)
                                         + "`", e);
                             }
