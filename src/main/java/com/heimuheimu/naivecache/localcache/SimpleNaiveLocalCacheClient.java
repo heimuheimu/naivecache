@@ -49,7 +49,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * 可通过 {@link LocalCacheMonitor#getInstance()} 获取本地缓存使用信息监控数据。
  * </blockquote>
  *
- * <p>{@code RpcChannel} 实例应调用 {@link #init()} 方法完成初始化，再提供服务。</p>
+ * <p>{@code SimpleNaiveLocalCacheClient} 实例应调用 {@link #init()} 方法完成初始化，再提供服务。</p>
  *
  * <p><strong>说明：</strong>{@code SimpleNaiveLocalCacheClient} 类是线程安全的，可在多个线程中使用同一个实例。</p>
  *
@@ -268,6 +268,7 @@ public class SimpleNaiveLocalCacheClient implements NaiveLocalCacheClient, Close
                     LOGGER.error("LocalCache clean task execute failed.", e);
                 }
                 try {
+                    //noinspection BusyWait
                     Thread.sleep(5000);
                 } catch (InterruptedException ignored) {}
             }
