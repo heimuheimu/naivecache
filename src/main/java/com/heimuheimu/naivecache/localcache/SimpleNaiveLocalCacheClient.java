@@ -190,6 +190,7 @@ public class SimpleNaiveLocalCacheClient implements NaiveLocalCacheClient, Close
         if (state != BeanStatusEnum.NORMAL) {
             LOGGER.error("Invalid SimpleNaiveLocalCacheClient state: `{}`.", state);
             monitor.increaseErrorCount();
+            return;
         }
         try {
             if (value == null) { // 如果Key为空或值为null
