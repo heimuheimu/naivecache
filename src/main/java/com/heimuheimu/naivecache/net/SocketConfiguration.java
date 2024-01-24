@@ -55,6 +55,8 @@ public class SocketConfiguration {
 		config.setSendBufferSize(32 * 1024);
 		config.setReceiveBufferSize(32 * 1024);
 		config.setConnectionTimeout(30000);
+		config.setConnectionTimeout(30000);
+		config.setConnectionTimeout(30000);
 		DEFAULT = config;
 	}
 	
